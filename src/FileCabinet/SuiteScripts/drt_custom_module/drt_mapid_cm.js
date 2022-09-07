@@ -151,9 +151,42 @@ define(
             }
         }
 
+        const drt_modulo_general = () => {
+            let respuesta = {};
+            try {
+                const mapObj = {
+                    [runtime.EnvType.PRODUCTION]: {
+                        formularioCilindro: 177,
+                        formularioEstacionario: 176,
+                        estatus: 3,
+                        equipoPipa: 1,
+                        equipoCamion: 2,
+                        equipoUtilitario: 3,
+                        equipoOtro: 4,
+                    },
+                    [runtime.EnvType.SANDBOX]: {
+                        formularioCilindro: 172,
+                        formularioEstacionario: 173,
+                        estatus: 3,
+                        equipoPipa: 1,
+                        equipoCamion: 2,
+                        equipoUtilitario: 3,
+                        equipoOtro: 4,
+                    }
+                }
+                respuesta = mapObj[runtime.envType];
+            } catch (error) {
+                log.error(`error drt_modulo_general`, error);
+            } finally {
+                log.debug(`respuesta drt_modulo_general ${runtime.envType}`, respuesta);
+                return respuesta;
+            }
+        }
+
         return {
             drt_liquidacion,
-            getVariables
+            getVariables,
+            drt_modulo_general
         };
 
     });
