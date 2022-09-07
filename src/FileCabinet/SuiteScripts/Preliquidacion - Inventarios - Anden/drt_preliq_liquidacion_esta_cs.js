@@ -474,21 +474,21 @@
     function redirectTo() {
         try {
           log.audit("redirectTo cs");
-          var formularioLiquidacion = 0;
+          var formularioLiquidacionEstacionario = 0;
           var estatusViajeLiquidacion = 0;
           var estatusLiquidacion = 0;
           
           if (runtime.envType === runtime.EnvType.SANDBOX) {
-            formularioLiquidacion = 179;
+            formularioLiquidacionEstacionario = 179;
             estatusViajeLiquidacion = 2;
             estatusLiquidacion = 2;
           } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-            formularioLiquidacion = 203;
+            formularioLiquidacionEstacionario = 203;
             estatusViajeLiquidacion = 2;
             estatusLiquidacion = 2;
           }
 
-            const newForm = formularioLiquidacion;
+            const newForm = formularioLiquidacionEstacionario;
 
             recObj = currentRecord.get();
             console.log("recObj", recObj);
@@ -540,20 +540,20 @@
       try {
         log.audit("redirectToFacturacion cs");
 
-        var formularioFacturacion = 0;
+        var formularioFacturacionEstacionario = 0;
         var estatusViajeEjecutado = 0;
         var estatusEjecutado = 0;
           
         if (runtime.envType === runtime.EnvType.SANDBOX) {
-          formularioFacturacion = 177;
+          formularioFacturacionEstacionario = 177;
           estatusViajeEjecutado = 3;
           estatusEjecutado = 3;
         } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          formularioFacturacion = 205;
+          formularioFacturacionEstacionario = 205;
           estatusViajeEjecutado = 3;
           estatusEjecutado = 3;
         }
-          const newForm = formularioFacturacion;
+          const newForm = formularioFacturacionEstacionario;
           
           recObj = currentRecord.get();
           console.log("recObj", recObj);
@@ -606,24 +606,24 @@
     try {
       log.audit("redirectToNuevoViajeYFacturacion cs");
 
-      var formularioFacturacion = 0;
+      var formularioFacturacionEstacionario = 0;
       var estatusViajeEjecutado = 0;
       var estatusEjecutado = 0;
       var urlCustomRecord = '';
           
       if (runtime.envType === runtime.EnvType.SANDBOX) {
-        formularioFacturacion = 177;
+        formularioFacturacionEstacionario = 177;
         estatusViajeEjecutado = 3;
         estatusEjecutado = 3;
         urlCustomRecord = 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=486&vehiculo=';
       } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        formularioFacturacion = 205;
+        formularioFacturacionEstacionario = 205;
         estatusViajeEjecutado = 3;
         estatusEjecutado = 3;
         urlCustomRecord = 'https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=588&vehiculo=';
       }
 
-        const newForm = formularioFacturacion;
+        const newForm = formularioFacturacionEstacionario;
         
         recObj = currentRecord.get();
         console.log("recObj", recObj);
@@ -785,20 +785,20 @@
     try {
       log.audit("facturar cambio pestana facturar");
 
-      var formularioFacturacion = 0;
+      var formularioFacturacionEstacionario = 0;
       var estatusFacturacion = 0;
       var limiteURL = 0;
       if (runtime.envType === runtime.EnvType.SANDBOX) {
-        formularioFacturacion = 177;
+        formularioFacturacionEstacionario = 177;
         estatusFacturacion = 4;
         limiteURL = 100;
       } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        formularioFacturacion = 205;
+        formularioFacturacionEstacionario = 205;
         estatusFacturacion = 4;
         limiteURL = 100;
       }
 
-            const newFormF = formularioFacturacion;
+            const newFormF = formularioFacturacionEstacionario;
 
             recObj = currentRecord.get();
             console.log("recObj", recObj);

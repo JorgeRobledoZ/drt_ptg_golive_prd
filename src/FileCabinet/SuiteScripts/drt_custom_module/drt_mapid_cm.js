@@ -247,6 +247,16 @@ define(
                         envase45: 4209,
                         formularioLiquidacion: 201,
                         limiteURL: 100,
+                        formularioLiquidacionCilindro: 173,
+                        estatusViajeLiquidacion: 2,
+                        formularioFacturacionCilindro: 171,
+                        estatusViajeEjecutado: 3,
+                        urlCustomRecord: 'https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=588&vehiculo=',
+                        urlCustomRecordFormulario: '&formulario=',
+                        estatusViajeConcluido: 1,
+                        estatusFacturado: 4,
+                        formularioLiquidacionEstacionario: 203,
+                        formularioFacturacionEstacionario: 205,
                     },
                     [runtime.EnvType.SANDBOX]: {
                         formularioCilindro: 172,
@@ -340,6 +350,16 @@ define(
                         envase45: 4604,
                         formularioLiquidacion: 205,
                         limiteURL: 100,
+                        formularioLiquidacionCilindro: 181,
+                        estatusViajeLiquidacion: 2,
+                        formularioFacturacionCilindro: 182,
+                        estatusViajeEjecutado: 3,
+                        urlCustomRecord: 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=486&vehiculo=',
+                        urlCustomRecordFormulario: '&formulario=',
+                        estatusViajeConcluido: 1,
+                        estatusFacturado: 4,
+                        formularioLiquidacionEstacionario: 179,
+                        formularioFacturacionEstacionario: 177,
                     }
                 }
                 respuesta = mapObj[runtime.envType];
