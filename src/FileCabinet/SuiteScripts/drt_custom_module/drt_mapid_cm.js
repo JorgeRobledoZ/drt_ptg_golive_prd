@@ -9,32 +9,42 @@ define(
     (
         runtime
     ) => {
-        const ptg_mr_update_opportunities = () => {
+        const getVariables = () => {
             let respuesta = {};
             try {
                 const mapObj = {
-                    [runtime.EnvType.PRODUCTION]: {
-                        customForm:265,
-                        productgasLpId:4216,
-                        publicoGeneral:27041,
+                    [ runtime.EnvType.PRODUCTION ]: {
+                        customFormOppPotogas : 265, // Oportunidad-Potogas
+                        productgasLpId       : 4216,
+                        publicoGeneralId     : 27041,
+                        currency             : 1,// Pesos
+                        tipoServicio         : 2,// Estacionario
+                        statusPedido         : 3,// Entregado
+                        entityStatus         : 13,// Concretado
+                        tipoSgcWeb           : 1,// Web
                     },
-                    [runtime.EnvType.SANDBOX]: {
-                        customForm:305,
-                        productgasLpId:4088,
-                        publicoGeneral:14508,
+                    [ runtime.EnvType.SANDBOX ]: {
+                        customFormOppPotogas : 305, // Oportunidad-Potogas
+                        productgasLpId       : 4088,
+                        publicoGeneralId     : 14508,
+                        currency             : 1,// Pesos
+                        tipoServicio         : 2,// Estacionario
+                        statusPedido         : 3,// Entregado
+                        entityStatus         : 13,// Concretado
+                        tipoSgcWeb           : 1,// Web
                     }
                 }
-                respuesta=mapObj[runtime.envType];
+                respuesta = mapObj[ runtime.envType ];
             } catch (error) {
-                log.error(`error ptg_mr_update_opportunities`, error);
+                log.error(`error getVariables`, error);
             } finally {
-                log.debug(`respuesta ptg_mr_update_opportunities ${runtime.envType}`, respuesta);
+                log.debug(`respuesta getVariables ${runtime.envType}`, respuesta);
                 return respuesta;
             }
         }
 
         return {
-            ptg_mr_update_opportunities
+            getVariables
         };
 
     });
