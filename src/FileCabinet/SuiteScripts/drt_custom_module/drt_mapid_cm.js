@@ -28,6 +28,8 @@ define(
                         urlSgcWeb              : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php",
                         urlSgcWebLogin         : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login",
                         urlSgcWebProcesar      : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
+                        urlSgcLocalDbUser      : "root",
+                        urlSgcLocalDbPass      : "root",
                     },
                     [ runtime.EnvType.SANDBOX ]: {
                         customFormOppPotogas   : 305, // Oportunidad-Potogas
@@ -44,6 +46,8 @@ define(
                         urlSgcWeb              : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php",
                         urlSgcWebLogin         : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login",
                         urlSgcWebProcesar      : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
+                        urlSgcLocalDbUser      : "root",
+                        urlSgcLocalDbPass      : "ROOT",
                     }
                 }
                 respuesta = mapObj[ runtime.envType ];
