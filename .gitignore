@@ -9,6 +9,7 @@
 *.sublime-workspace
 .vscode
 
+
 # Dependency directories
 node_modules
 
@@ -41,3 +42,6 @@ Thumbs.db
 
 # Project config
 project.json
+
+#Anotaciones txt
+anotaciones.txt

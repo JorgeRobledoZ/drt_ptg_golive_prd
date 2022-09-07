@@ -6,7 +6,7 @@
  * Script id: customscript_drt_ptg_reg_serv_est_mr
  * Deployment id: customdeploy_drt_ptg_reg_serv_est_mr
  * Applied to: 
- * File: drt_ptg_reg_serv_est_mr.js s
+ * File: drt_ptg_reg_serv_est_mr.js
  ******************************************************************/
 
 /**
