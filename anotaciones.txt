@@ -1,0 +1,166 @@
+Solicitar mapeo de datos de netsuite para el cliente para empatarlos con SGCWEB
+
+
+Listado Extensiones
+NetSuite Advanced Field Help
+NetSuite Field Explorer
+NetSuite Scripted Records
+NetSuite: HTML Script Notes
+NetSuite: Show Field IDs
+
+Cliente es walmart
+Consumidor: Son todas sus franquicias, como zapopan, gdl, etc
+Servicios: Sólo aplica para gas estacionario
+
+Oportunidades (Son los pedidos en SGC web):
+Transacciones->ventas->oportunidades
+
+Un servicio es la ejecución del pedido, y hay que actualizar la oportunidad
+
+Productos->Son artículos de potogast (Netsuite)
+
+Preguntar cómo se realiza el módulo de servicios (el que se consulta directo de SGCWEB)
+
+
+getInputData: Se obtiene los servicios que se van a validar en el map, 
+map: se procesa cada linea (posición) del arreglo retornado del getinputdata
+
+
+Nota módulo clientes:
+Política de venta se encontrará en la subficha llamada política de venta
+Nota: Revisar el id en el drive
+
+Nota módulo oportunidades (pedidos):
+Utilizar la empresa Zulay Aponte PTG, para que en la sublista de artículos, pueda obtener uno llamado GAS LP
+Precio unitario -> rate en netsuite
+Preguntar a Manuel cómo sacar un dato de un subrecord
+
+Nota módulo artículos (Listas->contabilidad->artículos)
+Seleccionar el formulario personalizado PTG - Artículos de inventario
+
+En el map reduce:
+Hacer una búsqueda guardada en un rango de fechas de hoy, con el status de asignado donde el tipo de artículo sea "Estacionario"
+Sólo estos se van a editar
+
+<!-- Video para módulos de rutas y camiones de SGC web -->
+https://drive.google.com/file/d/1AhfwGo4z4LNttI2AsqCuh59bBRUx46KC/view
+
+Lista de usuario en unidades va a ir el id del conductor, este no se crea en sgcweb
+
+Política de venta se aplica a cliente
+"       "   consumo se aplica a consumidor
+
+///////////////////////////////////////
+
+1.- En Visual Studio Code abrir el proyecto de la carpeta POS.
+
+2.- En la terminal de Visual Studio Code se debe situar en la siguiente ruta \POS\electron se debe de ejecutar el siguiente comando npm install
+
+NOTA: Para abrir una carpeta se ejecuta el siguiente comando cd nombre (sustituir nombre por el nombre de la carpeta), para regresar a la carpeta anterior se ejecuta el comando cd ..
+
+3.- Dentro de la ruta \POS se ejecuta el siguiente comando npm install
+
+4.- En la misma ruta \POS se ejecuta el siguiente comando npm install -g electron-builder para que lo instale de manera global.
+
+5.- Ahora se ejecuta el siguiente comando npm run postinstall
+
+6.- En la ruta \POS se ejecuta el siguiente comando npm run build
+
+7.- En la misma ruta se ejecuta el siguiente comando npx cap copy
+
+// Notas de SGC web
+Mandar el campo de método de pago como se muestra a continuación:
+{"pago":[{"tipo_pago": "2", "monto": "500"}, {"tipo_pago": "3", "monto": "500"}, {"tipo_pago": "5", "monto": "809.60"}]}
+
+// ANOTACIONES DE SGC
+-La política de consumo debe crearse cuando la dirección (consumidor), si la zona de venta es por ejemplo Z59, 
+el nombre debe ser Z59, y si el cliente, nativamente tiene .50 de descuento, debe quedar el nombre como Z59.50
+La política de consumo debe actualizarse/crearse en los siguientes escenarios:
+- Cuando se agrega una dirección nueva, debe crearse una política de venta
+- Cuando se modifica una dirección, debe actualizarse la política de venta en netsuite y en sgc (Tener un userevent en las políticas para detectar cuando se actualicen)
+- Cuando se modifica el descuento de cliente, deben actualizarse todas las políticas de consumo vinculadas a este
+- Cuando se actualicen las zonas de ventas, deben actualizarse las políticas de venta asociadas a los consumidores
+
+- A SGC se deben enviar los pedidos cuando tengan el status de notificado (Validar el punto con Christian para el tema de los programados)
+El campo descuento_id va a ser un catálogo que nos enviará el equipo de energiko
+.50
+Z59.50
+
+// Validaciones para pedidos para SGC
+Para guardar un pedido, debemos asegurarnos que el vehículo sea para sgc web, para eso, tenemos que encontrar el dato en 
+pedido-> num viaje -> vehiculo
+
+Política de consumo:
+El identificador_externo debe guardarse con el siguiente formato:
+Unidad de producto (K o L)
+Descuento en centavos (05)
+Zona de precios (Z59)
+
+Quedando de la siguiente manera: 
+L00Z59
+
+// Comentarios 29 de Junio del 2022
+- Integrar la interfaz de descuentos y productos, la documentación viene todas
+en el mismo archivo de producto
+
+- Identificadores externos para las políticas de venta:
+CREDITO_DEFAULT
+CONTADO
+
+Nota: Sólo se manejarán esos 2 con un límite de crédito $250,000
+
+- Enviar el pedido a SGC web cuando el pedido sea notificado
+- Corregir el formato del identificador externo del producto (Es la zona de venta así nada más)
+
+Check pruebas SGC carburación 15/07/2022
+- En el contador de dolio, se agregarán los campos de planta e ip (Se agregarán varios registros dependiendo del número de plantas)
+- Vincular la ubicación por IP en las oportunidades que se crean (Mapear el campo acorde a lo que nos envíen)
+
+Desarrollo restante de SGC web ventas
+- Falta separar el envío de datos a sgc web dependiendo de la subsidiaria del cliente (San Luis Gas, Gasera Potosina), falta que
+nos manden el WSDL de la otra gasera para hacer su integración
+- Falta la interfaz de servicios
+- Falta la integración con el middleware
+- Falta corregir las interfaces anteriormente creadas
+
+
+Notas del 20 de julio 2022
+Validar el campo dispensador, si es 1, asignar bomba 1, si es 2, asignar bomba 2
+
+SGC web ventas 21 de julio 2022:
+El método de pago en pedidos va a ser de contado siempre y cuando el método seleccionado sea diferente a crédito
+
+ID DE TOKEN
+47f3f2938d3c1464fab543c284074061027bdee060d128527085df0218d7c8ac
+SECRETO DE TOKEN
+27c4589075b83696f72a3114adaa517e171ef3e9fa485ca794e81fcf441a7d24
+
+
+// Tokens de usuario de Arturo
+ID DE TOKEN
+a2eea90470d952e111cc93b55229b969c34b92705a3014368c03b021f150df3f
+SECRETO DE TOKEN
+6fa3a5664327e6d24eac936c797b23645a059071def6876b18260bbb0d1a2803
+
+ctrl + alt + shift = Crea un multicursor para abajo
+
+ctrl + d = Selecciona duplicados con cursor
+
+Cambiar la lógica del script de actualizar servicios, estos se van a consultar similar a lo que se hace en SGC carburación.
+- Crear un registro personalizado aparte para los folios de sgc web
+- Si se encuentra el folio en una oportunidad existente, se actualiza
+- Si no se encuentra el folio, se crea una oportunidad nueva
+- Crear una búsqueda guardada que traiga el número de viaje activo acorde al número de vehículo de SGC web (en caso de que sea un antojado)
+Nota: El estado debe quedar como concretado, el campo estado de pedido debe ser entregado
+
+Notas pruebas integrales:
+// el identificador externo del cliente va a ser el campo entityid, no el id interno
+// el identificador externo del consumidor va a ser el campo entityid concatenado con guion (-) número de etiqueta
+// el array de descuentos debe enviarse en la interfaz de productos
+
+// Roles que se colocan en las implementaciones de los scripts
+Administrador
+PTG - Call Center - Agente HEB
+PTG - Call Center - Supervisor
+PTG - Monitor
+PTG - Agente Call Center
