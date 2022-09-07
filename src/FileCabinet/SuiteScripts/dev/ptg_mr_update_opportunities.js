@@ -90,23 +90,13 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
 
         const map = (mapContext) => {
             try {
-                const idMAp=drt_mapid_cm.ptg_mr_update_opportunities();
-                let currency         = 1;
-                let tipoServicio     = 2;// Estacionario
-                let statusPedido     = 3;// Entregado
-                let entityStatus     = 13;// Concretado
-                let tipoSgc          = 1;// SGC WEB
-                const customForm     = ( runtime.envType === runtime.EnvType.PRODUCTION ? 265   : 305 );// Oportunidad-Potogas
-                const productgasLpId   = ( runtime.envType === runtime.EnvType.PRODUCTION ? 4216  : 4088 );
-                const publicoGeneral   = ( runtime.envType === runtime.EnvType.PRODUCTION ? 27041 : 14508 );
-                // let customform       = 305;// Oportunidad-Potogas
-                // let productgasLpId   = 4088;
-                // let publicoGeneral   = 14508;
+                const customVars     = drt_mapid_cm.getVariables();
                 let viajeActivo      = null;
+                let equipo           = null;
                 let numViajesActivos = [];
                 let element          = JSON.parse(mapContext.value);
                 let unidadSgc        = element.unidad ? element.unidad.identificador_externo : null;
-                let equipo           = null;
+                
                 if ( unidadSgc ) {
                     numViajesActivos = getNumeroViajesActivos(unidadSgc);
                     equipo           = getEquipoSgc(unidadSgc);
@@ -114,15 +104,15 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
                         viajeActivo = numViajesActivos[0].idViaje;
                     }
                 }
-                log.debug('equipo', equipo);
+                // log.debug('equipo', equipo);
 
-                let tipoPago = element.tipo_pago == 1 ? 1 : 2;
-                let tipoServ = ( element.tipo_registro == 'D' ? 1 : ( element.tipo_registro == 'J' ? 2 : element.tipo_registro == 'A' ? 3 : 1 ) );
-                let iva      = Number(element.tasa_impuesto);
-                let subtotal = parseFloat( Number(element.cantidad) * Number(element.valor_unitario) ).toFixed(2);
-                let total    = parseFloat( subtotal * ( ( iva / 100 ) + 1) ).toFixed(2);
-                subtotal     = parseFloat(subtotal).toFixed(4);
-                total        = parseFloat(total).toFixed(4);
+                const tipoPago = element.tipo_pago == 1 ? 1 : 2;
+                const tipoServ = ( element.tipo_registro == 'D' ? 1 : ( element.tipo_registro == 'J' ? 2 : element.tipo_registro == 'A' ? 3 : 1 ) );
+                const iva      = Number(element.tasa_impuesto);
+                let subtotal   = parseFloat( Number(element.cantidad) * Number(element.valor_unitario) ).toFixed(2);
+                let total      = parseFloat( subtotal * ( ( iva / 100 ) + 1) ).toFixed(2);
+                subtotal       = parseFloat(subtotal).toFixed(4);
+                total          = parseFloat(total).toFixed(4);
                 // log.debug('iva', iva);
                 // log.debug('subtotal', subtotal);
                 // log.debug('total', total);
@@ -134,10 +124,10 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
                     registroLineaEst.setValue({fieldId:'custrecord_ptg_planta_sin_conciliar_2', value: equipo[0].plantaId});// Planta ID
                 }
                 
-                registroLineaEst.setValue({fieldId:'custrecord_ptg_cliente_reg_serv_est_lin', value: idMAp.publicoGeneral});// Cliente
+                registroLineaEst.setValue({fieldId:'custrecord_ptg_cliente_reg_serv_est_lin', value: customVars.publicoGeneralId});// Cliente
                 registroLineaEst.setText({fieldId:'custrecord_ptg_cantidad_reg_serv_est_lin', text: element.cantidad});// Cantidad de litros surtidos
                 registroLineaEst.setText({fieldId:'custrecord_ptg_cant_old_reg_serv_est_lin', text: element.cantidad});// Cantidad de litros surtidos
-                registroLineaEst.setValue({fieldId:'custrecord_ptg_articulo_reg_serv_est_lin', value:idMAp.productgasLpId });// GAS LP
+                registroLineaEst.setValue({fieldId:'custrecord_ptg_articulo_reg_serv_est_lin', value:customVars.productgasLpId });// GAS LP
                 registroLineaEst.setText({fieldId:'custrecord_ptg_litros_sin_conciliar_2', text: element.cantidad});// Cantidad de litros surtidos
                 registroLineaEst.setText({fieldId:'custrecord_ptg_precio_reg_serv_est_lin', text: element.valor_unitario});// Precio Unitario sin IVA
                 registroLineaEst.setText({fieldId:'custrecord_ptg_impuesto_reg_serv_est_lin', text: iva});// IVA
@@ -155,7 +145,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
                 registroLineaEst.setText({fieldId:'custrecord_ptg_totalizador_inicia_sgc_2', text: element.totalizador_inicial});// Totalizador inicial
                 registroLineaEst.setText({fieldId:'custrecord_totalizador_final_sgc_2_', text: element.totalizador_final});// Totalizador final
                 registroLineaEst.setValue({fieldId:'custrecord_ptg_tipo_de_pago_sgc_2_', value: tipoPago });// Tipo de pago (Contado, crédito)
-                registroLineaEst.setValue({fieldId:'custrecord_ptg_tipo_sgc_2_', value: 1 });// Tipo de SGC, se setea el web 
+                registroLineaEst.setValue({fieldId:'custrecord_ptg_tipo_sgc_2_', value: customVars.tipoSgcWeb });// Tipo de SGC, se setea el web 
 
                 let registroLineaEstId = registroLineaEst.save();
                 log.debug('Registro de de línea estacionario id guardado exitósamente', registroLineaEstId);
@@ -212,7 +202,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
                  * y el status del pedido es distinto a entregado, se actualiza la oportunidad
                  */
                 // else {// PARCHE PARA ACTUALIZAR TEMPORALMENTE LA OPORTUNIDAD
-                else if ( oppByFolio[0].entityStatusId != entityStatus && oppByFolio[0].estadoPedidoId != statusPedido) { 
+                else if ( oppByFolio[0].entityStatusId != customVars.entityStatus && oppByFolio[0].estadoPedidoId != customVars.statusPedido) { 
                     log.debug('Hay opp con este folio', 'Se actualiza la opp');
                     try {
                         // return;
@@ -230,8 +220,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
                         oppRecord.setText({fieldId:'custbody_ptg_totalizador_inicial_sgc', text: element.totalizador_inicial});
                         oppRecord.setText({fieldId:'custbody_totalizador_final_sgc_', text: element.totalizador_final});
                         oppRecord.setValue({fieldId:'custbody_ptg_tipo_de_pago_sgc_', value: tipoPago});
-                        oppRecord.setValue({fieldId:'custbody_ptg_estado_pedido', value: statusPedido});
-                        oppRecord.setValue({fieldId:'entitystatus', value: entityStatus});
+                        oppRecord.setValue({fieldId:'custbody_ptg_estado_pedido', value: customVars.statusPedido});
+                        oppRecord.setValue({fieldId:'entitystatus', value: customVars.entityStatus});
                         // oppRecord.setValue({fieldId:'custbody_ptg_tipo_sgc', value: tipoSgc});// Se indica que el registro es de SGC web
 
                         // Sólo se setea el número de viaje si es que existe
@@ -417,7 +407,6 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
             let fechaCreacion = horaCreacion = fechaDividida = horaDividida = horaMinDividida = fechaAtencion = anio = mes = dia = hora = min = isPm = horaMin = '';
             let trandate          = ( type == 'edit' ? rowItem.getValue({fieldId:'trandate'}) : rowItem.getValue({fieldId:'trandate'}) );
             let comentarios       = ( type == 'edit' ? rowItem.getValue({fieldId:'memo'}) : rowItem.getValue({fieldId:'memo'}) );
-            // let estatus           = ( type == 'edit' ? rowItem.getValue({fieldId:'entitystatus'}) : rowItem.getValue({fieldId:'entitystatus'}) );
             // let rutaId            = ( type == 'edit' ? rowItem.getValue({fieldId:'custbody_route'}) : rowItem.getValue({fieldId:'custbody_route'}) );
             let motivoCancelacion = ( type == 'edit' ? rowItem.getText({fieldId:'custbody_ptg_motivo_cancelation'}) : rowItem.getValue({fieldId:'custbody_ptg_motivo_cancelation'}) );
             let entity            = ( type == 'edit' ? rowItem.getValue({fieldId:'entity'}) : rowItem.getValue({fieldId:'entity'}) );
