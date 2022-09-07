@@ -90,12 +90,17 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
 
         const map = (mapContext) => {
             try {
-                const customVars     = drt_mapid_cm.getVariables();
-                let viajeActivo      = null;
-                let equipo           = null;
-                let numViajesActivos = [];
-                let element          = JSON.parse(mapContext.value);
-                let unidadSgc        = element.unidad ? element.unidad.identificador_externo : null;
+                const customVars       = drt_mapid_cm.getVariables();
+                const publicoGeneralId = customVars.publicoGeneralId;
+                const productgasLpId   = customVars.productgasLpId;
+                const tipoSgc          = customVars.tipoSgcWeb;
+                const entityStatus     = customVars.entityStatusConcretado;
+                const statusPedido     = customVars.statusPedidoEntregado;
+                let viajeActivo        = null;
+                let equipo             = null;
+                let numViajesActivos   = [];
+                let element            = JSON.parse(mapContext.value);
+                let unidadSgc          = element.unidad ? element.unidad.identificador_externo : null;
                 
                 if ( unidadSgc ) {
                     numViajesActivos = getNumeroViajesActivos(unidadSgc);
@@ -124,10 +129,10 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
                     registroLineaEst.setValue({fieldId:'custrecord_ptg_planta_sin_conciliar_2', value: equipo[0].plantaId});// Planta ID
                 }
                 
-                registroLineaEst.setValue({fieldId:'custrecord_ptg_cliente_reg_serv_est_lin', value: customVars.publicoGeneralId});// Cliente
+                registroLineaEst.setValue({fieldId:'custrecord_ptg_cliente_reg_serv_est_lin', value: publicoGeneralId});// Cliente
                 registroLineaEst.setText({fieldId:'custrecord_ptg_cantidad_reg_serv_est_lin', text: element.cantidad});// Cantidad de litros surtidos
                 registroLineaEst.setText({fieldId:'custrecord_ptg_cant_old_reg_serv_est_lin', text: element.cantidad});// Cantidad de litros surtidos
-                registroLineaEst.setValue({fieldId:'custrecord_ptg_articulo_reg_serv_est_lin', value:customVars.productgasLpId });// GAS LP
+                registroLineaEst.setValue({fieldId:'custrecord_ptg_articulo_reg_serv_est_lin', value: productgasLpId });// GAS LP
                 registroLineaEst.setText({fieldId:'custrecord_ptg_litros_sin_conciliar_2', text: element.cantidad});// Cantidad de litros surtidos
                 registroLineaEst.setText({fieldId:'custrecord_ptg_precio_reg_serv_est_lin', text: element.valor_unitario});// Precio Unitario sin IVA
                 registroLineaEst.setText({fieldId:'custrecord_ptg_impuesto_reg_serv_est_lin', text: iva});// IVA
@@ -145,7 +150,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
                 registroLineaEst.setText({fieldId:'custrecord_ptg_totalizador_inicia_sgc_2', text: element.totalizador_inicial});// Totalizador inicial
                 registroLineaEst.setText({fieldId:'custrecord_totalizador_final_sgc_2_', text: element.totalizador_final});// Totalizador final
                 registroLineaEst.setValue({fieldId:'custrecord_ptg_tipo_de_pago_sgc_2_', value: tipoPago });// Tipo de pago (Contado, crédito)
-                registroLineaEst.setValue({fieldId:'custrecord_ptg_tipo_sgc_2_', value: customVars.tipoSgcWeb });// Tipo de SGC, se setea el web 
+                registroLineaEst.setValue({fieldId:'custrecord_ptg_tipo_sgc_2_', value: tipoSgc });// Tipo de SGC, se setea el web 
 
                 let registroLineaEstId = registroLineaEst.save();
                 log.debug('Registro de de línea estacionario id guardado exitósamente', registroLineaEstId);
@@ -202,7 +207,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
                  * y el status del pedido es distinto a entregado, se actualiza la oportunidad
                  */
                 // else {// PARCHE PARA ACTUALIZAR TEMPORALMENTE LA OPORTUNIDAD
-                else if ( oppByFolio[0].entityStatusId != customVars.entityStatus && oppByFolio[0].estadoPedidoId != customVars.statusPedido) { 
+                else if ( oppByFolio[0].entityStatusId != entityStatus && oppByFolio[0].estadoPedidoId != statusPedido) { 
                     log.debug('Hay opp con este folio', 'Se actualiza la opp');
                     try {
                         // return;
@@ -220,8 +225,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
                         oppRecord.setText({fieldId:'custbody_ptg_totalizador_inicial_sgc', text: element.totalizador_inicial});
                         oppRecord.setText({fieldId:'custbody_totalizador_final_sgc_', text: element.totalizador_final});
                         oppRecord.setValue({fieldId:'custbody_ptg_tipo_de_pago_sgc_', value: tipoPago});
-                        oppRecord.setValue({fieldId:'custbody_ptg_estado_pedido', value: customVars.statusPedido});
-                        oppRecord.setValue({fieldId:'entitystatus', value: customVars.entityStatus});
+                        oppRecord.setValue({fieldId:'custbody_ptg_estado_pedido', value: statusPedido});
+                        oppRecord.setValue({fieldId:'entitystatus', value: entityStatus});
                         // oppRecord.setValue({fieldId:'custbody_ptg_tipo_sgc', value: tipoSgc});// Se indica que el registro es de SGC web
 
                         // Sólo se setea el número de viaje si es que existe
