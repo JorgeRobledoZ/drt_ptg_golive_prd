@@ -173,6 +173,15 @@ define(
                         idArticuloDescuento: 4217,
                         articuloCilindro: 1,
                         articuloEnvase: 5,
+                        cilindro10: 4210,
+                        cilindro20: 4211,
+                        cilindro30: 4212,
+                        cilindro45: 4213,
+                        articuloEstacionario: 2, 
+                        unidad10: 12,
+                        unidad20: 13,
+                        unidad30: 14,
+                        unidad45: 15,  
                     },
                     [runtime.EnvType.SANDBOX]: {
                         formularioCilindro: 172,
@@ -192,6 +201,15 @@ define(
                         idArticuloDescuento: 4528,
                         articuloCilindro: 1,
                         articuloEnvase: 5,
+                        cilindro10: 4094,
+                        cilindro20: 4095,
+                        cilindro30: 4096,
+                        cilindro45: 4602,
+                        articuloEstacionario: 2,
+                        unidad10: 24,
+                        unidad20: 25,
+                        unidad30: 26,
+                        unidad45: 27,
                     }
                 }
                 respuesta = mapObj[runtime.envType];
