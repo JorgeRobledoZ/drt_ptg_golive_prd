@@ -163,6 +163,16 @@ define(
                         equipoCamion: 2,
                         equipoUtilitario: 3,
                         equipoOtro: 4,
+                        formularioComp: 264,
+                        servicioComp: 3,
+                        tipoPagoComp: 2,
+                        tipoPagoCreditoComp: 5,
+                        entregadoEstadoPedido: 3,
+                        articuloEstacionario: 2,
+                        tipoPagoVariosComp: 7,
+                        idArticuloDescuento: 4217,
+                        articuloCilindro: 1,
+                        articuloEnvase: 5,
                     },
                     [runtime.EnvType.SANDBOX]: {
                         formularioCilindro: 172,
@@ -172,6 +182,16 @@ define(
                         equipoCamion: 2,
                         equipoUtilitario: 3,
                         equipoOtro: 4,
+                        formularioComp: 307,
+                        servicioComp: 3,
+                        tipoPagoComp: 2,
+                        tipoPagoCreditoComp: 5,
+                        entregadoEstadoPedido: 3,
+                        articuloEstacionario: 2,
+                        tipoPagoVariosComp: 7,
+                        idArticuloDescuento: 4528,
+                        articuloCilindro: 1,
+                        articuloEnvase: 5,
                     }
                 }
                 respuesta = mapObj[runtime.envType];

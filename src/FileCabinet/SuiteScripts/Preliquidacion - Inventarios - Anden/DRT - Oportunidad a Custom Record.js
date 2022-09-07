@@ -399,6 +399,8 @@ define(["N/record", "N/search", "N/runtime", "N/format", "N/config"], function (
           articuloEstacionario = 2;
           articuloEnvase = 5;
           tipoPagoVariosComp = 7;
+          formularioComp = 307;
+          servicioComp = 3;
         } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
           idArticuloDescuento = 4217;
           articuloCilindro = 1;
