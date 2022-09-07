@@ -181,7 +181,13 @@ define(
                         unidad10: 12,
                         unidad20: 13,
                         unidad30: 14,
-                        unidad45: 15,  
+                        unidad45: 15,
+                        plantillaDocumentoElectronico: 119,
+                        metodoDeEnvio: 10,
+                        paqueteMySuite: 2,
+                        estatusEnCurso: 3,
+                        formularioTrasladoCarburacion: 266,
+                        gasLPUnidades: 4216,
                     },
                     [runtime.EnvType.SANDBOX]: {
                         formularioCilindro: 172,
@@ -210,6 +216,12 @@ define(
                         unidad20: 25,
                         unidad30: 26,
                         unidad45: 27,
+                        plantillaDocumentoElectronico: 135,
+                        metodoDeEnvio: 11,
+                        paqueteMySuite: 2,
+                        estatusEnCurso: 3,
+                        formularioTrasladoCarburacion: 313,
+                        gasLPUnidades: 4693,
                     }
                 }
                 respuesta = mapObj[runtime.envType];
