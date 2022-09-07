@@ -2,7 +2,7 @@
  * @NApiVersion 2.1
  * @NScriptType MapReduceScript
  */
-define(['N/file', 'N/http', 'N/https', 'N/record', 'N/search', 'N/xml', 'N/runtime', 'N/task', 'SuiteScripts/dev/moment'],
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/https', 'N/record', 'N/search', 'N/xml', 'N/runtime', 'N/task', 'SuiteScripts/dev/moment'],
     /**
  * @param{file} file
  * @param{http} http
@@ -11,7 +11,7 @@ define(['N/file', 'N/http', 'N/https', 'N/record', 'N/search', 'N/xml', 'N/runti
  * @param{search} search
  * @param{xml} xml
  */
-    (file, http, https, record, search, xml, runtime, task, moment) => {
+    (drt_mapid_cm, file, http, https, record, search, xml, runtime, task, moment) => {
         /**
          * Defines the function that is executed at the beginning of the map/reduce process and generates the input data.
          * @param {Object} inputContext
@@ -90,6 +90,7 @@ define(['N/file', 'N/http', 'N/https', 'N/record', 'N/search', 'N/xml', 'N/runti
 
         const map = (mapContext) => {
             try {
+                const idMAp=drt_mapid_cm.ptg_mr_update_opportunities();
                 let currency         = 1;
                 let tipoServicio     = 2;// Estacionario
                 let statusPedido     = 3;// Entregado
@@ -133,10 +134,10 @@ define(['N/file', 'N/http', 'N/https', 'N/record', 'N/search', 'N/xml', 'N/runti
                     registroLineaEst.setValue({fieldId:'custrecord_ptg_planta_sin_conciliar_2', value: equipo[0].plantaId});// Planta ID
                 }
                 
-                registroLineaEst.setValue({fieldId:'custrecord_ptg_cliente_reg_serv_est_lin', value: publicoGeneral});// Cliente
+                registroLineaEst.setValue({fieldId:'custrecord_ptg_cliente_reg_serv_est_lin', value: idMAp.publicoGeneral});// Cliente
                 registroLineaEst.setText({fieldId:'custrecord_ptg_cantidad_reg_serv_est_lin', text: element.cantidad});// Cantidad de litros surtidos
                 registroLineaEst.setText({fieldId:'custrecord_ptg_cant_old_reg_serv_est_lin', text: element.cantidad});// Cantidad de litros surtidos
-                registroLineaEst.setValue({fieldId:'custrecord_ptg_articulo_reg_serv_est_lin', value: productgasLpId });// GAS LP
+                registroLineaEst.setValue({fieldId:'custrecord_ptg_articulo_reg_serv_est_lin', value:idMAp.productgasLpId });// GAS LP
                 registroLineaEst.setText({fieldId:'custrecord_ptg_litros_sin_conciliar_2', text: element.cantidad});// Cantidad de litros surtidos
                 registroLineaEst.setText({fieldId:'custrecord_ptg_precio_reg_serv_est_lin', text: element.valor_unitario});// Precio Unitario sin IVA
                 registroLineaEst.setText({fieldId:'custrecord_ptg_impuesto_reg_serv_est_lin', text: iva});// IVA
