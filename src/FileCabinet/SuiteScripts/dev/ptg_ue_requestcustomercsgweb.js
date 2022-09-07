@@ -89,7 +89,7 @@ define(['N/file', 'N/http', 'N/search', 'N/xml', 'N/record', 'N/query'],
                     // log.debug('Listado de direcciones', customerAddresses);
                     // log.debug('data customer', dataToSend);
                     // return;
-                    let typeModule = action = responseConsPol = '';
+                    let typeModule = action = responseConsPol = dataCustomer = '';
                     let xmlContent = file.load({ id: internalFileId }).getContents();
 
                     // Se da de alta la política de venta
@@ -229,8 +229,6 @@ define(['N/file', 'N/http', 'N/search', 'N/xml', 'N/record', 'N/query'],
 
             let headers = {};
             headers['Content-Type'] = 'text/xml; charset=utf-8';
-            // headers['SOAPAction'] = 'http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login';
-            // let url = 'http://testpotogas.sgcweb.com.mx//ws/1094AEV2/v2/soap.php';
             headers['SOAPAction'] = 'http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login';
             let url = 'http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php';
             // Method, url, body, headers

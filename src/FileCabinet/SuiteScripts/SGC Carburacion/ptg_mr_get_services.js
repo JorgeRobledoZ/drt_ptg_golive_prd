@@ -2,7 +2,7 @@
  * @NApiVersion 2.1
  * @NScriptType MapReduceScript
  */
- define(['N/file', 'N/format', 'N/http', 'N/https', 'N/record', 'N/search', 'N/xml', 'N/runtime', 'N/task', 'SuiteScripts/dev/moment'],
+ define(['N/file', 'N/format', 'N/http', 'N/https', 'N/record', 'N/search', 'N/xml', 'N/runtime', 'N/task', 'SuiteScripts/dev/moment', 'SuiteScripts/drt_custom_module/drt_mapid_cm'],
  /**
 * @param{file} file
 * @param{format} format
@@ -14,7 +14,7 @@
 * @param{runtime} runtime
 * @param{task} task
 */
- (file, format, http, https, record, search, xml, runtime, task, moment) => {
+ (file, format, http, https, record, search, xml, runtime, task, moment, drt_mapid_cm) => {
      /**
       * Defines the function that is executed at the beginning of the map/reduce process and generates the input data.
       * @param {Object} inputContext
@@ -85,12 +85,13 @@
     const map = (mapContext) => {
          
         try {
-            const currency       = 1;
-            const tipoServicio   = 3;// Carburación
-            const entityStatus   = 13;
-            const customForm     = ( runtime.envType === runtime.EnvType.PRODUCTION ? 264   : 307 );
-            const productgasLpId = ( runtime.envType === runtime.EnvType.PRODUCTION ? 4216  : 4088 );
-            const publicoGeneral = ( runtime.envType === runtime.EnvType.PRODUCTION ? 27041 : 14508 );
+            const customVars     = drt_mapid_cm.getVariables();
+            const currency       = customVars.currency;
+            const tipoServicio   = customVars.tipoServicioCar;
+            const entityStatus   = customVars.entityStatusConcretado;
+            const customForm     = customVars.customFormOppCarb;
+            const productgasLpId = customVars.productgasLpId;
+            const publicoGeneral = customVars.publicoGeneralId;
             const item           = JSON.parse(mapContext.value);
             const producto       = item.producto.trim() == 'GLP' ? 'GLP' : null;
             const bomba          = item.dispensador == 1 ? 1 : 2;
@@ -158,18 +159,18 @@
                 line: 0,
                 value: item.valor_unitario ?? 0
             });
- 
+
             const oppId = newOpp.save();
 
             log.debug('Info', 'Opotunidad guardada exitósamente: '+oppId);
-             
+            
             // Se actualiza el folio recién procesado
             let contadorFolio = record.load({isDynamic : true, type: 'customrecord_ptg_folio_counter', id : item.folioId});
-             
+            
             contadorFolio.setValue({fieldId: 'custrecord_ptg_folio_counter', value: item.folio});
-             
+            
             const folioId = contadorFolio.save();
-             
+            
             log.debug('Folio contador actualizado exitósamente', folioId);
         } catch (error) {
             log.debug('Algo salió mal', error);
@@ -305,8 +306,8 @@
         });
           
         return foliosArray;
-     }
+    }
 
-     return {getInputData, map, reduce, summarize}
+    return {getInputData, map, reduce, summarize}
 
- });
+});
