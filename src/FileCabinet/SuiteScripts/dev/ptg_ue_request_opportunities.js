@@ -2,7 +2,7 @@
  * @NApiVersion 2.1
  * @NScriptType UserEventScript
  */
-define(['N/file', 'N/http', 'N/record', 'N/search', 'N/xml', 'N/format', 'N/query', 'SuiteScripts/dev/moment'],
+define(['N/file', 'N/http', 'N/record', 'N/search', 'N/xml', 'N/format', 'N/query', 'SuiteScripts/dev/moment', 'SuiteScripts/drt_custom_module/drt_mapid_cm'],
     /**
  * @param{file} file
  * @param{http} http
@@ -11,7 +11,7 @@ define(['N/file', 'N/http', 'N/record', 'N/search', 'N/xml', 'N/format', 'N/quer
  * @param{xml} xml
  * @param {import('./moment')} moment 
  */
-    (file, http, record, search, xml, format, query, moment) => {
+    (file, http, record, search, xml, format, query, moment, drt_mapid_cm) => {
         /**
          * Defines the function definition that is executed before record is loaded.
          * @param {Object} scriptContext
@@ -47,23 +47,20 @@ define(['N/file', 'N/http', 'N/record', 'N/search', 'N/xml', 'N/format', 'N/quer
          */
         const afterSubmit = (scriptContext) => {
             try {
-                let idToken = login();
-                // let gasLpId = "4088";
-                let gasLpId = 4216;
-                let statusAsignadoId = "2";
-                let rowItem = scriptContext.newRecord;
+                const customVars     = drt_mapid_cm.getVariables();
+                const idToken        = login();
+                const gasLpId        = customVars.productgasLpId;
+                let statusAsignadoId = customVars.statusPedidoAsignado;
+                let rowItem          = scriptContext.newRecord;
 
                 if ( scriptContext.type === scriptContext.UserEventType.EDIT ) {
-                    /* Sólo si la oportunidad contiene un artículo de GAS LP, cuenta con un status de asignado 
-                    * y tiene una ruta (vehiculo) asignada es que puede guardar/enviar un pedido en SGC web
-                    */
-                    let statusOpp = rowItem.getValue({fieldId:'custbody_ptg_estado_pedido'});
-                    let articulos = searchArticlesOpp(rowItem);
-                    let extraInfo = getOppInfo(rowItem);
-                    let addressId = rowItem.getValue({fieldId:'shipaddresslist'});
-                    let zonaPrecio = rowItem.getText({fieldId:'custbody_ptg_zonadeprecioop_'});
-                    let addressInfo = getAddressData(addressId);
-                    let customerInfo = search.lookupFields({
+                    const statusOpp    = rowItem.getValue({fieldId:'custbody_ptg_estado_pedido'});
+                    const articulos    = searchArticlesOpp(rowItem);
+                    const extraInfo    = getOppInfo(rowItem);
+                    const addressId    = rowItem.getValue({fieldId:'shipaddresslist'});
+                    const zonaPrecio   = rowItem.getText({fieldId:'custbody_ptg_zonadeprecioop_'});
+                    const addressInfo  = getAddressData(addressId);
+                    const customerInfo = search.lookupFields({
                         type: search.Type.CUSTOMER,
                         id: addressInfo.idCliente,
                         columns: ['companyname', 'altname', 'phone', 'altphone', 'email', 'balance', 'entityid']
@@ -77,6 +74,10 @@ define(['N/file', 'N/http', 'N/record', 'N/search', 'N/xml', 'N/format', 'N/quer
                     // log.debug('addressInfo', addressInfo);
                     // log.debug('customerInfo', customerInfo);
                     // return;
+
+                    /* Sólo si la oportunidad contiene un artículo de GAS LP, cuenta con un status de asignado 
+                    * y tiene una ruta (vehiculo) asignada es que puede guardar/enviar un pedido en SGC web
+                    */
                     if ( articulos.length && articulos[0].id == gasLpId && statusOpp == statusAsignadoId && extraInfo.vehiculoSgc ) {
                         let typeModule = action = responseOpp = responseProduct = '';
                        
@@ -180,7 +181,7 @@ define(['N/file', 'N/http', 'N/record', 'N/search', 'N/xml', 'N/format', 'N/quer
             let headers = {};
             headers['Content-Type'] = 'text/xml; charset=utf-8';
             headers['SOAPAction'] = 'http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login';
-            let url = 'http://testpotogas.sgcweb.com.mx//ws/1094AEV2/v2/soap.php';
+            let url = 'http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php';
             // headers['SOAPAction'] = 'http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login';
             // let url = 'http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php';
             // Method, url, body, headers
@@ -486,10 +487,10 @@ define(['N/file', 'N/http', 'N/record', 'N/search', 'N/xml', 'N/format', 'N/quer
             let headers = {};
             headers['Content-Type'] = 'text/xml; charset=utf-8';
             headers['SOAPAction'] = 'http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion';
-            let url = 'http://testpotogas.sgcweb.com.mx//ws/1094AEV2/v2/soap.php';
+            const URL = 'http://testpotogas.sgcweb.com.mx//ws/1094AEV2/v2/soap.php';
             // headers['SOAPAction'] = 'http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion';
             // let url = 'http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php';
-            let response = http.request({ method: http.Method.POST, url: url, body: xmlContent, headers: headers });                    
+            let response = http.request({ method: http.Method.POST, url: URL, body: xmlContent, headers: headers });
             let xmlFileContent = response.body;
             let xmlDocument = xml.Parser.fromString({ text: xmlFileContent });
             let info = xmlDocument.getElementsByTagName({ tagName: 'informacion' });

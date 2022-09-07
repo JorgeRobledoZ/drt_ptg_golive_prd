@@ -15,25 +15,35 @@ define(
                 const mapObj = {
                     [ runtime.EnvType.PRODUCTION ]: {
                         customFormOppPotogas   : 265, // Oportunidad-Potogas
+                        customFormOppCarb      : 264, // Oportunidad-Carburación
                         productgasLpId         : 4216,
                         publicoGeneralId       : 27041,
                         currency               : 1,// Pesos
                         tipoServicioEst        : 2,// Estacionario
                         tipoServicioCar        : 3,// Carburación
                         statusPedidoEntregado  : 3,// Entregado
+                        statusPedidoAsignado   : 2,// Asignado
                         entityStatusConcretado : 13,// Concretado
                         tipoSgcWeb             : 1,// Web
+                        urlSgcWeb              : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php",
+                        urlSgcWebLogin         : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login",
+                        urlSgcWebProcesar      : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
                     },
                     [ runtime.EnvType.SANDBOX ]: {
                         customFormOppPotogas   : 305, // Oportunidad-Potogas
+                        customFormOppCarb      : 307, // Oportunidad-Carburación
                         productgasLpId         : 4088,
                         publicoGeneralId       : 14508,
                         currency               : 1,// Pesos
                         tipoServicioEst        : 2,// Estacionario
                         tipoServicioCar        : 3,// Carburación
                         statusPedidoEntregado  : 3,// Entregado
+                        statusPedidoAsignado   : 2,// Asignado
                         entityStatusConcretado : 13,// Concretado
                         tipoSgcWeb             : 1,// Web
+                        urlSgcWeb              : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php",
+                        urlSgcWebLogin         : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login",
+                        urlSgcWebProcesar      : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
                     }
                 }
                 respuesta = mapObj[ runtime.envType ];
