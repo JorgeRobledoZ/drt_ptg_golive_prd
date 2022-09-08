@@ -65,7 +65,6 @@ define(
                         // 23 San Luis Gas
                         // 26 Distribuidora potosina
                         //Aqui inician los de Iztac
-                        ,
                         tipo_vehiculo:"Camión Cilindros",
 
                     },
