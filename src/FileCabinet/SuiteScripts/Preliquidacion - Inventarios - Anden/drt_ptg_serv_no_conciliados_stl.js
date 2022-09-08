@@ -9,7 +9,7 @@
  * File: drt_ptg_serv_no_conciliados_stl.js
  ******************************************************************/
 /**
- * @NApiVersion 2.x
+ * @NApiVersion 2.1
  * @NScriptType Suitelet
  */
 //define(['N/ui/serverWidget', 'N/runtime', 'N/error', 'N/format', 'N/task', 'N/redirect', 'N/ui/message', './Preliquidacion - Inventarios - Anden/drt_ptg_serv_no_conciliados_lib', 'N/url', 'N/https', 'N/record'],

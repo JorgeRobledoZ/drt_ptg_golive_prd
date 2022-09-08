@@ -10,7 +10,7 @@
  ******************************************************************/
 
 /**
- *@NApiVersion 2.x
+ *@NApiVersion 2.1
  *@NScriptType MapReduceScript
  */
  define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https'], function (runtime, search, record, email, error, url, https) {

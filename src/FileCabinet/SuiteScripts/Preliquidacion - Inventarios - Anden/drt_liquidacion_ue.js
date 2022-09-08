@@ -9,7 +9,7 @@
  * File: drt_liquidacion_ue_copy.js
  ******************************************************************/
 /**
- * @NApiVersion 2.0
+ * @NApiVersion 2.1
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */

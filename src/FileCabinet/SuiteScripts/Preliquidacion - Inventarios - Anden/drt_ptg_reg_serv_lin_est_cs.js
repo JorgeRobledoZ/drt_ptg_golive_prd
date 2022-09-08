@@ -9,7 +9,7 @@
  * File: drt_ptg_reg_serv_lin_est_cs.js
  ******************************************************************/
 /**
- *@NApiVersion 2.x
+ *@NApiVersion 2.1
  *@NScriptType ClientScript
  */
 define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog"], function (record, search, error, currentRecord, dialog) {

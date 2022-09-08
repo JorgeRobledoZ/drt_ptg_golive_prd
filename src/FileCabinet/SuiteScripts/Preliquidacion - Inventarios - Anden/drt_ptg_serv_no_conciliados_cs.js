@@ -9,7 +9,7 @@
  * File: drt_ptg_serv_no_conciliados_cs.js
  ******************************************************************/
 /**
- * @NApiVersion 2.x
+ * @NApiVersion 2.1
  * @NScriptType ClientScript
  * @NModuleScope Public
  */

@@ -10,7 +10,7 @@
  ******************************************************************/
 
 /**
- *@NApiVersion 2.x
+ *@NApiVersion 2.1
  *@NScriptType MapReduceScript
  */
  define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https', 'N/format'], function (drt_mapid_cm, runtime, search, record, email, error, url, https, format) {
