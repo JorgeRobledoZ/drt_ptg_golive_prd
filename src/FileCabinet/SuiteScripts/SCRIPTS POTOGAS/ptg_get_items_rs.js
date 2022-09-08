@@ -2,10 +2,11 @@
  *@NApiVersion 2.x
  *@NScriptType Restlet
  */
-define(["N/search"], function (search) {
+define(["N/search", "SuiteScripts/drt_custom_module/drt_mapid_cm"], function (search, drt_mapid_cm) {
 
     function _get(context) {
         try {
+            const customVars = drt_mapid_cm.getVariables();
             log.debug('test', 'christian')
             var response = {
                 success: false,
@@ -17,7 +18,9 @@ define(["N/search"], function (search) {
             var itemSearchObj = search.create({
                 type: "item",
                 filters: [
-                    ["subsidiary", "anyof", "20", "14", "16", "13"],
+                    ["subsidiary", "anyof", customVars.subsidiariaGas, customVars.subsidiariaCorpoGas, 
+                    customVars.subsidiariaSanLuisGas, customVars.subsidiariaDistPotosi, customVars.subsidiariaEliminacion],
+                    // ["subsidiary", "anyof", "20", "14", "16", "13"],
                     "AND",
                     ["type", "anyof", "InvtPart"],
                     //"AND", 
@@ -27,7 +30,7 @@ define(["N/search"], function (search) {
                     "AND",
                     ["isinactive", "is", "F"],
                     "AND",
-                    ["custitem_ptg_tipodearticulo_", "anyof", "1", "2", "5", "7"],
+                    ["custitem_ptg_tipodearticulo_", "anyof", customVars.tipoArticuloCil, customVars.tipoArticuloEst, customVars.tipoArticuloEnvCil, customVars.tipoArticuloEnvEst],
                     "AND", 
                     ["custitem_ptg_mostrar_call_center","is","T"]
                 ],
@@ -111,6 +114,7 @@ define(["N/search"], function (search) {
 
     function post(context) {
         try {
+            const customVars = drt_mapid_cm.getVariables();
             log.debug('test', 'christian')
             var response = {
                 success: false,
@@ -122,7 +126,9 @@ define(["N/search"], function (search) {
             var itemSearchObj = search.create({
                 type: "item",
                 filters: [
-                    ["subsidiary", "anyof", "20", "14", "16", "13"],
+                    // ["subsidiary", "anyof", "20", "14", "16", "13"], // Este código no sabemos por qué tiene subsidiarias que NO son de potogas
+                    ["subsidiary", "anyof", customVars.subsidiariaGas, customVars.subsidiariaCorpoGas, 
+                    customVars.subsidiariaSanLuisGas, customVars.subsidiariaDistPotosi, customVars.subsidiariaEliminacion],
                     "AND",
                     ["type", "anyof", "InvtPart"],
                     //"AND", 
@@ -132,7 +138,8 @@ define(["N/search"], function (search) {
                     "AND",
                     ["isinactive", "is", "F"],
                     "AND",
-                    ["custitem_ptg_tipodearticulo_", "anyof", "1", "2", "5", "7"]
+                    ["custitem_ptg_tipodearticulo_", "anyof", customVars.tipoArticuloCil, customVars.tipoArticuloEst, customVars.tipoArticuloEnvCil, customVars.tipoArticuloEnvEst]
+                    // ["custitem_ptg_tipodearticulo_", "anyof", "1", "2", "5", "7"]
                 ],
                 columns: [
                     search.createColumn({

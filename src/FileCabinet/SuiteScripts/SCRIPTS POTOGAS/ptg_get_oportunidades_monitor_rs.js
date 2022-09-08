@@ -2,7 +2,7 @@
  *@NApiVersion 2.1
  *@NScriptType Restlet
  */
-define(['N/search'], function (search) {
+define(['N/search', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (search, drt_mapid_cm) {
 
     const responseData = {
         success: false,
@@ -15,6 +15,7 @@ define(['N/search'], function (search) {
 
         try {
             log.audit('request data', request)
+            var customVars = drt_mapid_cm.getVariables();
             var arrayOportunidadesM = [];
             var objOportunidadesM = {};
             var transactionSearchObj = search.create({
@@ -716,15 +717,15 @@ define(['N/search'], function (search) {
 
 
                         //obtencion de informacion por id
-                        if (typeCustomer == 1) {
+                        if (typeCustomer == customVars.tipoClienteIndustrial) {
                             tipoCliente = 'Industrial'
-                        } else if (typeCustomer == 2) {
+                        } else if (typeCustomer == customVars.tipoClienteIntercom) {
                             tipoCliente = 'Intercompañía'
-                        } else if (typeCustomer == 3) {
+                        } else if (typeCustomer == customVars.tipoClienteDomestico) {
                             tipoCliente = 'Doméstico'
-                        } else if (typeCustomer == 4) {
+                        } else if (typeCustomer == customVars.tipoClienteOtraComp) {
                             tipoCliente = 'Otras Compañias'
-                        } else if (typeCustomer == 5) {
+                        } else if (typeCustomer == customVars.tipoClienteComercial) {
                             tipoCliente = 'Comercial'
                         }
 

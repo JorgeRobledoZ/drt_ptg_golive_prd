@@ -47,10 +47,23 @@ define(
                         tipoServicioVentaAnden : 5,
                         tipoServicioMontacarga : 6,
                         tipoServicioViajeEsp   : 7,
-                        tipoAlianzaComContrato : 1,
+                        tipoAlianzaComContrato : null,
                         tipoAlianzaComCredito  : 2,
                         tipoAlianzaComContado  : 3,
-                        formOrdenTransladoCarb : 266
+                        formOrdenTransladoCarb : 266,
+                        tipoArticuloCil        : 1,
+                        tipoArticuloEst        : 2,
+                        tipoArticuloEnvCil     : 5,
+                        tipoArticuloEnvEst     : 7,
+                        subsidiariaGas         : 20,
+                        subsidiariaCorpoGas    : 22,
+                        subsidiariaSanLuisGas  : 23,
+                        subsidiariaDistPotosi  : 26,
+                        subsidiariaEliminacion : 28,
+                        // 20 gas
+                        // 22 Corpo gas
+                        // 23 San Luis Gas
+                        // 26 Distribuidora potosina
                         //Aqui inician los de Iztac
                     },
                     [ runtime.EnvType.SANDBOX ]: {
@@ -90,7 +103,20 @@ define(
                         tipoAlianzaComContrato : 1,
                         tipoAlianzaComCredito  : 2,
                         tipoAlianzaComContado  : 3,
-                        formOrdenTransladoCarb : 313
+                        formOrdenTransladoCarb : 313,
+                        tipoArticuloCil        : 1,
+                        tipoArticuloEst        : 2,
+                        tipoArticuloEnvCil     : 5,
+                        tipoArticuloEnvEst     : 7,
+                        subsidiariaGas         : 20,
+                        subsidiariaCorpoGas    : 22,
+                        subsidiariaSanLuisGas  : 23,
+                        subsidiariaDistPotosi  : 25,
+                        subsidiariaEliminacion : 31,
+                        // 20 gas
+                        // 22 Corpo gas
+                        // 23 San Luis Gas
+                        // 26 Distribuidora potosina
                         //Aqui inician los de Iztac
                     }
                 }
