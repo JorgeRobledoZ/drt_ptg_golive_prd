@@ -30,11 +30,11 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var cantidadArray = [];
         var equiposObj = [];
         var ubicacionArray = [];
-        var cuentaInventario = 0;
+        var cuentaAjusteInventario = 0;
         var gasLP = 0;
         var objMap=drt_mapid_cm.drt_liquidacion();
         if (Object.keys(objMap).length>0) {
-          cuentaInventario = objMap.cuentaInventario;
+          cuentaAjusteInventario = objMap.cuentaAjusteInventario;
           gasLP = objMap.gasLP;
         }
 

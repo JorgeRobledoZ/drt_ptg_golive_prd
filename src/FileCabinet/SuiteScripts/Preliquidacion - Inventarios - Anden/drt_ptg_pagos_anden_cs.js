@@ -58,10 +58,10 @@
         var total = 0;
         var totalEfectivo = 0;
         var efectivo = false;
-        var pagoEfectivo = 0;
+        var efectivoPago = 0;
         var objMap=drt_mapid_cm.drt_liquidacion();
         if (Object.keys(objMap).length>0) {
-          pagoEfectivo = objMap.pagoEfectivo;
+          efectivoPago = objMap.efectivoPago;
         }
         log.audit("totalServicio", totalServicio);
         log.audit("cobroEfectivo", cobroEfectivo);
@@ -79,7 +79,7 @@
             line: i,
           });
 
-          if(tipoPago == pagoEfectivo){
+          if(tipoPago == efectivoPago){
             totalEfectivo += totalLinea;
             efectivo = true;
           }

@@ -45,7 +45,6 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var unidad20 = 0;
         var unidad30 = 0;
         var unidad45 = 0;
-        var cuentaAjuste = 0;
 
       var objMap=drt_mapid_cm.drt_liquidacion();
       if (Object.keys(objMap).length>0) {
@@ -53,7 +52,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           unidad20 = objMap.unidad20;
           unidad30 = objMap.unidad30;
           unidad45 = objMap.unidad45;
-          cuentaAjuste = objMap.cuentaAjuste;
+          cuentaAjusteInventario = objMap.cuentaAjusteInventario;
           gasLPUnidades = objMap.gasLPUnidades;
           gasLP = objMap.gasLP;
         }
@@ -99,7 +98,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         recAjusteInventario.setValue("subsidiary", subsidiaria);
         recAjusteInventario.setValue("adjlocation", localizacion);
         recAjusteInventario.setValue("memo", "Ajuste por Inventario Fisico");
-        recAjusteInventario.setValue("account", cuentaAjuste);
+        recAjusteInventario.setValue("account", cuentaAjusteInventario);
 
         for (var k = 0; k < lineCountCilindros; k++) {
           recAjusteInventario.selectLine("inventory", k);

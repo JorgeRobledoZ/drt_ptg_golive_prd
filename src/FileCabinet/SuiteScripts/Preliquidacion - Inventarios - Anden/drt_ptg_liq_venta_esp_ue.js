@@ -23,8 +23,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
       var factura = newRecord.getValue("custrecord_ptg_factura_vta_especial_");
       var planta = newRecord.getValue("custrecord_ptg_planta_vta_especial_");
       var localizacionAlmacen = newRecord.getValue("custrecord_ptg_loc_almacen_");
-      var articuloGas = 0;
-      var formulario = 0;
+      var gasLP = 0;
+      var formularioFacturaPTG = 0;
       var notaLinea = "";
       var formaPago = 0;
       var referencia = "";
@@ -113,7 +113,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
         tarjetaDebitoBancomerId : objMap.tarjetaDebitoBancomerId;
         tarjetaDebitoHSBCId : objMap.tarjetaDebitoHSBCId;
         formulario : objMap.formulario;
-        articuloGas : objMap.articuloGas;
+        gasLP : objMap.gasLP;
         servicioViajeEspecial : objMap.servicioViajeEspecial;
       }
 
@@ -207,7 +207,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
           type: record.Type.INVOICE,
           isDynamic: true,
         });
-        recordFactura.setValue("customform", formulario);
+        recordFactura.setValue("customform", formularioFacturaPTG);
         recordFactura.setValue("entity", cliente);
         recordFactura.setValue("location", localizacionAlmacen);
         recordFactura.setValue("memo", notaLinea);
@@ -267,7 +267,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
 
         for (var j = 0; j < lineCount; j++) {
           recordFactura.selectLine("item", j);
-          recordFactura.setCurrentSublistValue("item", "item", articuloGas);
+          recordFactura.setCurrentSublistValue("item", "item", gasLP);
           recordFactura.setCurrentSublistValue("item", "location", localizacionAlmacen);
           recordFactura.setCurrentSublistValue("item", "quantity", litrosVendidos[j]);
           recordFactura.setCurrentSublistValue("item", "rate", precioUnitario[j]);

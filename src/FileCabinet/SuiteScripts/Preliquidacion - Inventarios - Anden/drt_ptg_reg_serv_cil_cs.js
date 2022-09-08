@@ -348,7 +348,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
       var tipoServicio = currentRecord.getValue("custrecord_ptg_tipo_servici_reg_serv_cil");
       var totalCabeceraPF = 0;
       var total = 0;
-      var idPublicoGeneral = 0;
+      var publicoGeneral = 0;
       var efectivoId = 0;
       var tarjetaCreditoId = 0;
       var tarjetaDebitoId = 0;
@@ -366,7 +366,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
 
       var objMap=drt_mapid_cm.drt_liquidacion();
       if (Object.keys(objMap).length>0) {
-        idPublicoGeneral = objMap.idPublicoGeneral;
+        publicoGeneral = objMap.publicoGeneral;
         efectivoId = objMap.efectivoId;
         tarjetaCreditoId = objMap.tarjetaCreditoId;
         tarjetaDebitoId = objMap.tarjetaDebitoId;
@@ -408,7 +408,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           var totalCabecera = currentRecord.getValue("custrecord_ptg_total_reg_serv_cil") || 0;
 
 
-          if((formaPago != efectivoId) && (formaPago != tarjetaCreditoId) && (formaPago != tarjetaDebitoId) && (formaPago != consumoInternoId) && (formaPago != recirculacionId) && (formaPago != canceladoId) && (formaPago != traspasoId) && (formaPago != tarjetaCreditoBancomerId) && (formaPago != tarjetaCreditoHSBCId) && (formaPago != tarjetaCreditoBanamexId) && (formaPago != tarjetaDebitoBanamexId) && (formaPago != tarjetaDebitoBancomerId) && (formaPago != tarjetaDebitoHSBCId) && clienteServCilindros == idPublicoGeneral){
+          if((formaPago != efectivoId) && (formaPago != tarjetaCreditoId) && (formaPago != tarjetaDebitoId) && (formaPago != consumoInternoId) && (formaPago != recirculacionId) && (formaPago != canceladoId) && (formaPago != traspasoId) && (formaPago != tarjetaCreditoBancomerId) && (formaPago != tarjetaCreditoHSBCId) && (formaPago != tarjetaCreditoBanamexId) && (formaPago != tarjetaDebitoBanamexId) && (formaPago != tarjetaDebitoBancomerId) && (formaPago != tarjetaDebitoHSBCId) && clienteServCilindros == publicoGeneral){
             var options = {
               title: "Restricción",
               message: "No se puede registrar el servicio a Público General.",

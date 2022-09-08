@@ -23,13 +23,13 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             var sublistFieldName = context.fieldId;
             var estacionCarburacion = currentRecord.getValue("custrecord_ptg_estacion_reg_serv_carb");
             var articuloCilindro = 0;
-            var estatusViejaEnCurso = 0;
+            var estatusViejeEnCurso = 0;
             var articuloEnvase = 0;
 
             var objMap=drt_mapid_cm.drt_liquidacion();
             if (Object.keys(objMap).length>0) {
               articuloCilindro = objMap.articuloCilindro;
-              estatusViejaEnCurso = objMap.estatusViejaEnCurso;
+              estatusViejeEnCurso = objMap.estatusViejeEnCurso;
               articuloEnvase = objMap.articuloEnvase;
             }
 
@@ -47,7 +47,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
               //BÚSQUEDA GUARDADA: PTG - Viaje activo SS
               var viajeActivoObj = search.create({
                   type: "customrecord_ptg_tabladeviaje_enc2_",
-                  filters:[["custrecord_ptg_vehiculo_tabladeviajes_","anyof",vehiculoDestino], "AND", ["custrecord_ptg_estatus_tabladeviajes_","anyof",estatusViejaEnCurso]],
+                  filters:[["custrecord_ptg_vehiculo_tabladeviajes_","anyof",vehiculoDestino], "AND", ["custrecord_ptg_estatus_tabladeviajes_","anyof",estatusViejeEnCurso]],
                   columns:[
                      search.createColumn({name: "internalid", sort: search.Sort.DESC, label: "Internal ID"}),
                   ]

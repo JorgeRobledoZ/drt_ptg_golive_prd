@@ -153,7 +153,7 @@
             var formularioRecepcion = 0;
             var formularioOportunidad = 0;
             var formularioOrdenTraslado = 0;
-            var publicoGeneralID = 0;
+            var idPublicoGeneral = 0;
             var idArticuloDescuento = 0;
             var objMap=drt_mapid_cm.drt_liquidacion();
             if (Object.keys(objMap).length>0) {
@@ -166,7 +166,7 @@
                 formularioRecepcion = objMap.formularioRecepcion;
                 formularioOportunidad = objMap.formularioOportunidad;
                 formularioOrdenTraslado = objMap.formularioOrdenTraslado;
-                publicoGeneralID = objMap.publicoGeneralID;
+                idPublicoGeneral = objMap.idPublicoGeneral;
                 idArticuloDescuento = objMap.idArticuloDescuento;
             }
 
@@ -211,7 +211,7 @@
                 var objValue = JSON.stringify(objPagosOportunidad);
 
 
-                if(cliente != publicoGeneralID){// Cuando tiene un cliente distinto a público general, trata de buscar una opp para actualizar
+                if(cliente != idPublicoGeneral){// Cuando tiene un cliente distinto a público general, trata de buscar una opp para actualizar
                     log.debug('INFO', 'Cuando tiene un cliente distinto a público general, trata de buscar una opp para actualizar');
                     var oportunidadID = null;
                     var location_id = planta;

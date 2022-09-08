@@ -82,8 +82,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var transaccionAjuste = newRecord.getValue("custrecord_ptg_ajuste_inventario_gtc");
         var transaccionNota = newRecord.getValue("custrecord_ptg_nota_credito_gtc");
         var idOportunidad = newRecord.getValue("custrecord_ptg_ord_venta_gas_cuenta_");
-        var idGasLP = 0;
-        var cuentaAjuste = 0;
+        var gasLP = 0;
+        var cuentaAjusteInventario = 0;
         var formularioNotaCredito = 0;
         var objUpdate = {};
         var rate = 0;
@@ -96,7 +96,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var objMap=drt_mapid_cm.drt_liquidacion();
         if (Object.keys(objMap).length>0) {
           cuentaAjuste = objMap.cuentaAjuste;
-          idGasLP = objMap.idGasLP;
+          gasLP = objMap.idGasLP;
           formularioNotaCredito = objMap.formularioNotaCredito;
         }
 
@@ -155,11 +155,11 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           
           recAjusteInventario.setValue("subsidiary", subsidiaria);
           recAjusteInventario.setValue("adjlocation", idAlmacenCentral);
-          recAjusteInventario.setValue("account", cuentaAjuste);
+          recAjusteInventario.setValue("account", cuentaAjusteInventario);
           
           for (var k = 0; k < 1; k++) {
             recAjusteInventario.selectLine("inventory", k);
-            recAjusteInventario.setCurrentSublistValue("inventory", "item", idGasLP);
+            recAjusteInventario.setCurrentSublistValue("inventory", "item", gasLP);
             recAjusteInventario.setCurrentSublistValue("inventory", "location", idAlmacenCentral);
             recAjusteInventario.setCurrentSublistValue("inventory", "adjustqtyby", kilogramos);
             recAjusteInventario.commitLine("inventory");
@@ -185,7 +185,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           
           for (var k = 0; k < 1; k++) {
             recNotaCredito.selectLine("item", k);
-            recNotaCredito.setCurrentSublistValue("item", "item", idGasLP);
+            recNotaCredito.setCurrentSublistValue("item", "item", gasLP);
             recNotaCredito.setCurrentSublistValue("item", "quantity", kilogramos);
             recNotaCredito.setCurrentSublistValue("item", "rate", rate);
             recNotaCredito.commitLine("item");
