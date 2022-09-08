@@ -479,10 +479,26 @@ define(
             }
         }
 
+        const drt_compras = () => {
+            let respuesta = {};
+            try {
+                const mapObj = {
+
+                }
+                respuesta = mapObj[runtime.envType];
+            } catch (error_compras) {
+                log.error(`error drt_compras`, error_compras)     
+            } finally {
+                log.debug(`respuesta drt_compras ${runtime.envType}`, respuesta);
+                return respuesta;
+            }
+        }
+
         return {
             drt_liquidacion,
             getVariables,
-            drt_modulo_general
+            drt_modulo_general,
+            drt_compras
         };
 
     });
