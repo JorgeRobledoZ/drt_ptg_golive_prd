@@ -2,12 +2,12 @@
  * @NApiVersion 2.1
  * @NScriptType UserEventScript
  */
-define(['N/runtime', 'N/search', 'N/record'],
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 'N/record'],
     /**
  * @param{runtime} runtime
  * @param{search} search
  */
-    (runtime, search, record) => {
+    (drt_mapid_cm, runtime, search, record) => {
         /**
          * Defines the function definition that is executed before record is loaded.
          * @param {Object} scriptContext
@@ -52,10 +52,10 @@ define(['N/runtime', 'N/search', 'N/record'],
                     type: record.Type.CUSTOMER,
                     id: id
                 })
-
+                const mapObj=drt_mapid_cm.drt_liquidacion();
                 let isContract = customer.getValue({fieldId : 'custentity_ptg_alianza_comercial_cliente'});
                 log.debug('isContract', isContract)
-                if (runtime.executionContext == 'RESTLET' && isContract == 1 && (scriptContext.type == 'create' || scriptContext.type == scriptContext.UserEventType.CREATE)) {
+                if (runtime.executionContext == 'RESTLET' && isContract == mapObj.tipoAlianzaComContrato && (scriptContext.type == 'create' || scriptContext.type == scriptContext.UserEventType.CREATE)) {
                     
 
                     let customerSearchObj = search.create({
@@ -114,6 +114,8 @@ define(['N/runtime', 'N/search', 'N/record'],
             }
         }
 
-        return { beforeLoad, beforeSubmit, afterSubmit }
+        return {
+            afterSubmit
+        }
 
     });

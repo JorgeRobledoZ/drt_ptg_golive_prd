@@ -2,21 +2,21 @@
  *@NApiVersion 2.1
  *@NScriptType Restlet
  */
-define(["N/search"], function (search) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/search"], function (drt_mapid_cm, search) {
 
     function _post(request) {
         try {
             let arrayRutas = [];
             let objRutas = {};
             let idSubcidiaria = request.id;
-
+            const mapObj=drt_mapid_cm.drt_liquidacion();
             log.audit('request', request)
             var customrecord_ptg_equiposSearchObj = search.create({
                 type: "customrecord_ptg_equipos",
                 filters: [
                     ["custrecord_ptg_subsidiaria_1", "anyof", idSubcidiaria],
                     "AND",
-                    ["custrecord_ptg_tipo_vehiculo_", "is", "Camión Cilindros"]
+                    ["custrecord_ptg_tipo_vehiculo_", "is", mapObj.tipo_vehiculo]
                 ],
                 columns: [
                     search.createColumn({

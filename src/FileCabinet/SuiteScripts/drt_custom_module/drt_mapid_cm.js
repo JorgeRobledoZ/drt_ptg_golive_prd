@@ -47,11 +47,26 @@ define(
                         tipoServicioVentaAnden : 5,
                         tipoServicioMontacarga : 6,
                         tipoServicioViajeEsp   : 7,
-                        tipoAlianzaComContrato : 1,
+                        tipoAlianzaComContrato : null,
                         tipoAlianzaComCredito  : 2,
                         tipoAlianzaComContado  : 3,
-                        formOrdenTransladoCarb : 266
+                        formOrdenTransladoCarb : 266,
+                        tipoArticuloCil        : 1,
+                        tipoArticuloEst        : 2,
+                        tipoArticuloEnvCil     : 5,
+                        tipoArticuloEnvEst     : 7,
+                        subsidiariaGas         : 20,
+                        subsidiariaCorpoGas    : 22,
+                        subsidiariaSanLuisGas  : 23,
+                        subsidiariaDistPotosi  : 26,
+                        subsidiariaEliminacion : 28,
+                        // 20 gas
+                        // 22 Corpo gas
+                        // 23 San Luis Gas
+                        // 26 Distribuidora potosina
                         //Aqui inician los de Iztac
+                        tipo_vehiculo:"Camión Cilindros",
+
                     },
                     [ runtime.EnvType.SANDBOX ]: {
                         customFormOppPotogas   : 305, // Oportunidad-Potogas
@@ -90,8 +105,22 @@ define(
                         tipoAlianzaComContrato : 1,
                         tipoAlianzaComCredito  : 2,
                         tipoAlianzaComContado  : 3,
-                        formOrdenTransladoCarb : 313
+                        formOrdenTransladoCarb : 313,
+                        tipoArticuloCil        : 1,
+                        tipoArticuloEst        : 2,
+                        tipoArticuloEnvCil     : 5,
+                        tipoArticuloEnvEst     : 7,
+                        subsidiariaGas         : 20,
+                        subsidiariaCorpoGas    : 22,
+                        subsidiariaSanLuisGas  : 23,
+                        subsidiariaDistPotosi  : 25,
+                        subsidiariaEliminacion : 31,
+                        // 20 gas
+                        // 22 Corpo gas
+                        // 23 San Luis Gas
+                        // 26 Distribuidora potosina
                         //Aqui inician los de Iztac
+
                     }
                 }
                 respuesta = mapObj[ runtime.envType ];
@@ -479,10 +508,51 @@ define(
             }
         }
 
+        const drt_compras = () => {
+            let respuesta = {};
+            try {
+                const mapObj = {
+                    [runtime.EnvType.PRODUCTION]:{
+                        ubicacion_desvio_planta_receipt: 1525,
+                        form_desvio_cliente_invoice: 308,
+                        form_vendor_bill: 309,
+                        item_vendor_bill_flete: 4114,
+                        form_transfer_order: 57,
+                        ubicacion_transfer_order: 1525,
+                        form_full_filment: 40,
+                        form_item_receipt: 303,
+                        form_intercompany_invoice: 308,
+                        subcidiary_intercompany_invoice: 25,
+                        ubicacion_intercompany_invoice: 762
+                    },
+                    [runtime.EnvType.SANDBOX]: {
+                        ubicacion_desvio_planta_receipt: 1525,
+                        form_desvio_cliente_invoice: 286,
+                        form_vendor_bill: 300,
+                        item_vendor_bill_flete: 4114,
+                        form_transfer_order: 57,
+                        ubicacion_transfer_order: 1525,
+                        form_full_filment: 40,
+                        form_item_receipt: 208,
+                        form_intercompany_invoice: 286,
+                        subcidiary_intercompany_invoice: 25,
+                        ubicacion_intercompany_invoice: 762
+                    }
+                }
+                respuesta = mapObj[runtime.envType];
+            } catch (error_compras) {
+                log.error(`error drt_compras`, error_compras)     
+            } finally {
+                log.debug(`respuesta drt_compras ${runtime.envType}`, respuesta);
+                return respuesta;
+            }
+        }
+
         return {
             drt_liquidacion,
             getVariables,
-            drt_modulo_general
+            drt_modulo_general,
+            drt_compras
         };
 
     });
