@@ -845,62 +845,13 @@
 
     }
 
-   /* function searchCuenta(idSubsidiaria, idTipoPago) {
-      try {
-        var cuentaDefault = 0;
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-            cuentaDefault = 2786;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-            cuentaDefault = 2786;
-        }
-        //SS: PTG - Mapeo Formas de pago y cuentas SS
-        var mapeoCuentaObj = search.create({
-          type: "customrecord_mapeo_formasdepago_cuentas",
-          filters: [
-            ["custrecord_ptg_formadepago_subsidiaria", "anyof", idSubsidiaria],
-            "AND",
-            ["custrecord_ptg_forma_pago", "anyof", idTipoPago],
-          ],
-          columns: [
-            search.createColumn({
-              name: "custrecord_ptg_formadepago_cuenta",
-              label: "PTG - Cuenta de banco",
-            }),
-          ],
-        });
-
-        var mapeoCuentaObjCount = mapeoCuentaObj.runPaged().count;
-        var mapeoCuentaObjResult = mapeoCuentaObj.run().getRange({
-          start: 0,
-          end: mapeoCuentaObjCount,
-        });
-        if (mapeoCuentaObjCount > 0) {
-          idCuenta = mapeoCuentaObjResult[0].getValue({
-            name: "custrecord_ptg_formadepago_cuenta",
-            label: "PTG - Cuenta de banco",
-          });
-          log.debug("idCuenta", idCuenta);
-        } else {
-            idCuenta = cuentaDefault;
-            log.debug("cuenta no encontrada", idCuenta);
-        }
-
-        return idCuenta;
-      } catch (error) {
-        log.error({
-          title: "error searchCuenta",
-          details: JSON.stringify(error),
-        });
-      }
-    }*/
-
     function searchCuenta(idSubsidiaria, idTipoPago) {
         try {
             var cuentaDefault = 0;
             if (runtime.envType === runtime.EnvType.SANDBOX) {
                 cuentaDefault = 2786;
                 subsidiariaCorpoGas = 22;
-                subsidiariaDistribuidora = 26;
+                subsidiariaDistribuidora = 25;
                 subsidiariaSanLuis = 23;
             } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
                 cuentaDefault = 2786;

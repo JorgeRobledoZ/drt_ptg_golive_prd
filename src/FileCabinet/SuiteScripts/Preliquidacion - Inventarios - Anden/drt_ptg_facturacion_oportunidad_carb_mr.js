@@ -1063,7 +1063,7 @@
             if (runtime.envType === runtime.EnvType.SANDBOX) {
                 cuentaDefault = 2786;
                 subsidiariaCorpoGas = 22;
-                subsidiariaDistribuidora = 26;
+                subsidiariaDistribuidora = 25;
                 subsidiariaSanLuis = 23;
             } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
                 cuentaDefault = 2786;

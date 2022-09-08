@@ -52,10 +52,10 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         var cantidadGas = newRecord.getValue("custrecord_ptg_traspasokil_");
         var idAjusteInventario = newRecord.getValue("custrecord_ptg_ajuste_inventario_gtcl");
         var idNotaCredito = newRecord.getValue("custrecord_ptg_nota_credito_gtcl");
-        var idGasLP = 0;
+        var gasLP = 0;
         var unidadLitros = 0;
         var lineCountTransaccion = newRecord.getLineCount({ sublistId:'recmachcustrecord_ptg_gascliente_' })||0;
-        var cuentaAjuste = 0;
+        var cuentaAjusteInventario = 0;
         var gasLPUnidades = 0;
         var objUpdate = {};
         var itemArray = [];
@@ -68,15 +68,15 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         if (runtime.envType === runtime.EnvType.SANDBOX) {
           planta = 1142;
           unidadLitros = 23;
-          cuentaAjuste = 218;
-          idGasLP = 4088;
+          cuentaAjusteInventario = 218;
+          gasLP = 4088;
           gasLPUnidades = 4693;
           envaseCilindro = 5;
         } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
           planta = 1505; //Temporal esto es de Rio Verde
           unidadLitros = 11;
-          cuentaAjuste = 218;
-          idGasLP = 4216;
+          cuentaAjusteInventario = 218;
+          gasLP = 4216;
           gasLPUnidades = 4216;
           envaseCilindro = 5;
         }
@@ -181,7 +181,7 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
 
         recAjusteInventario.setValue("subsidiary", subsidiaria);
         recAjusteInventario.setValue("adjlocation", planta);
-        recAjusteInventario.setValue("account", cuentaAjuste);
+        recAjusteInventario.setValue("account", cuentaAjusteInventario);
         recAjusteInventario.setValue("memo", "Ajuste Generado Automáticamente Por Toma De Cliente");
 
 
@@ -189,7 +189,7 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
           recAjusteInventario.selectLine("inventory", l);
           recAjusteInventario.setCurrentSublistValue("inventory", "item", itemArray[l]);
           recAjusteInventario.setCurrentSublistValue("inventory", "location", planta);
-          if(itemArray[l] == idGasLP){
+          if(itemArray[l] == gasLP){
             var cantidadGasLP = cantidadArray[l] / 0.54;
             recAjusteInventario.setCurrentSublistValue("inventory", "adjustqtyby", cantidadGasLP);
           } else {
@@ -220,7 +220,7 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         for (var m = 0; m < lineCountTransaccion; m++) {
           recNotaCredito.selectLine("item", m);
           recNotaCredito.setCurrentSublistValue("item", "item", itemArray[m]);
-          if(itemArray[m] == idGasLP){
+          if(itemArray[m] == gasLP){
             var cantidadGasLP = cantidadArray[m] / 0.54;
             recNotaCredito.setCurrentSublistValue("item", "quantity", cantidadGasLP);
             recNotaCredito.setCurrentSublistValue("item", "rate", precio);

@@ -84,11 +84,11 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         var transferenciaCreadaCero = transferenciaCreada[0];
         log.audit("transferenciaCreadaCero", transferenciaCreadaCero);
 
-        var formularioCarburacion = 0;
+        var formularioTrasladoCarburacion = 0;
         if (runtime.envType === runtime.EnvType.SANDBOX) {
-          formularioCarburacion = 313;
+          formularioTrasladoCarburacion = 313;
         } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          formularioCarburacion = 266;
+          formularioTrasladoCarburacion = 266;
         }
 
         if(!transferenciaCreadaCero){
@@ -129,7 +129,7 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
             isDynamic: true,
           });
   
-          recOrdenTraslado.setValue("customform", formularioCarburacion);
+          recOrdenTraslado.setValue("customform", formularioTrasladoCarburacion);
           recOrdenTraslado.setValue("subsidiary", subsidiaria);
           recOrdenTraslado.setValue("location", estacion);
           recOrdenTraslado.setValue("transferlocation", ubicacionDestino);

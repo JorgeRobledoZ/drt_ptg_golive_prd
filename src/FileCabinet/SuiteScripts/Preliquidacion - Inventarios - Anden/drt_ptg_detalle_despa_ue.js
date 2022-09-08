@@ -57,7 +57,7 @@ define(["N/record", "N/search", 'N/ui/serverWidget', 'N/runtime'], function (rec
         prepagoSantander = 16;
         prepagoScotian = 17;
         estatusFacturacion = 4;
-        idArticuloDescuento = 4217;
+        idArticuloDescuento = 4528;
       } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
         prepagoBanorte = 2;
         prepagoTransferencia = 8;
