@@ -52,6 +52,9 @@ define(
                         tipoAlianzaComContado  : 3,
                         formOrdenTransladoCarb : 266
                         //Aqui inician los de Iztac
+                        ,
+                        tipo_vehiculo:"Camión Cilindros",
+
                     },
                     [ runtime.EnvType.SANDBOX ]: {
                         customFormOppPotogas   : 305, // Oportunidad-Potogas
@@ -92,6 +95,7 @@ define(
                         tipoAlianzaComContado  : 3,
                         formOrdenTransladoCarb : 313
                         //Aqui inician los de Iztac
+
                     }
                 }
                 respuesta = mapObj[ runtime.envType ];
