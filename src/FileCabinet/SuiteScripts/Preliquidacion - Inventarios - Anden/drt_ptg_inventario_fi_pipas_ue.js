@@ -30,13 +30,13 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         var cantidadArray = [];
         var equiposObj = [];
         var ubicacionArray = [];
-        var cuentaInventario = 0;
+        var cuentaAjusteInventario = 0;
         var gasLP = 0;
         if (runtime.envType === runtime.EnvType.SANDBOX) {
-          cuentaInventario = 218;
+          cuentaAjusteInventario = 218;
           gasLP = 4088;
         } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          cuentaInventario = 218;
+          cuentaAjusteInventario = 218;
           gasLP = 4216;
         }
 

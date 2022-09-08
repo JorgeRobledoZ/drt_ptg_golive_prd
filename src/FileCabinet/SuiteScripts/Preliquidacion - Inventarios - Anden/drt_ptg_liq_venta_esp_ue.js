@@ -23,8 +23,8 @@ define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/h
       var factura = newRecord.getValue("custrecord_ptg_factura_vta_especial_");
       var planta = newRecord.getValue("custrecord_ptg_planta_vta_especial_");
       var localizacionAlmacen = newRecord.getValue("custrecord_ptg_loc_almacen_");
-      var articuloGas = 0;
-      var formulario = 0;
+      var gasLP = 0;
+      var formularioFacturaPTG = 0;
       var notaLinea = "";
       var formaPago = 0;
       var referencia = "";
@@ -105,8 +105,14 @@ define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/h
         chequeHSBCId = 28;
         chequeBanamexId = 29;
         chequeBanorteId = 30;
-        formulario = 286;
-        articuloGas = 4088;
+        tarjetaCreditoBancomerId = 31;
+        tarjetaCreditoHSBCId = 32;
+        tarjetaCreditoBanamexId = 33;
+        tarjetaDebitoBanamexId = 34;
+        tarjetaDebitoBancomerId = 35;
+        tarjetaDebitoHSBCId = 36;
+        formularioFacturaPTG = 286;
+        gasLP = 4088;
         servicioViajeEspecial = 7;
       } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
         efectivoId = 1;
@@ -145,8 +151,8 @@ define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/h
         tarjetaDebitoBanamexId = 34;
         tarjetaDebitoBancomerId = 35;
         tarjetaDebitoHSBCId = 36;
-        formulario = 308;
-        articuloGas = 4216;
+        formularioFacturaPTG = 308;
+        gasLP = 4216;
         servicioViajeEspecial = 7;
       }
 
@@ -240,7 +246,7 @@ define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/h
           type: record.Type.INVOICE,
           isDynamic: true,
         });
-        recordFactura.setValue("customform", formulario);
+        recordFactura.setValue("customform", formularioFacturaPTG);
         recordFactura.setValue("entity", cliente);
         recordFactura.setValue("location", localizacionAlmacen);
         recordFactura.setValue("memo", notaLinea);
@@ -300,7 +306,7 @@ define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/h
 
         for (var j = 0; j < lineCount; j++) {
           recordFactura.selectLine("item", j);
-          recordFactura.setCurrentSublistValue("item", "item", articuloGas);
+          recordFactura.setCurrentSublistValue("item", "item", gasLP);
           recordFactura.setCurrentSublistValue("item", "location", localizacionAlmacen);
           recordFactura.setCurrentSublistValue("item", "quantity", litrosVendidos[j]);
           recordFactura.setCurrentSublistValue("item", "rate", precioUnitario[j]);

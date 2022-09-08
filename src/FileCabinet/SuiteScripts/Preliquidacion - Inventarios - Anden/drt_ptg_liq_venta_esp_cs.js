@@ -109,6 +109,12 @@ function fieldChanged(context) {
     if (runtime.envType === runtime.EnvType.SANDBOX) {
       tarjetaCreditoId = 5;
       tarjetaDebitoId = 6;
+      tarjetaCreditoBancomerId = 31;
+      tarjetaCreditoHSBCId = 32;
+      tarjetaCreditoBanamexId = 33;
+      tarjetaDebitoBanamexId = 34;
+      tarjetaDebitoBancomerId = 35;
+      tarjetaDebitoHSBCId = 36;
     } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
       tarjetaCreditoId = 5;
       tarjetaDebitoId = 6;

@@ -28,13 +28,13 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
           type: record.Type.LOCATION,
           id: ubicacionSalchicha,
         });
-        var cuentaDefault = 0;
+        var cuentaAjusteInventario = 0;
         var gasLP = 0;
         if (runtime.envType === runtime.EnvType.SANDBOX) {
-          cuentaDefault = 218;
+          cuentaAjusteInventario = 218;
           gasLP = 4088;
         } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          cuentaDefault = 218;
+          cuentaAjusteInventario = 218;
           gasLP = 4216;
         }
 
