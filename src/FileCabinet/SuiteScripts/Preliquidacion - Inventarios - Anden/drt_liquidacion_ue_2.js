@@ -13,8 +13,8 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
-define(["N/record", "N/search", "N/runtime", 'N/task', 'N/url', 'N/https', "N/redirect", "N/log", 'N/currentRecord'], 
-function (record, search, runtime, task, url, https, redirect, log, currentRecord) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime", 'N/task', 'N/url', 'N/https', "N/redirect", "N/log", 'N/currentRecord'],
+function (drt_mapid_cm, record, search, runtime, task, url, https, redirect, log, currentRecord) {
     
     function afterSubmit(context) {
         try {
@@ -39,24 +39,16 @@ function (record, search, runtime, task, url, https, redirect, log, currentRecor
                 var envase30 = 0;
                 var envase45 = 0;
 
-                if (runtime.envType === runtime.EnvType.SANDBOX) {
-                    estadoOpNegociacion = 11;
-                    estadoOpCompra = 12;
-                    estadoOpConcretado = 13;
-                    estadoOpClienteConcretado = 18;
-                    envase10 = 4097;
-                    envase20 = 4099;
-                    envase30 = 4098;
-                    envase45 = 4604;
-                } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                    estadoOpNegociacion = 11;
-                    estadoOpCompra = 12;
-                    estadoOpConcretado = 13;
-                    estadoOpClienteConcretado = 18;
-                    envase10 = 4206;
-                    envase20 = 4207;
-                    envase30 = 4208;
-                    envase45 = 4209;
+                var objMap=drt_mapid_cm.drt_liquidacion();
+                if (Object.keys(objMap).length>0) {
+                    estadoOpNegociacion = objMap.estadoOpNegociacion;
+                    estadoOpCompra = objMap.estadoOpCompra;
+                    estadoOpConcretado = objMap.estadoOpConcretado;
+                    estadoOpClienteConcretado = objMap.estadoOpClienteConcretado;
+                    envase10 = objMap.envase10;
+                    envase20 = objMap.envase20;
+                    envase30 = objMap.envase30;
+                    envase45 = objMap.envase45;
                 }
 
                 var registroOportunidad = search.create({

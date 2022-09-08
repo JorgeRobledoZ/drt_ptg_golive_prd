@@ -12,7 +12,7 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", "N/runtime"], function (record, search, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime"], function (drt_mapid_cm, record, search, runtime) {
   function afterSubmit(context) {
     try {
       //if (context.type == "create") {
@@ -30,14 +30,12 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         var cantidadArray = [];
         var equiposObj = [];
         var ubicacionArray = [];
-        var cuentaInventario = 0;
+        var cuentaAjusteInventario = 0;
         var gasLP = 0;
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          cuentaInventario = 218;
-          gasLP = 4088;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          cuentaInventario = 218;
-          gasLP = 4216;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          cuentaAjusteInventario = objMap.cuentaAjusteInventario;
+          gasLP = objMap.gasLP;
         }
 
       if(!transaccion){

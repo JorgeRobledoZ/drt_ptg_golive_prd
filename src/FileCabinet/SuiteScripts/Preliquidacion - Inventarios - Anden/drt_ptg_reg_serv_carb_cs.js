@@ -12,7 +12,7 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
-define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/runtime"], function (record, search, error, currentRecord, dialog, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/runtime"], function (drt_mapid_cm, record, search, error, currentRecord, dialog, runtime) {
     function fieldChanged(context) {
         try {
             debugger;
@@ -23,17 +23,14 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/
             var sublistFieldName = context.fieldId;
             var estacionCarburacion = currentRecord.getValue("custrecord_ptg_estacion_reg_serv_carb");
             var articuloCilindro = 0;
-            var estatusViejaEnCurso = 0;
+            var estatusViejeEnCurso = 0;
             var articuloEnvase = 0;
 
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-              articuloCilindro = 1;
-              estatusViejaEnCurso = 3;
-              articuloEnvase = 5;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-              articuloCilindro = 1;
-              estatusViejaEnCurso = 3;
-              articuloEnvase = 5;
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+              articuloCilindro = objMap.articuloCilindro;
+              estatusViejeEnCurso = objMap.estatusViejeEnCurso;
+              articuloEnvase = objMap.articuloEnvase;
             }
 
             if(estacionCarburacion && cabeceraFieldName === "custrecord_ptg_estacion_reg_serv_carb"){
@@ -50,7 +47,7 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/
               //BÚSQUEDA GUARDADA: PTG - Viaje activo SS
               var viajeActivoObj = search.create({
                   type: "customrecord_ptg_tabladeviaje_enc2_",
-                  filters:[["custrecord_ptg_vehiculo_tabladeviajes_","anyof",vehiculoDestino], "AND", ["custrecord_ptg_estatus_tabladeviajes_","anyof",estatusViejaEnCurso]],
+                  filters:[["custrecord_ptg_vehiculo_tabladeviajes_","anyof",vehiculoDestino], "AND", ["custrecord_ptg_estatus_tabladeviajes_","anyof",estatusViejeEnCurso]],
                   columns:[
                      search.createColumn({name: "internalid", sort: search.Sort.DESC, label: "Internal ID"}),
                   ]
@@ -213,82 +210,48 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/
       var tarjetaDebitoBancomerId = 0;
       var tarjetaDebitoHSBCId = 0;
 
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        idPublicoGeneral = 14508;
-        alianzaCContrato = 1;
-        alianzaCCredito = 2;
-        alianzaCContado = 3;
-        efectivoId = 1;
-        prepagoBanorteId = 2;
-        valeId = 3;
-        cortesiaId = 4;
-        tarjetaCreditoId = 5;
-        tarjetaDebitoId = 6;
-        multipleId = 7;
-        prepagoTransferenciaId = 8;
-        creditoClienteId = 9;
-        reposicionId = 10;
-        saldoAFavorId = 11;
-        consumoInternoId = 12;
-        prepagoBancomerId = 13;
-        prepagoHSBCId = 14;
-        prepagoBanamexId = 15;
-        prepagoSantanderId = 16;
-        prepagoScotianId = 17;
-        bonificacionId = 18;
-        ticketCardId = 19;
-        chequeBancomerId = 20;
-        recirculacionId = 21;
-        canceladoId = 22;
-        rellenoId = 23;
-        transferenciaId = 24;
-        traspasoId = 25;
-        chequeSantanderId = 26;
-        chequeScotianId = 27;
-        chequeHSBCId = 28;
-        chequeBanamexId = 29;
-        chequeBanorteId = 30;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        idPublicoGeneral = 27041;
-        alianzaCContrato = 1;
-        alianzaCCredito = 2;
-        alianzaCContado = 3;
-        efectivoId = 1;
-        prepagoBanorteId = 2;
-        valeId = 3;
-        cortesiaId = 4;
-        tarjetaCreditoId = 5;
-        tarjetaDebitoId = 6;
-        multipleId = 7;
-        prepagoTransferenciaId = 8;
-        creditoClienteId = 9;
-        reposicionId = 10;
-        saldoAFavorId = 11;
-        consumoInternoId = 12;
-        prepagoBancomerId = 13;
-        prepagoHSBCId = 14;
-        prepagoBanamexId = 15;
-        prepagoSantanderId = 16;
-        prepagoScotianId = 17;
-        bonificacionId = 18;
-        ticketCardId = 19;
-        chequeBancomerId = 20;
-        recirculacionId = 21;
-        canceladoId = 22;
-        rellenoId = 23;
-        transferenciaId = 24;
-        traspasoId = 25;
-        chequeSantanderId = 26;
-        chequeScotianId = 27;
-        chequeHSBCId = 28;
-        chequeBanamexId = 29;
-        chequeBanorteId = 30;
-        tarjetaCreditoBancomerId = 31;
-        tarjetaCreditoHSBCId = 32;
-        tarjetaCreditoBanamexId = 33;
-        tarjetaDebitoBanamexId = 34;
-        tarjetaDebitoBancomerId = 35;
-        tarjetaDebitoHSBCId = 36;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        idPublicoGeneral = objMap.idPublicoGeneral;
+        alianzaCContrato = objMap.alianzaCContrato;
+        alianzaCCredito = objMap.alianzaCCredito;
+        alianzaCContado = objMap.alianzaCContado;
+        efectivoId = objMap.efectivoId;
+        prepagoBanorteId = objMap.prepagoBanorteId;
+        valeId = objMap.valeId;
+        cortesiaId = objMap.cortesiaId;
+        tarjetaCreditoId = objMap.tarjetaCreditoId;
+        tarjetaDebitoId = objMap.tarjetaDebitoId;
+        multipleId = objMap.multipleId;
+        prepagoTransferenciaId = objMap.prepagoTransferenciaId;
+        creditoClienteId = objMap.creditoClienteId;
+        reposicionId = objMap.reposicionId;
+        saldoAFavorId = objMap.saldoAFavorId;
+        consumoInternoId = objMap.consumoInternoId;
+        prepagoBancomerId = objMap.prepagoBancomerId;
+        prepagoHSBCId = objMap.prepagoHSBCId;
+        prepagoBanamexId = objMap.prepagoBanamexId;
+        prepagoSantanderId = objMap.prepagoSantanderId;
+        prepagoScotianId = objMap.prepagoScotianId;
+        bonificacionId = objMap.bonificacionId;
+        ticketCardId = objMap.ticketCardId;
+        chequeBancomerId = objMap.chequeBancomerId;
+        recirculacionId = objMap.recirculacionId;
+        canceladoId = objMap.canceladoId;
+        rellenoId = objMap.rellenoId;
+        transferenciaId = objMap.transferenciaId;
+        traspasoId = objMap.traspasoId;
+        chequeSantanderId = objMap.chequeSantanderId;
+        chequeScotianId = objMap.chequeScotianId;
+        chequeHSBCId = objMap.chequeHSBCId;
+        chequeBanamexId = objMap.chequeBanamexId;
+        chequeBanorteId = objMap.chequeBanorteId;
+        tarjetaCreditoBancomerId = objMap.tarjetaCreditoBancomerId;
+        tarjetaCreditoHSBCId = objMap.tarjetaCreditoHSBCId;
+        tarjetaCreditoBanamexId = objMap.tarjetaCreditoBanamexId;
+        tarjetaDebitoBanamexId = objMap.tarjetaDebitoBanamexId;
+        tarjetaDebitoBancomerId = objMap.tarjetaDebitoBancomerId;
+        tarjetaDebitoHSBCId = objMap.tarjetaDebitoHSBCId;
       }
 
       if (sublistName === idRegistroDeServicios) {
@@ -448,12 +411,10 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/
         var urlPreliquidacion = '';
         var estatusProcesado = 0;
 
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          urlPreliquidacion = 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=614&whence=&estacion=';
-          estatusProcesado = 2;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          urlPreliquidacion = 'https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=658&whence=&estacion=';
-          estatusProcesado = 2;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          urlPreliquidacion = objMap.urlPreliquidacion;
+          estatusProcesado = objMap.estatusProcesado;
         }
           
           recObj = currentRecord.get();
@@ -503,10 +464,9 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/
       recObj = currentRecord.get();
       var urlRegistroCliente = '';
 
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        urlRegistroCliente = 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1070&planta=';
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        urlRegistroCliente = 'https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=645&planta=';
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        urlRegistroCliente = objMap.drt_mapid_cm;
       }
 
       var planta = recObj.getValue("custrecord_ptg_estacion_reg_serv_carb");

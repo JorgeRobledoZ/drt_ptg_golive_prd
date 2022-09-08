@@ -12,7 +12,7 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", "N/task", "N/runtime", 'N/config', "N/format", 'N/https', 'N/url', "N/redirect"], function (record, search, task, runtime, config, format, https, url, redirect) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/task", "N/runtime", 'N/config', "N/format", 'N/https', 'N/url', "N/redirect"], function (drt_mapid_cm, record, search, task, runtime, config, format, https, url, redirect) {
   
   function beforeLoad(context) {
     try {
@@ -34,12 +34,8 @@ define(["N/record", "N/search", "N/task", "N/runtime", 'N/config', "N/format", '
         var estatusProcesado = 0;
         var servicioCilindros = 0;
         var servicioEstacionarios = 0;
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          estatusEtapa = 1;
-          estatusProcesado = 2;
-          servicioCilindros = 1;
-          servicioEstacionarios = 2;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
           estatusEtapa = 1;
           estatusProcesado = 2;
           servicioCilindros = 1;
@@ -112,11 +108,8 @@ define(["N/record", "N/search", "N/task", "N/runtime", 'N/config', "N/format", '
         var estatusEtapaProcesado = 0;
         var estatusEtapaConciliado = 0;
         var busquedaMayor = 0;
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          estatusEtapaCarga = 1;
-          estatusEtapaProcesado = 2;
-          estatusEtapaConciliado = 3;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
           estatusEtapaCarga = 1;
           estatusEtapaProcesado = 2;
           estatusEtapaConciliado = 3;

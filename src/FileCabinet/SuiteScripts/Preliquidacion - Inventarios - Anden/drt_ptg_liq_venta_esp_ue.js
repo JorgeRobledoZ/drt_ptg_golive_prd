@@ -13,7 +13,7 @@
  * @NScriptType UserEventScript
  */
 //define(["N/record", "N/search", "N/task"], function (record, search, task) {
-define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https'], function (runtime, search, record, email, error, url, https) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https'], function (drt_mapid_cm, runtime, search, record, email, error, url, https) {
   function afterSubmit(context) {
     try {
       var newRecord = context.newRecord;
@@ -23,8 +23,8 @@ define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/h
       var factura = newRecord.getValue("custrecord_ptg_factura_vta_especial_");
       var planta = newRecord.getValue("custrecord_ptg_planta_vta_especial_");
       var localizacionAlmacen = newRecord.getValue("custrecord_ptg_loc_almacen_");
-      var articuloGas = 0;
-      var formulario = 0;
+      var gasLP = 0;
+      var formularioFacturaPTG = 0;
       var notaLinea = "";
       var formaPago = 0;
       var referencia = "";
@@ -74,80 +74,47 @@ define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/h
       var servicioViajeEspecial = 0;
 
 
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        efectivoId = 1;
-        prepagoBanorteId = 2;
-        valeId = 3;
-        cortesiaId = 4;
-        tarjetaCreditoId = 5;
-        tarjetaDebitoId = 6;
-        multipleId = 7;
-        prepagoTransferenciaId = 8;
-        creditoClienteId = 9;
-        reposicionId = 10;
-        saldoAFavorId = 11;
-        consumoInternoId = 12;
-        prepagoBancomerId = 13;
-        prepagoHSBCId = 14;
-        prepagoBanamexId = 15;
-        prepagoSantanderId = 16;
-        prepagoScotianId = 17;
-        bonificacionId = 18;
-        ticketCardId = 19;
-        chequeBancomerId = 20;
-        recirculacionId = 21;
-        canceladoId = 22;
-        rellenoId = 23;
-        transferenciaId = 24;
-        traspasoId = 25;
-        chequeSantanderId = 26;
-        chequeScotianId = 27;
-        chequeHSBCId = 28;
-        chequeBanamexId = 29;
-        chequeBanorteId = 30;
-        formulario = 286;
-        articuloGas = 4088;
-        servicioViajeEspecial = 7;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        efectivoId = 1;
-        prepagoBanorteId = 2;
-        valeId = 3;
-        cortesiaId = 4;
-        tarjetaCreditoId = 5;
-        tarjetaDebitoId = 6;
-        multipleId = 7;
-        prepagoTransferenciaId = 8;
-        creditoClienteId = 9;
-        reposicionId = 10;
-        saldoAFavorId = 11;
-        consumoInternoId = 12;
-        prepagoBancomerId = 13;
-        prepagoHSBCId = 14;
-        prepagoBanamexId = 15;
-        prepagoSantanderId = 16;
-        prepagoScotianId = 17;
-        bonificacionId = 18;
-        ticketCardId = 19;
-        chequeBancomerId = 20;
-        recirculacionId = 21;
-        canceladoId = 22;
-        rellenoId = 23;
-        transferenciaId = 24;
-        traspasoId = 25;
-        chequeSantanderId = 26;
-        chequeScotianId = 27;
-        chequeHSBCId = 28;
-        chequeBanamexId = 29;
-        chequeBanorteId = 30;
-        tarjetaCreditoBancomerId = 31;
-        tarjetaCreditoHSBCId = 32;
-        tarjetaCreditoBanamexId = 33;
-        tarjetaDebitoBanamexId = 34;
-        tarjetaDebitoBancomerId = 35;
-        tarjetaDebitoHSBCId = 36;
-        formulario = 308;
-        articuloGas = 4216;
-        servicioViajeEspecial = 7;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        efectivoId : objMap.efectivoId;
+        prepagoBanorteId : objMap.prepagoBanorteId;
+        valeId : objMap.valeId;
+        cortesiaId : objMap.cortesiaId;
+        tarjetaCreditoId : objMap.tarjetaCreditoId;
+        tarjetaDebitoId : objMap.tarjetaDebitoId;
+        multipleId : objMap.multipleId;
+        prepagoTransferenciaId : objMap.prepagoTransferenciaId;
+        creditoClienteId : objMap.creditoClienteId;
+        reposicionId : objMap.reposicionId;
+        saldoAFavorId : objMap.saldoAFavorId;
+        consumoInternoId : objMap.consumoInternoId;
+        prepagoBancomerId : objMap.prepagoBancomerId;
+        prepagoHSBCId : objMap.prepagoHSBCId;
+        prepagoBanamexId : objMap.prepagoBanamexId;
+        prepagoSantanderId : objMap.prepagoSantanderId;
+        prepagoScotianId : objMap.prepagoScotianId;
+        bonificacionId : objMap.bonificacionId;
+        ticketCardId : objMap.ticketCardId;
+        chequeBancomerId : objMap.chequeBancomerId;
+        recirculacionId : objMap.recirculacionId;
+        canceladoId : objMap.canceladoId;
+        rellenoId : objMap.rellenoId;
+        transferenciaId : objMap.transferenciaId;
+        traspasoId : objMap.traspasoId;
+        chequeSantanderId : objMap.chequeSantanderId;
+        chequeScotianId : objMap.chequeScotianId;
+        chequeHSBCId : objMap.chequeHSBCId;
+        chequeBanamexId : objMap.chequeBanamexId;
+        chequeBanorteId : objMap.chequeBanorteId;
+        tarjetaCreditoBancomerId : objMap.tarjetaCreditoBancomerId;
+        tarjetaCreditoHSBCId : objMap.tarjetaCreditoHSBCId;
+        tarjetaCreditoBanamexId : objMap.tarjetaCreditoBanamexId;
+        tarjetaDebitoBanamexId : objMap.tarjetaDebitoBanamexId;
+        tarjetaDebitoBancomerId : objMap.tarjetaDebitoBancomerId;
+        tarjetaDebitoHSBCId : objMap.tarjetaDebitoHSBCId;
+        formulario : objMap.formulario;
+        gasLP : objMap.gasLP;
+        servicioViajeEspecial : objMap.servicioViajeEspecial;
       }
 
       if (!factura) {
@@ -240,7 +207,7 @@ define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/h
           type: record.Type.INVOICE,
           isDynamic: true,
         });
-        recordFactura.setValue("customform", formulario);
+        recordFactura.setValue("customform", formularioFacturaPTG);
         recordFactura.setValue("entity", cliente);
         recordFactura.setValue("location", localizacionAlmacen);
         recordFactura.setValue("memo", notaLinea);
@@ -300,7 +267,7 @@ define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/h
 
         for (var j = 0; j < lineCount; j++) {
           recordFactura.selectLine("item", j);
-          recordFactura.setCurrentSublistValue("item", "item", articuloGas);
+          recordFactura.setCurrentSublistValue("item", "item", gasLP);
           recordFactura.setCurrentSublistValue("item", "location", localizacionAlmacen);
           recordFactura.setCurrentSublistValue("item", "quantity", litrosVendidos[j]);
           recordFactura.setCurrentSublistValue("item", "rate", precioUnitario[j]);

@@ -12,7 +12,7 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", "N/task", "N/format", 'N/config', "N/runtime"], function (record, search, task, format, config, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/task", "N/format", 'N/config', "N/runtime"], function (drt_mapid_cm, record, search, task, format, config, runtime) {
   
   function beforeLoad(context) {
     try {
@@ -25,12 +25,10 @@ define(["N/record", "N/search", "N/task", "N/format", 'N/config', "N/runtime"], 
         var desglose = newRecord.getValue("custrecord_ptg_total_anden_liq");
         var estatusLiquidacion = 0;
         var estatusFacturacion = 0;
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          estatusLiquidacion = 2;
-          estatusFacturacion = 4;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          estatusLiquidacion = 2;
-          estatusFacturacion = 4;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          estatusLiquidacion = objMap.estatusLiquidacion;
+          estatusFacturacion = objMap.estatusFacturacion;
         }
         
         if (type_event == "view") {
@@ -126,24 +124,16 @@ define(["N/record", "N/search", "N/task", "N/format", 'N/config', "N/runtime"], 
         var creditoClienteAnden = 0;
         var recirculacionAnden = 0;
 
-        if (runtime.envType === runtime.EnvType.SANDBOX) {         
-          efectivoAnden = 1;
-          tarjetaDebitoAnden = 2;
-          tarjetaCreditoAnden = 3;
-          chequeAnden = 4;
-          cortesiaAnden = 5;
-          valesTraspAnden = 6;
-          creditoClienteAnden = 7;
-          recirculacionAnden = 8;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          efectivoAnden = 1;
-          tarjetaDebitoAnden = 2;
-          tarjetaCreditoAnden = 3;
-          chequeAnden = 4;
-          cortesiaAnden = 5;
-          valesTraspAnden = 6;
-          creditoClienteAnden = 7;
-          recirculacionAnden = 8;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+          efectivoAnden = objMap.efectivoAnden;
+          tarjetaDebitoAnden = objMap.tarjetaDebitoAnden;
+          tarjetaCreditoAnden = objMap.tarjetaCreditoAnden;
+          chequeAnden = objMap.chequeAnden;
+          cortesiaAnden = objMap.cortesiaAnden;
+          valesTraspAnden = objMap.valesTraspAnden;
+          creditoClienteAnden = objMap.creditoClienteAnden;
+          recirculacionAnden = objMap.recirculacionAnden;
         }
 
         var d = fechaInicio;

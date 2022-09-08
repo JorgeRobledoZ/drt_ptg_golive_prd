@@ -12,7 +12,7 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", "N/runtime"], function (record, search, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime"], function (drt_mapid_cm, record, search, runtime) {
   function beforeSubmit(context) {
     try {
       var newRecord = context.newRecord;
@@ -65,20 +65,14 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         log.audit("planta", planta);
         var envaseCilindro = 0;
 
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          planta = 1142;
-          unidadLitros = 23;
-          cuentaAjusteInventario = 218;
-          gasLP = 4088;
-          gasLPUnidades = 4693;
-          envaseCilindro = 5;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          planta = 1505; //Temporal esto es de Rio Verde
-          unidadLitros = 11;
-          cuentaAjusteInventario = 218;
-          gasLP = 4216;
-          gasLPUnidades = 4216;
-          envaseCilindro = 5;
+        var objMap=drt_mapid_cm.drt_liquidacion()
+        if (Object.keys(objMap).length>0) {
+          planta = objMap.planta; //Temporal esto es de Rio Verde
+          unidadLitros = objMap.unidadLitros;
+          cuentaAjusteInventario = objMap.cuentaAjusteInventario;
+          gasLP = objMap.gasLP;
+          gasLPUnidades = objMap.gasLPUnidades;
+          envaseCilindro = objMap.envaseCilindro;
         }
 
         var localizacionObj = record.load({

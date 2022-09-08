@@ -13,7 +13,7 @@
  *@NApiVersion 2.x
  *@NScriptType MapReduceScript
  */
- define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https'], function (runtime, search, record, email, error, url, https) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https'], function (drt_mapid_cm, runtime, search, record, email, error, url, https) {
 
     function getInputData() {
         try {
@@ -125,45 +125,27 @@
             });
             var planta = recVentaAnden.getText("custrecord_ptg_planta_anden");
 
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-                ubicacionAnden = 1142;
-                publicoGeneral = 14508;
-                articuloCilindro = 1;
-                cuentaAjusteInventario = 218;
-                gasLPUnidades = 4693;
-                articuloChatarra = 4831;
-                efectivoAnden = 1;
-                tarjetaDebitoAnden = 2;
-                tarjetaCreditoAnden = 3;
-                chequeAnden = 4;
-                cortesiaAnden = 5;
-                valesTraspAnden = 6;
-                creditoClienteAnden = 7;
-                recirculacionAnden = 8;
-                unidad10 = 24;
-                unidad20 = 25;
-                unidad30 = 26;
-                unidad45 = 27;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                ubicacionAnden = 1502; //Este es temporal solo es para Rio Verde.
-                publicoGeneral = 27041;
-                articuloCilindro = 1;
-                cuentaAjusteInventario = 218;
-                gasLPUnidades = 4216;
-                articuloChatarra = 4831;
-                efectivoAnden = 1;
-                tarjetaDebitoAnden = 2;
-                tarjetaCreditoAnden = 3;
-                chequeAnden = 4;
-                cortesiaAnden = 5;
-                valesTraspAnden = 6;
-                creditoClienteAnden = 7;
-                recirculacionAnden = 8;
-                unidad10 = 12;
-                unidad20 = 13;
-                unidad30 = 14;
-                unidad45 = 15;
-                publicoGeneralTXT = "Publico General";
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+                ubicacionAnden = objMap.ubicacionAnden;
+                publicoGeneral = objMap.publicoGeneral;
+                articuloCilindro = objMap.articuloCilindro;
+                cuentaAjusteInventario = objMap.cuentaAjusteInventario;
+                gasLPUnidades = objMap.gasLPUnidades;
+                articuloChatarra = objMap.articuloChatarra;
+                efectivoAnden = objMap.efectivoAnden;
+                tarjetaDebitoAnden = objMap.tarjetaDebitoAnden;
+                tarjetaCreditoAnden = objMap.tarjetaCreditoAnden;
+                chequeAnden = objMap.chequeAnden;
+                cortesiaAnden = objMap.cortesiaAnden;
+                valesTraspAnden = objMap.valesTraspAnden;
+                creditoClienteAnden = objMap.creditoClienteAnden;
+                recirculacionAnden = objMap.recirculacionAnden;
+                unidad10 = objMap.unidad10;
+                unidad20 = objMap.unidad20;
+                unidad30 = objMap.unidad30;
+                unidad45 = objMap.unidad45;
+                publicoGeneralTXT = objMap.publicoGeneralTXT;
             }
             
             for (var t = 0; t < lineasArticulos; t++){
@@ -477,42 +459,25 @@
             var creditoClientePago = 0;
             var recirculacionPago = 0;
             var chequeBanamexPago = 0;
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-                efectivoAnden = 1;
-                tarjetaDebitoAnden = 2;
-                tarjetaCreditoAnden = 3;
-                chequeAnden = 4;
-                cortesiaAnden = 5;
-                valesTraspAnden = 6;
-                creditoClienteAnden = 7;
-                recirculacionAnden = 8;
-                efectivoPago = 1;
-                valePago = 3;
-                cortesiaPago = 4;
-                tarjetaCreditoPago = 5;
-                tarjetaDebitoPago = 6;
-                creditoClientePago = 9;
-                recirculacionPago = 21;
-                chequeBanamexPago = 29;
-                articuloBonificacion = 4832;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                efectivoAnden = 1;
-                tarjetaDebitoAnden = 2;
-                tarjetaCreditoAnden = 3;
-                chequeAnden = 4;
-                cortesiaAnden = 5;
-                valesTraspAnden = 6;
-                creditoClienteAnden = 7;
-                recirculacionAnden = 8;
-                efectivoPago = 1;
-                valePago = 3;
-                cortesiaPago = 4;
-                tarjetaCreditoPago = 5;
-                tarjetaDebitoPago = 6;
-                creditoClientePago = 9;
-                recirculacionPago = 21;
-                chequeBanamexPago = 29;
-                articuloBonificacion = 4218;
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+                efectivoAnden = objMap.efectivoAnden;
+                tarjetaDebitoAnden = objMap.tarjetaDebitoAnden;
+                tarjetaCreditoAnden = objMap.tarjetaCreditoAnden;
+                chequeAnden = objMap.chequeAnden;
+                cortesiaAnden = objMap.cortesiaAnden;
+                valesTraspAnden = objMap.valesTraspAnden;
+                creditoClienteAnden = objMap.creditoClienteAnden;
+                recirculacionAnden = objMap.recirculacionAnden;
+                efectivoPago = objMap.efectivoPago;
+                valePago = objMap.valePago;
+                cortesiaPago = objMap.cortesiaPago;
+                tarjetaCreditoPago = objMap.tarjetaCreditoPago;
+                tarjetaDebitoPago = objMap.tarjetaDebitoPago;
+                creditoClientePago = objMap.creditoClientePago;
+                recirculacionPago = objMap.recirculacionPago;
+                chequeBanamexPago = objMap.chequeBanamexPago;
+                articuloBonificacion = objMap.articuloBonificacion;
             }
 
             var formaPagoFacturar = facturaObj.getValue("custbody_ptg_forma_pago_facturar_anden");
@@ -604,65 +569,16 @@
 
     }
 
-   /* function searchCuenta(idSubsidiaria, idTipoPago) {
-        try {
-
-            var cuentaDefault = 0;
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-                cuentaDefault = 2786;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                cuentaDefault = 2786;
-            }
-            //SS: PTG - Mapeo Formas de pago y cuentas SS
-            var mapeoCuentaObj = search.create({
-                type: "customrecord_mapeo_formasdepago_cuentas",
-                filters: [
-                    ["custrecord_ptg_formadepago_subsidiaria", "anyof", idSubsidiaria], "AND",
-                    ["custrecord_ptg_forma_pago", "anyof", idTipoPago],
-                ],
-                columns: [
-                    search.createColumn({name: "custrecord_ptg_formadepago_cuenta", label: "PTG - Cuenta de banco",}),
-                ],
-            });
-
-            var mapeoCuentaObjCount = mapeoCuentaObj.runPaged().count;
-            var mapeoCuentaObjResult = mapeoCuentaObj.run().getRange({
-                start: 0,
-                end: mapeoCuentaObjCount,
-            });
-            if (mapeoCuentaObjCount > 0) {
-                idCuenta = mapeoCuentaObjResult[0].getValue({
-                    name: "custrecord_ptg_formadepago_cuenta",
-                    label: "PTG - Cuenta de banco",
-                });
-                log.debug("idCuenta", idCuenta);
-            } else {
-                idCuenta = cuentaDefault;
-                log.debug("cuenta no encontrada", idCuenta);
-            }
-            
-            return idCuenta;
-        } catch (error) {
-            log.error({
-                title: "error searchCuenta",
-                details: JSON.stringify(error),
-            });
-        }
-    }*/
 
     function searchCuenta(idSubsidiaria, idTipoPago) {
         try {
             var cuentaDefault = 0;
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-                cuentaDefault = 2786;
-                subsidiariaCorpoGas = 22;
-                subsidiariaDistribuidora = 26;
-                subsidiariaSanLuis = 23;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                cuentaDefault = 2786;
-                subsidiariaCorpoGas = 22;
-                subsidiariaDistribuidora = 26;
-                subsidiariaSanLuis = 23;
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+                cuentaDefault : objMap.cuentaDefault;
+                subsidiariaCorpoGas : objMap.subsidiariaCorpoGas;
+                subsidiariaDistribuidora : objMap.subsidiariaDistribuidora;
+                subsidiariaSanLuis : objMap.subsidiariaSanLuis;
             }
 
           //SS: PTG - Mapeo Formas de pago y cuentas SS
@@ -715,10 +631,9 @@
     function searchFormaPagoSAT(idSubsidiaria, idTipoPago) {
         try {
             var formaDePagoDefault = 0;
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-                formaDePagoDefault = 28;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                formaDePagoDefault = 28;
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+                formaDePagoDefault = objMap.formaDePagoDefault;
             }
 
             //SS: PTG - Mapeo Formas de pago y cuentas SS

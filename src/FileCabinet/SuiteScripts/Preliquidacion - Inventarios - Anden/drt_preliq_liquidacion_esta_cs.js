@@ -12,8 +12,8 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
- define(['N/https', 'N/currentRecord', 'N/url', 'N/ui/message', 'N/ui/dialog', 'N/search', 'N/runtime', 'N/record', 'N/error', ['N/currency']], 
- function (https, currentRecord, url, message, dialog, search, runtime, record, error, currency) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/https', 'N/currentRecord', 'N/url', 'N/ui/message', 'N/ui/dialog', 'N/search', 'N/runtime', 'N/record', 'N/error', ['N/currency']],
+ function (drt_mapid_cm, https, currentRecord, url, message, dialog, search, runtime, record, error, currency) {
     function pageInit(context) {
       try {
         var currentRecord = context.currentRecord;
@@ -123,10 +123,9 @@
             var suma = 0;
 
             var estatusEnCurso = 0;
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-              estatusEnCurso = 3;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-              estatusEnCurso = 3;
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+              estatusEnCurso = objMap.estatusEnCurso;
             }
 
 
@@ -338,11 +337,9 @@
 
         var estatusLiquidacion = 0;
 
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          estatusLiquidacion = 2;
-
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          estatusLiquidacion = 2;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          estatusLiquidacion = objMap.estatusLiquidacion;
         }
 
         //Búsqueda Guardada: PTG - PreLiquidacion Estacionarios SS
@@ -477,15 +474,12 @@
           var formularioLiquidacionEstacionario = 0;
           var estatusViajeLiquidacion = 0;
           var estatusLiquidacion = 0;
-          
-          if (runtime.envType === runtime.EnvType.SANDBOX) {
-            formularioLiquidacionEstacionario = 179;
-            estatusViajeLiquidacion = 2;
-            estatusLiquidacion = 2;
-          } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-            formularioLiquidacionEstacionario = 203;
-            estatusViajeLiquidacion = 2;
-            estatusLiquidacion = 2;
+
+          var objMap=drt_mapid_cm.drt_liquidacion();
+          if (Object.keys(objMap).length>0) {
+            formularioLiquidacionEstacionario = objMap.formularioLiquidacionEstacionario;
+            estatusViajeLiquidacion = objMap.estatusViajeLiquidacion;
+            estatusLiquidacion = objMap.estatusLiquidacion;
           }
 
             const newForm = formularioLiquidacionEstacionario;
@@ -543,15 +537,12 @@
         var formularioFacturacionEstacionario = 0;
         var estatusViajeEjecutado = 0;
         var estatusEjecutado = 0;
-          
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          formularioFacturacionEstacionario = 177;
-          estatusViajeEjecutado = 3;
-          estatusEjecutado = 3;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          formularioFacturacionEstacionario = 205;
-          estatusViajeEjecutado = 3;
-          estatusEjecutado = 3;
+
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          formularioFacturacionEstacionario = objMap.formularioFacturacionEstacionario;
+          estatusViajeEjecutado = objMap.estatusViajeEjecutado;
+          estatusEjecutado = objMap.estatusEjecutado;
         }
           const newForm = formularioFacturacionEstacionario;
           
@@ -610,17 +601,13 @@
       var estatusViajeEjecutado = 0;
       var estatusEjecutado = 0;
       var urlCustomRecord = '';
-          
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        formularioFacturacionEstacionario = 177;
-        estatusViajeEjecutado = 3;
-        estatusEjecutado = 3;
-        urlCustomRecord = 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=486&vehiculo=';
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        formularioFacturacionEstacionario = 205;
-        estatusViajeEjecutado = 3;
-        estatusEjecutado = 3;
-        urlCustomRecord = 'https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=588&vehiculo=';
+
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        formularioFacturacionEstacionario = objMap.formularioFacturacionEstacionario;
+        estatusViajeEjecutado = objMap.estatusViajeEjecutado;
+        estatusEjecutado = objMap.estatusEjecutado;
+        urlCustomRecord = objMap.urlCustomRecord;
       }
 
         const newForm = formularioFacturacionEstacionario;
@@ -698,13 +685,11 @@
       log.audit("facturar Oportunidad cs");
       var estatusViajeConcluido = 0;
       var estatusFacturado = 0;
-          
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        estatusViajeConcluido = 1;
-        estatusFacturado = 4;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        estatusViajeConcluido = 1;
-        estatusFacturado = 4;
+
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        estatusViajeConcluido = objMap.estatusViajeConcluido;
+        estatusFacturado = objMap.estatusFacturado;
       }
 
       var button = document.getElementById('custpage_drt_to_facturacion');
@@ -788,14 +773,11 @@
       var formularioFacturacionEstacionario = 0;
       var estatusFacturacion = 0;
       var limiteURL = 0;
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        formularioFacturacionEstacionario = 177;
-        estatusFacturacion = 4;
-        limiteURL = 100;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        formularioFacturacionEstacionario = 205;
-        estatusFacturacion = 4;
-        limiteURL = 100;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        formularioFacturacionEstacionario = objMap.formularioFacturacionEstacionario;
+        estatusFacturacion = objMap.estatusFacturacion;
+        limiteURL = objMap.limiteURL;
       }
 
             const newFormF = formularioFacturacionEstacionario;

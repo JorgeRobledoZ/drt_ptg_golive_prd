@@ -12,7 +12,7 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
- define(["N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog"], function (record, search, error, runtime, dialog) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog"], function (drt_mapid_cm, record, search, error, runtime, dialog) {
     function fieldChanged(context) {
       try {
         var currentRecord = context.currentRecord;
@@ -29,12 +29,10 @@
       debugger;
       var vehiculoPipa = 0;
       var gasLP = 0;
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        vehiculoPipa = 1;
-        gasLP = 4088;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        vehiculoPipa = 1;
-        gasLP = 4216;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        vehiculoPipa = objMap.vehiculoPipa;
+        gasLP = objMap.gasLP;
       }
 
 

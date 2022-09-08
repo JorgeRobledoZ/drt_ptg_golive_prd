@@ -12,7 +12,7 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
- define(["N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog"], function (record, search, error, runtime, dialog) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog"], function (drt_mapid_cm, record, search, error, runtime, dialog) {
     function pageInit(context) {
         try {
           var currentRecord = context.currentRecord;
@@ -58,11 +58,10 @@
         var total = 0;
         var totalEfectivo = 0;
         var efectivo = false;
-        var pagoEfectivo = 0;
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          pagoEfectivo = 1;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          pagoEfectivo = 1;
+        var efectivoPago = 0;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          efectivoPago = objMap.efectivoPago;
         }
         log.audit("totalServicio", totalServicio);
         log.audit("cobroEfectivo", cobroEfectivo);
@@ -80,7 +79,7 @@
             line: i,
           });
 
-          if(tipoPago == pagoEfectivo){
+          if(tipoPago == efectivoPago){
             totalEfectivo += totalLinea;
             efectivo = true;
           }

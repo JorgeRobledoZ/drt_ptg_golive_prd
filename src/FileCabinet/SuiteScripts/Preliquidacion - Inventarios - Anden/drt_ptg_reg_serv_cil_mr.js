@@ -13,7 +13,7 @@
  *@NApiVersion 2.x
  *@NScriptType MapReduceScript
  */
- define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https'], function (runtime, search, record, email, error, url, https) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https'], function (drt_mapid_cm, runtime, search, record, email, error, url, https) {
 
     function getInputData() {
         try {
@@ -122,48 +122,28 @@
             var idArticuloDescuento = 0;
             var subTotalSinDecuento = 0;
 
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-                publicoGeneral = 14508;
-                cilindro10 = 4094;
-                cilindro20 = 4095;
-                cilindro30 = 4096;
-                cilindro45 = 4602;
-                gasLPUnidades = 4693;
-                unidad10 = 24;
-                unidad20 = 25;
-                unidad30 = 26;
-                unidad45 = 27;
-                condretado = 13;
-                entregado = 3;
-                ventaLitro = 9;
-                traspasoId = 25;
-                formularioRecepcion = 258;
-                formularioOportunidad = 305;
-                formularioOrdenTraslado = 313;
-                rfcGenerico = "XAXX010101000";
-                rfcPublicoGeneral = "AAA010101AAA";
-                idArticuloDescuento = 4217;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                publicoGeneral = 27041;
-                cilindro10 = 4210;
-                cilindro20 = 4211;
-                cilindro30 = 4212;
-                cilindro45 = 4213;
-                gasLPUnidades = 4216;
-                unidad10 = 12;
-                unidad20 = 13;
-                unidad30 = 14;
-                unidad45 = 15;
-                condretado = 13;
-                entregado = 3;
-                ventaLitro = 9;
-                traspasoId = 25;
-                formularioRecepcion = 270;
-                formularioOportunidad = 265;
-                formularioOrdenTraslado = 266;
-                rfcGenerico = "XAXX010101000";
-                rfcPublicoGeneral = "AAA010101AAA";
-                idArticuloDescuento = 4217;
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+                publicoGeneral = objMap.publicoGeneral;
+                cilindro10 = objMap.cilindro10;
+                cilindro20 = objMap.cilindro20;
+                cilindro30 = objMap.cilindro30;
+                cilindro45 = objMap.cilindro45;
+                gasLPUnidades = objMap.gasLPUnidades;
+                unidad10 = objMap.unidad10;
+                unidad20 = objMap.unidad20;
+                unidad30 = objMap.unidad30;
+                unidad45 = objMap.unidad45;
+                condretado = objMap.condretado;
+                entregado = objMap.entregado;
+                ventaLitro = objMap.ventaLitro;
+                traspasoId = objMap.traspasoId;
+                formularioRecepcion = objMap.formularioRecepcion;
+                formularioOportunidad = objMap.formularioOportunidad;
+                formularioOrdenTraslado = objMap.formularioOrdenTraslado;
+                rfcGenerico = objMap.rfcGenerico;
+                rfcPublicoGeneral = objMap.rfcPublicoGeneral;
+                idArticuloDescuento = objMap.idArticuloDescuento;
             }
 
             var itemCilObj = record.load({

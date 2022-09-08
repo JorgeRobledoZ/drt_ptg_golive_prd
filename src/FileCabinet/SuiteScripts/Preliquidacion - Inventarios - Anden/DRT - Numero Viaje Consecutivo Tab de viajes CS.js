@@ -12,7 +12,7 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
- define(["N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog"], function (record, search, error, runtime, dialog) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog"], function (drt_mapid_cm, record, search, error, runtime, dialog) {
     function pageInit(context) {
         try {
           var currentRecord = context.currentRecord;
@@ -147,17 +147,15 @@
           var equipoUtilitario = 0;
           var equipoOtro = 0;
 
-          if (runtime.envType === runtime.EnvType.SANDBOX) {
-            formularioCilindro = 172;
-            estatus = 3;
-          } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-            formularioCilindro = 177;
-            formularioEstacionario = 176;
-            estatus = 3;
-            equipoPipa = 1;
-            equipoCamion = 2;
-            equipoUtilitario = 3;
-            equipoOtro = 4;
+          var objMap=drt_mapid_cm.drt_liquidacion();
+          if (Object.keys(objMap).length>0) {
+            formularioCilindro = objMap.formularioCilindro;
+            formularioEstacionario = objMap.formularioEstacionario;
+            estatus = objMap.estatus;
+            equipoPipa = objMap.equipoPipa;
+            equipoCamion = objMap.equipoCamion;
+            equipoUtilitario = objMap.equipoUtilitario;
+            equipoOtro = objMap.equipoOtro;
           }
 
           var equiposObj = record.load({

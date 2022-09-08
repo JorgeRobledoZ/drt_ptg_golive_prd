@@ -12,9 +12,10 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", "N/runtime"], function (record, search, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime"], function (drt_mapid_cm,record, search, runtime) {
   function afterSubmit(context) {
     try {
+        var objMap=drt_mapid_cm.drt_liquidacion();
         var newRecord = context.newRecord;
         var recId = newRecord.id;
         var estacion = newRecord.getValue("custrecord_ptg_est_dot_est_carb_");
@@ -24,12 +25,9 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         var notaConsumo = newRecord.getValue("custrecord_ptg_nota_de_consumo_");
         var articulo = 0;
         var formularioTransferenciaInventario = 0;
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          articulo = 4088;
-          formularioTransferenciaInventario = 306;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          articulo = 4216;
-          formularioTransferenciaInventario = 57;
+        if (Object.keys(objMap).length>0) {
+          articulo = articulo.objMap;
+          formularioTransferenciaInventario = formularioTransferenciaInventario.objMap;
         }
 
       if(!transaccion){

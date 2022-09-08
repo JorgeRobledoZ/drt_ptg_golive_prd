@@ -33,9 +33,6 @@
             
             log.audit('Remaining Usage start proceso', runtime.getCurrentScript().getRemainingUsage());
 
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-            }
 
             //BÚSQUEDA GUARDADA: PTG - Registro Conciliacion Esta
             var conciliarServSearch = search.create({

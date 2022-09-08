@@ -12,7 +12,7 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", 'N/config', 'N/format', "N/runtime"], function (record, search, config, format, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", 'N/config', 'N/format', "N/runtime"], function (drt_mapid_cm, record, search, config, format, runtime) {
   function afterSubmit(context) {
     try {
       var objUpdate = {};
@@ -73,32 +73,20 @@ define(["N/record", "N/search", 'N/config', 'N/format', "N/runtime"], function (
         log.audit("formulario", formulario);
 
 
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          plantillaDocumentoElectronico = 135;
-          metodoDeEnvio = 11;
-          unidad10 = 24;
-          unidad20 = 25;
-          unidad30 = 26;
-          unidad45 = 27;
-          formularioCilindros = 172;
-          formularioEstacionarios = 173;
-          paqueteMySuite = 2;
-          estatusEnCurso = 3;
-          formularioTrasladoCarburacion = 313;
-          gasLPUnidades = 4693;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          plantillaDocumentoElectronico = 119;
-          metodoDeEnvio = 10;
-          unidad10 = 12;
-          unidad20 = 13;
-          unidad30 = 14;
-          unidad45 = 15;
-          formularioCilindros = 177;
-          formularioEstacionarios = 176;
-          paqueteMySuite = 2;
-          estatusEnCurso = 3;
-          formularioTrasladoCarburacion = 266;
-          gasLPUnidades = 4216;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+          plantillaDocumentoElectronico = objMap.plantillaDocumentoElectronico;
+          metodoDeEnvio = objMap.metodoDeEnvio;
+          unidad10 = objMap.unidad10;
+          unidad20 = objMap.unidad20;
+          unidad30 = objMap.unidad30;
+          unidad45 = objMap.unidad45;
+          formularioCilindros = objMap.formularioCilindros;
+          formularioEstacionarios = objMap.formularioEstacionarios;
+          paqueteMySuite = objMap.paqueteMySuite;
+          estatusEnCurso = objMap.estatusEnCurso;
+          formularioTrasladoCarburacion = objMap.formularioTrasladoCarburacion;
+          gasLPUnidades = objMap.gasLPUnidades;
         }
 
 

@@ -12,7 +12,7 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", "N/task", "N/format", "N/config", "N/runtime"], function (record, search, task, format, config, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/task", "N/format", "N/config", "N/runtime"], function (drt_mapid_cm, record, search, task, format, config, runtime) {
   function afterSubmit(context) {
     try {
       if (context.type == "create") {
@@ -32,13 +32,10 @@ define(["N/record", "N/search", "N/task", "N/format", "N/config", "N/runtime"], 
       var formaDePago = newRecord.getValue("custrecord_ptg_metododepago_registro");
       var planta = newRecord.getValue("custrecord_ptg_registro_cliente_planta");
       var correoElectronico = newRecord.getValue("custrecord_ptg_registro_cliente_email");
-
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        formulario = 194;
-        clienteIndividual = 1;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        formulario = 180;
-        clienteIndividual = 1;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        formulario = objMap.formulario;
+        clienteIndividual = objMap.clienteIndividual;
       }
 
       var locationObj = record.load({

@@ -12,7 +12,7 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", "N/task", "N/format", 'N/config', "N/runtime"], function (record, search, task, format, config, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm',"N/record", "N/search", "N/task", "N/format", 'N/config', "N/runtime"], function (drt_mapid_cm, record, search, task, format, config, runtime) {
 
   function beforeLoad(context){
     try {
@@ -120,8 +120,8 @@ define(["N/record", "N/search", "N/task", "N/format", 'N/config', "N/runtime"], 
       var multipleId = 0;
       var creditoClienteId = 0;
       var servicioVentanAnden = 0;
-
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
         efectivoAnden = 1;
         tarjetaDebitoAnden = 2;
         tarjetaCreditoAnden = 3;

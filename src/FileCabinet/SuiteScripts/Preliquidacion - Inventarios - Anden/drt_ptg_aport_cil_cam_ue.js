@@ -12,7 +12,7 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", "N/runtime"], function (record, search, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime"], function (drt_mapid_cm, record, search, runtime) {
   function beforeLoad(scriptContext) {
     try {
         var customRec = scriptContext.newRecord;
@@ -85,10 +85,9 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         log.audit("transferenciaCreadaCero", transferenciaCreadaCero);
 
         var formularioTrasladoCarburacion = 0;
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          formularioTrasladoCarburacion = 313;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          formularioTrasladoCarburacion = 266;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          formularioTrasladoCarburacion = objMap.formularioTrasladoCarburacion;
         }
 
         if(!transferenciaCreadaCero){

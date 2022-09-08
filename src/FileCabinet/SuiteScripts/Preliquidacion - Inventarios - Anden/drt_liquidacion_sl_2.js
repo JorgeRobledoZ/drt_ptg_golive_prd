@@ -13,7 +13,7 @@
  * @NScriptType Suitelet
  * @NModuleScope public
  */
- define(['N/search', 'N/record', 'N/ui/message', 'N/ui/dialog', 'N/task', 'N/runtime', "N/redirect", "N/log", "N/url"], function (search, record, message, dialog, task, runtime, redirect, log, url) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/search', 'N/record', 'N/ui/message', 'N/ui/dialog', 'N/task', 'N/runtime', "N/redirect", "N/log", "N/url"], function (drt_mapid_cm, search, record, message, dialog, task, runtime, redirect, log, url) {
     function onRequest(context) {
         try {
             var req_param = context.request.parameters;
@@ -51,50 +51,29 @@
             var ventaServicioCilindro = 0;
             var ventaServicio = 0;
 
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-                prepagoBanorte = 2;
-                prepagoTransferencia = 8;
-                creditoCliente = 9;
-                prepagoBancomer = 13;
-                prepagoHSBC = 14;
-                prepagoBanamex = 15;
-                prepagoSantander = 16;
-                prepagoScotian = 17;
-                publicoGeneral = 14508;
-                urlPago = "https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=503&id=";
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+                prepagoBanorte = objMap.prepagoBanorte;
+                prepagoTransferencia = objMap.prepagoTransferencia;
+                creditoCliente = objMap.creditoCliente;
+                prepagoBancomer = objMap.prepagoBancomer;
+                prepagoHSBC = objMap.prepagoHSBC;
+                prepagoBanamex = objMap.prepagoBanamex;
+                prepagoSantander = objMap.prepagoSantander;
+                prepagoScotian = objMap.prepagoScotian;
+                publicoGeneral = objMap.publicoGeneral;
+                urlPago = objMap.urlPago;
 
-                estadoOpNegociacion = 11;
-                estadoOpCompra = 12;
-                estadoOpConcretado = 13;
-                estadoOpClienteConcretado = 18;
+                estadoOpNegociacion = objMap.estadoOpNegociacion;
+                estadoOpCompra = objMap.estadoOpCompra;
+                estadoOpConcretado = objMap.estadoOpConcretado;
+                estadoOpClienteConcretado = objMap.estadoOpClienteConcretado;
 
-                articuloCilindro = 1;
-                articuloEnvase = 5;
-                ventaServicioGas = 1;
-                ventaServicioCilindro = 2;
-                ventaServicio = 3;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                prepagoBanorte = 2;
-                prepagoTransferencia = 8;
-                creditoCliente = 9;
-                prepagoBancomer = 13;
-                prepagoHSBC = 14;
-                prepagoBanamex = 15;
-                prepagoSantander = 16;
-                prepagoScotian = 17;
-                publicoGeneral = 27041;
-                urlPago = "https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=587&id=";
-
-                estadoOpNegociacion = 11;
-                estadoOpCompra = 12;
-                estadoOpConcretado = 13;
-                estadoOpClienteConcretado = 18;
-
-                articuloCilindro = 1;
-                articuloEnvase = 5;
-                ventaServicioGas = 1;
-                ventaServicioCilindro = 2;
-                ventaServicio = 3;
+                articuloCilindro = objMap.articuloCilindro;
+                articuloEnvase = objMap.articuloEnvase;
+                ventaServicioGas = objMap.ventaServicioGas;
+                ventaServicioCilindro = objMap.ventaServicioCilindro;
+                ventaServicio = objMap.ventaServicio;
             }
 
             //LINEA

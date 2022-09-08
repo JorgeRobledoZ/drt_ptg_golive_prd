@@ -12,7 +12,7 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
- define(["N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog", 'N/currentRecord', 'N/url'], function (record, search, error, runtime, dialog, currentRecord, url) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm',"N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog", 'N/currentRecord', 'N/url'], function (drt_mapid_cm, record, search, error, runtime, dialog, currentRecord, url) {
 
     function fieldChanged(context) {
       try {
@@ -37,31 +37,19 @@
         var envase45 = 0;
         var idCilindroChatarra = 0;
         var valvula = 0;
-
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          precioValvulas = 100;
-          cilindro10 = 4094;
-          cilindro20 = 4095;
-          cilindro30 = 4096;
-          cilindro45 = 4602;
-          envase10 = 4097;
-          envase20 = 4099;
-          envase30 = 4098;
-          envase45 = 4604;
-          idCilindroChatarra = 4831;
-          valvula = 4670;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          precioValvulas = 100;
-          cilindro10 = 4210;
-          cilindro20 = 4211;
-          cilindro30 = 4212;
-          cilindro45 = 4213;
-          envase10 = 4206;
-          envase20 = 4207;
-          envase30 = 4208;
-          envase45 = 4209;          
-          idCilindroChatarra = 4831;
-          valvula = 4670;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          precioValvulas =objMap.precioValvulas;
+          cilindro10 =objMap.cilindro10;
+          cilindro20 =objMap.cilindro20;
+          cilindro30 =objMap.cilindro30;
+          cilindro45 =objMap.cilindro45;
+          envase10 =objMap.envase10;
+          envase20 =objMap.envase20;
+          envase30 =objMap.envase30;
+          envase45 =objMap.envase45;
+          idCilindroChatarra =objMap.idCilindroChatarra;
+          valvula =objMap.valvula;
         }
   
         if(precioGasCabecera && fieldName === 'custrecord_ptg_precio_gas_venta_anden'){
@@ -332,16 +320,12 @@
       var total = 0;
       var tarjetaDebitoAnden = 0;
       var tarjetaCreditoAnden = 0;
-      
 
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        tarjetaDebitoAnden = 2;
-        tarjetaCreditoAnden = 3;
-        idCilindroChatarra = 4831;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        tarjetaDebitoAnden = 2;
-        tarjetaCreditoAnden = 3;
-        idCilindroChatarra = 4831;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        tarjetaDebitoAnden =objMap.tarjetaDebitoAnden;
+        tarjetaCreditoAnden =objMap.tarjetaCreditoAnden;
+        idCilindroChatarra =objMap.idCilindroChatarra;
       }
       
         if (sublistName === sublistaArticuloAVender){
@@ -545,11 +529,9 @@
       try {
         recObj = currentRecord.get();
         var urlRegistroCliente = "";
-
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          urlRegistroCliente = "https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1070&planta=";
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          urlRegistroCliente = "https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=645&planta=";
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          urlRegistroCliente = objMap.urlRegistroCliente
         }
 
         var planta = recObj.getValue("custrecord_ptg_planta_anden");
@@ -576,11 +558,9 @@
       var totalizador = currentRecord.getValue("custrecord_ptg_totalizador_venta_anden") || 0;
       var idCilindroChatarra = 0;
       var total = 0;
-
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        idCilindroChatarra = 4831;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        idCilindroChatarra = 4831;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        idCilindroChatarra = objMap.idCilindroChatarra;
       }
 
       if (sublistName === sublistaArticuloAVender){

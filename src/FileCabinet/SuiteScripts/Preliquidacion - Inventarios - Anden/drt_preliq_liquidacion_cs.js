@@ -12,8 +12,8 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
- define(['N/https', 'N/currentRecord', 'N/url', 'N/ui/message', 'N/ui/dialog', 'N/search', 'N/runtime', 'N/record', 'N/error', ['N/currency']], 
- function (https, currentRecord, url, message, dialog, search, runtime, record, error, currency) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/https', 'N/currentRecord', 'N/url', 'N/ui/message', 'N/ui/dialog', 'N/search', 'N/runtime', 'N/record', 'N/error', ['N/currency']],
+ function (drt_mapid_cm, https, currentRecord, url, message, dialog, search, runtime, record, error, currency) {
 
     function pageInit(context) {
       try {
@@ -68,10 +68,9 @@
             var vehiculoTXT = currentRecord.getText("custrecord_ptg_nodevehiculo_prelicil_");
             var estatusEnCurso = 0;
 
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-              estatusEnCurso = 3;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-              estatusEnCurso = 3;
+          var objMap=drt_mapid_cm.drt_liquidacion();
+          if (Object.keys(objMap).length>0) {
+              estatusEnCurso = objMap.estatusEnCurso;
             }
 
             if(((milPesos || !milPesos) && cabeceraFieldName === "custrecord_ptg_1000") || ((quinientosPesos || !quinientosPesos) && cabeceraFieldName === "custrecord_ptg_500") || 
@@ -177,17 +176,12 @@
         var estatusEjecutado = 0;
         var estatusFacturacion = 0;
 
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          estatusPreliquidacion = 1;
-          estatusLiquidacion = 2;
-          estatusEjecutado = 3;
-          estatusFacturacion = 4;
-
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          estatusPreliquidacion = 1;
-          estatusLiquidacion = 2;
-          estatusEjecutado = 3;
-          estatusFacturacion = 4;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          estatusPreliquidacion = objMap.estatusPreliquidacion;
+          estatusLiquidacion = objMap.estatusLiquidacion;
+          estatusEjecutado = objMap.estatusEjecutado;
+          estatusFacturacion = objMap.estatusFacturacion;
         }
 
 
@@ -351,15 +345,12 @@
           var formularioLiquidacionCilindro = 0;
           var estatusViajeLiquidacion = 0;
           var estatusLiquidacion = 0;
-          
-          if (runtime.envType === runtime.EnvType.SANDBOX) {
-            formularioLiquidacionCilindro = 181;
-            estatusViajeLiquidacion = 2;
-            estatusLiquidacion = 2;
-          } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-            formularioLiquidacionCilindro = 173;
-            estatusViajeLiquidacion = 2;
-            estatusLiquidacion = 2;
+
+          var objMap=drt_mapid_cm.drt_liquidacion();
+          if (Object.keys(objMap).length>0) {
+            formularioLiquidacionCilindro = objMap.formularioLiquidacionCilindro;
+            estatusViajeLiquidacion = objMap.estatusViajeLiquidacion;
+            estatusLiquidacion = objMap.estatusLiquidacion;
           }
 
             const newForm = formularioLiquidacionCilindro;
@@ -417,15 +408,12 @@
         var formularioFacturacionCilindro = 0;
         var estatusViajeEjecutado = 0;
         var estatusEjecutado = 0;
-          
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          formularioFacturacionCilindro = 182;
-          estatusViajeEjecutado = 3;
-          estatusEjecutado = 3;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          formularioFacturacionCilindro = 171;
-          estatusViajeEjecutado = 3;
-          estatusEjecutado = 3;
+
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          formularioFacturacionCilindro = objMap.formularioFacturacionCilindro;
+          estatusViajeEjecutado = objMap.estatusViajeEjecutado;
+          estatusEjecutado = objMap.estatusEjecutado;
         }
 
           const newForm = formularioFacturacionCilindro;
@@ -487,21 +475,15 @@
       var urlCustomRecord = '';
       var urlCustomRecordFormulario = '';
       var formularioCilindro = 0;
-          
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        formularioFacturacionCilindro = 182;
-        estatusViajeEjecutado = 3;
-        estatusEjecutado = 3;
-        formularioCilindro = 172;
-        urlCustomRecord = 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=486&vehiculo=';
-        urlCustomRecordFormulario = '&formulario=';
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        formularioFacturacionCilindro = 171;
-        estatusViajeEjecutado = 3;
-        estatusEjecutado = 3;
-        formularioCilindro = 177;
-        urlCustomRecord = 'https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=588&vehiculo=';
-        urlCustomRecordFormulario = '&formulario=';
+
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        formularioFacturacionCilindro = objMap.formularioFacturacionCilindro;
+        estatusViajeEjecutado = objMap.estatusViajeEjecutado;
+        estatusEjecutado = objMap.estatusEjecutado;
+        formularioCilindro = objMap.formularioCilindro;
+        urlCustomRecord = objMap.urlCustomRecord;
+        urlCustomRecordFormulario = objMap.urlCustomRecordFormulario;
       }
 
 
@@ -580,13 +562,11 @@
       log.audit("facturar Oportunidad cs");
       var estatusViajeConcluido = 0;
       var estatusFacturado = 0;
-          
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        estatusViajeConcluido = 1;
-        estatusFacturado = 4;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        estatusViajeConcluido = 1;
-        estatusFacturado = 4;
+
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        estatusViajeConcluido = objMap.estatusViajeConcluido;
+        estatusFacturado = objMap.estatusFacturado;
       }
 
       var button = document.getElementById('custpage_drt_to_facturacion');
@@ -646,17 +626,13 @@
       var urlCustomRecord = '';
       var urlCustomRecordFormulario = '';
       var formularioCilindro = 0;
-          
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        formularioFacturacionCilindro = 182;
-        formularioCilindro = 0;
-        urlCustomRecord = 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=486&vehiculo=';
-        urlCustomRecordFormulario = '&formulario=';
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        formularioFacturacionCilindro = 171;
-        formularioCilindro = 177;
-        urlCustomRecord = 'https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=588&vehiculo=';
-        urlCustomRecordFormulario = '&formulario=';
+
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        formularioFacturacionCilindro = objMap.formularioFacturacionCilindro;
+        formularioCilindro = objMap.formularioCilindro;
+        urlCustomRecord = objMap.urlCustomRecord;
+        urlCustomRecordFormulario = objMap.urlCustomRecordFormulario;
       }
 
         
@@ -703,14 +679,11 @@
       var formularioFacturacionCilindro = 0;
       var estatusFacturacion = 0;
       var limiteURL = 0;
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        formularioFacturacionCilindro = 182;
-        estatusFacturacion = 4;
-        limiteURL = 100;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        formularioFacturacionCilindro = 171;
-        estatusFacturacion = 4;
-        limiteURL = 100;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        formularioFacturacionCilindro = objMap.formularioFacturacionCilindro;
+        estatusFacturacion = objMap.estatusFacturacion;
+        limiteURL = objMap.limiteURL;
       }
 
             const newFormF = formularioFacturacionCilindro;

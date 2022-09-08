@@ -13,7 +13,7 @@
  *@NApiVersion 2.1
  *@NScriptType MapReduceScript
  */
- define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https', 'SuiteScripts/dev/moment'], function (runtime, search, record, email, error, url, https, moment) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https', 'SuiteScripts/dev/moment'], function (drt_mapid_cm, runtime, search, record, email, error, url, https, moment) {
 
     function getInputData() {
         try {
@@ -153,33 +153,21 @@
             var formularioRecepcion = 0;
             var formularioOportunidad = 0;
             var formularioOrdenTraslado = 0;
-            var publicoGeneralID = 0;
+            var idPublicoGeneral = 0;
             var idArticuloDescuento = 0;
-
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-                rfcGenerico = "XAXX010101000";
-                rfcPublicoGeneral = "JES900109Q90";
-                condretado = 13;
-                entregado = 3;
-                ventaLitro = 9;
-                traspasoId = 25;
-                formularioRecepcion = 258;
-                formularioOportunidad = 305;
-                formularioOrdenTraslado = 313;
-                publicoGeneralID = 27041;
-                idArticuloDescuento = 4217;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                rfcGenerico = "XAXX010101000";
-                rfcPublicoGeneral = "JES900109Q90";
-                condretado = 13;
-                entregado = 3;
-                ventaLitro = 9;
-                traspasoId = 25;
-                formularioRecepcion = 270;
-                formularioOportunidad = 265;
-                formularioOrdenTraslado = 266;
-                publicoGeneralID = 27041;
-                idArticuloDescuento = 4217;
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+                rfcGenerico = objMap.rfcGenerico;
+                rfcPublicoGeneral = objMap.rfcPublicoGeneral;
+                condretado = objMap.condretado;
+                entregado = objMap.entregado;
+                ventaLitro = objMap.ventaLitro;
+                traspasoId = objMap.traspasoId;
+                formularioRecepcion = objMap.formularioRecepcion;
+                formularioOportunidad = objMap.formularioOportunidad;
+                formularioOrdenTraslado = objMap.formularioOrdenTraslado;
+                idPublicoGeneral = objMap.idPublicoGeneral;
+                idArticuloDescuento = objMap.idArticuloDescuento;
             }
 
 
@@ -223,7 +211,7 @@
                 var objValue = JSON.stringify(objPagosOportunidad);
 
 
-                if(cliente != publicoGeneralID){// Cuando tiene un cliente distinto a público general, trata de buscar una opp para actualizar
+                if(cliente != idPublicoGeneral){// Cuando tiene un cliente distinto a público general, trata de buscar una opp para actualizar
                     log.debug('INFO', 'Cuando tiene un cliente distinto a público general, trata de buscar una opp para actualizar');
                     var oportunidadID = null;
                     var location_id = planta;

@@ -12,8 +12,8 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
- define(['N/https', 'N/currentRecord', 'N/url', 'N/ui/message', 'N/ui/dialog', 'N/search', 'N/runtime', 'N/record', 'N/error', 'N/currency', 'N/format'], 
- function (https, currentRecord, url, message, dialog, search, runtime, record, error, currency, format) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/https', 'N/currentRecord', 'N/url', 'N/ui/message', 'N/ui/dialog', 'N/search', 'N/runtime', 'N/record', 'N/error', 'N/currency', 'N/format'],
+ function (drt_mapid_cm, https, currentRecord, url, message, dialog, search, runtime, record, error, currency, format) {
     function pageInit(context){
       try {
         var currentRecord = context.currentRecord;
@@ -220,19 +220,13 @@
         var estatusFacturacion = 0;
         var gasLP = 0;
 
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          estatusPreliquidacion = 1;
-          estatusLiquidacion = 2;
-          estatusEjecutado = 3;
-          estatusFacturacion = 4;
-          gasLP = 4088;
-
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          estatusPreliquidacion = 1;
-          estatusLiquidacion = 2;
-          estatusEjecutado = 3;
-          estatusFacturacion = 4;
-          gasLP = 4216;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          estatusPreliquidacion = objMap.estatusPreliquidacion;
+          estatusLiquidacion = objMap.estatusLiquidacion;
+          estatusEjecutado = objMap.estatusEjecutado;
+          estatusFacturacion = objMap.estatusFacturacion;
+          gasLP = objMap.gasLP;
         }
 
         if(estatus == estatusLiquidacion){
@@ -352,13 +346,11 @@
 
           var formularioLiquidacion = 0;
           var estatusLiquidacion = 0;
-          
-          if (runtime.envType === runtime.EnvType.SANDBOX) {
-            formularioLiquidacion = 205;
-            estatusLiquidacion = 2;
-          } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-            formularioLiquidacion = 201;
-            estatusLiquidacion = 2;
+
+          var objMap=drt_mapid_cm.drt_liquidacion();
+          if (Object.keys(objMap).length>0) {
+            formularioLiquidacion = objMap.formularioLiquidacion;
+            estatusLiquidacion = objMap.estatusLiquidacion;
           }
 
             const newForm = formularioLiquidacion;
@@ -401,13 +393,11 @@
         log.audit("redirectToFacturacion cs");
         var formularioLiquidacion = 0;
         var estatusEjecutado = 0;
-          
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          formularioLiquidacion = 205;
-          estatusEjecutado = 3;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          formularioLiquidacion = 201;
-          estatusEjecutado = 3;
+
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          formularioLiquidacion = objMap.formularioLiquidacion;
+          estatusEjecutado = objMap.estatusEjecutado;
         }
 
           const newForm = formularioLiquidacion;
@@ -516,14 +506,11 @@
       var formularioLiquidacion = 0;
       var estatusFacturacion = 0;
       var limiteURL = 0;
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        formularioLiquidacion = 205;
-        estatusFacturacion = 4;
-        limiteURL = 100;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        formularioLiquidacion = 201;
-        estatusFacturacion = 4;
-        limiteURL = 100;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        formularioLiquidacion = objMap.formularioLiquidacion;
+        estatusFacturacion = objMap.estatusFacturacion;
+        limiteURL = objMap.limiteURL;
       }
       
 

@@ -12,8 +12,8 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
- define(['N/https', 'N/currentRecord', 'N/url', 'N/ui/message', 'N/ui/dialog', 'N/search', 'N/runtime', 'N/record', 'N/error', ['N/currency']], 
- function (https, currentRecord, url, message, dialog, search, runtime, record, error, currency) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/https', 'N/currentRecord', 'N/url', 'N/ui/message', 'N/ui/dialog', 'N/search', 'N/runtime', 'N/record', 'N/error', 'N/currency'],
+ function (drt_mapid_cm, https, currentRecord, url, message, dialog, search, runtime, record, error, currency) {
    
 
     function fieldChanged(context) {
@@ -25,10 +25,9 @@
       log.audit("numViaje", numViaje);
       log.audit("vehiculo", vehiculo);
       var estatusViajeEnCurso = 0;
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        estatusViajeEnCurso = 3;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        estatusViajeEnCurso = 3;   
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        estatusViajeEnCurso = objMap.estatusViajeEnCurso;
       }
 
       if (vehiculo && fieldName === "custrecord_ptg_vehiculo_estcarb_rec_apor") {
@@ -139,15 +138,11 @@
           var formularioCustomRecord = 0;
           var estatusRecibido = 0;
           var formularioRecepcion = 0;
-
-          if (runtime.envType === runtime.EnvType.SANDBOX) {
-            formularioCustomRecord = 324;
-            estatusRecibido = 2;
-            formularioRecepcion = 258;
-          } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-            formularioCustomRecord = 189;
-            estatusRecibido = 2;
-            formularioRecepcion = 270;
+          var objMap=drt_mapid_cm.drt_liquidacion();
+          if (Object.keys(objMap).length>0) {
+            formularioCustomRecord = objMap.formularioCustomRecord;
+            estatusRecibido = objMap.estatusRecibido;
+            formularioRecepcion = objMap.formularioRecepcion;
           }
           
           function success(result) {

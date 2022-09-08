@@ -12,7 +12,7 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", "N/runtime"], function (record, search, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime"], function (drt_mapid_cm, record, search, runtime) {
 
   function beforeSubmit(context) {
     try {
@@ -93,14 +93,11 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         log.audit("transaccionAjuste", transaccionAjuste);
         log.audit("transaccionNota", transaccionNota);
 
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          cuentaAjusteInventario = 218;
-          gasLP = 4088;
-          formularioNotaCredito = 435;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          cuentaAjusteInventario = 218;
-          gasLP = 4216;
-          formularioNotaCredito = 307;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          cuentaAjuste = objMap.cuentaAjuste;
+          gasLP = objMap.idGasLP;
+          formularioNotaCredito = objMap.formularioNotaCredito;
         }
 
         //SS: PTG - Almacén Central por Planta

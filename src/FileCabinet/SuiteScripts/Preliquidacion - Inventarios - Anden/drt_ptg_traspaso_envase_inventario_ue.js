@@ -12,7 +12,7 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", "N/runtime"], function (record, search, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime"], function (drt_mapid_cm, record, search, runtime) {
   function afterSubmit(context) {
     try {
         var newRecord = context.newRecord;
@@ -29,10 +29,9 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         var articuloArray = [];
         var cantidadArray = [];
         var formularioOrdenTraslado = 0;
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          formularioOrdenTraslado = 313;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          formularioOrdenTraslado = 266;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          formularioOrdenTraslado = objMap.formularioOrdenTraslado;
         }
         
       if(!transaccion){
