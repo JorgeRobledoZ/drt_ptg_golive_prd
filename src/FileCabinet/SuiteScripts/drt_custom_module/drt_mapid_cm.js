@@ -65,6 +65,9 @@ define(
                         // 23 San Luis Gas
                         // 26 Distribuidora potosina
                         //Aqui inician los de Iztac
+                        ,
+                        tipo_vehiculo:"Camión Cilindros",
+
                     },
                     [ runtime.EnvType.SANDBOX ]: {
                         customFormOppPotogas   : 305, // Oportunidad-Potogas
@@ -118,6 +121,7 @@ define(
                         // 23 San Luis Gas
                         // 26 Distribuidora potosina
                         //Aqui inician los de Iztac
+
                     }
                 }
                 respuesta = mapObj[ runtime.envType ];
@@ -505,10 +509,51 @@ define(
             }
         }
 
+        const drt_compras = () => {
+            let respuesta = {};
+            try {
+                const mapObj = {
+                    [runtime.EnvType.PRODUCTION]:{
+                        ubicacion_desvio_planta_receipt: 1525,
+                        form_desvio_cliente_invoice: 286,
+                        form_vendor_bill: 300,
+                        item_vendor_bill_flete: 4114,
+                        form_transfer_order: 57,
+                        ubicacion_transfer_order: 1525,
+                        form_full_filment: 40,
+                        form_item_receipt: 208,
+                        form_intercompany_invoice: 286,
+                        subcidiary_intercompany_invoice: 25,
+                        ubicacion_intercompany_invoice: 762
+                    },
+                    [runtime.EnvType.SANDBOX]: {
+                        ubicacion_desvio_planta_receipt: 1525,
+                        form_desvio_cliente_invoice: 286,
+                        form_vendor_bill: 300,
+                        item_vendor_bill_flete: 4114,
+                        form_transfer_order: 57,
+                        ubicacion_transfer_order: 1525,
+                        form_full_filment: 40,
+                        form_item_receipt: 208,
+                        form_intercompany_invoice: 286,
+                        subcidiary_intercompany_invoice: 25,
+                        ubicacion_intercompany_invoice: 762
+                    }
+                }
+                respuesta = mapObj[runtime.envType];
+            } catch (error_compras) {
+                log.error(`error drt_compras`, error_compras)     
+            } finally {
+                log.debug(`respuesta drt_compras ${runtime.envType}`, respuesta);
+                return respuesta;
+            }
+        }
+
         return {
             drt_liquidacion,
             getVariables,
-            drt_modulo_general
+            drt_modulo_general,
+            drt_compras
         };
 
     });
