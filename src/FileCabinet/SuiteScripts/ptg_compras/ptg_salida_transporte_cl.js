@@ -1,5 +1,5 @@
 /**
- *@NApiVersion 2.x
+ *@NApiVersion 2.1
  *@NScriptType ClientScript
  */
 define(["N/search", 'N/ui/message', 'N/ui/dialog', 'N/error'], function (search, message, dialog, error) {
