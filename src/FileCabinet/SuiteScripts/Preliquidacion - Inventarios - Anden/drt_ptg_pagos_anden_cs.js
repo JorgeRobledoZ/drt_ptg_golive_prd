@@ -58,11 +58,11 @@
         var total = 0;
         var totalEfectivo = 0;
         var efectivo = false;
-        var pagoEfectivo = 0;
+        var efectivoPago = 0;
         if (runtime.envType === runtime.EnvType.SANDBOX) {
-          pagoEfectivo = 1;
+          efectivoPago = 1;
         } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          pagoEfectivo = 1;
+          efectivoPago = 1;
         }
         log.audit("totalServicio", totalServicio);
         log.audit("cobroEfectivo", cobroEfectivo);
@@ -80,7 +80,7 @@
             line: i,
           });
 
-          if(tipoPago == pagoEfectivo){
+          if(tipoPago == efectivoPago){
             totalEfectivo += totalLinea;
             efectivo = true;
           }
