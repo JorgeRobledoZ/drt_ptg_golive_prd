@@ -363,7 +363,6 @@ define(
                         cuenta: 2809,
                         formularioPago: 296,
                         estatusViejeEnCurso: 3,
-
                         condretado: 13,
                         pagoSGCContado: 1,
                         equipo: "2051",
@@ -596,7 +595,6 @@ define(
                         cuenta: 2809,
                         formularioPago: 70,
                         estatusViejeEnCurso: 3,
-
                         condretado: 13,
                         pagoSGCContado: 1,
                         equipo: "2051",
