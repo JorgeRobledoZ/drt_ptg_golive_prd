@@ -153,7 +153,7 @@
             var formularioRecepcion = 0;
             var formularioOportunidad = 0;
             var formularioOrdenTraslado = 0;
-            var publicoGeneralID = 0;
+            var idPublicoGeneral = 0;
             var idArticuloDescuento = 0;
 
             if (runtime.envType === runtime.EnvType.SANDBOX) {
@@ -166,7 +166,7 @@
                 formularioRecepcion = 258;
                 formularioOportunidad = 305;
                 formularioOrdenTraslado = 313;
-                publicoGeneralID = 27041;
+                idPublicoGeneral = 27041;
                 idArticuloDescuento = 4217;
             } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
                 rfcGenerico = "XAXX010101000";
@@ -178,7 +178,7 @@
                 formularioRecepcion = 270;
                 formularioOportunidad = 265;
                 formularioOrdenTraslado = 266;
-                publicoGeneralID = 27041;
+                idPublicoGeneral = 27041;
                 idArticuloDescuento = 4217;
             }
 
@@ -223,7 +223,7 @@
                 var objValue = JSON.stringify(objPagosOportunidad);
 
 
-                if(cliente != publicoGeneralID){// Cuando tiene un cliente distinto a público general, trata de buscar una opp para actualizar
+                if(cliente != idPublicoGeneral){// Cuando tiene un cliente distinto a público general, trata de buscar una opp para actualizar
                     log.debug('INFO', 'Cuando tiene un cliente distinto a público general, trata de buscar una opp para actualizar');
                     var oportunidadID = null;
                     var location_id = planta;

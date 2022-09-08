@@ -356,7 +356,7 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/
       var tipoServicio = currentRecord.getValue("custrecord_ptg_tipo_servici_reg_serv_cil");
       var totalCabeceraPF = 0;
       var total = 0;
-      var idPublicoGeneral = 0;
+      var publicoGeneral = 0;
       var efectivoId = 0;
       var tarjetaCreditoId = 0;
       var tarjetaDebitoId = 0;
@@ -373,7 +373,7 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/
       var tarjetaDebitoHSBCId = 0;
 
       if (runtime.envType === runtime.EnvType.SANDBOX) {
-        idPublicoGeneral = 14508;
+        publicoGeneral = 14508;
         efectivoId = 1;
         tarjetaCreditoId = 5;
         tarjetaDebitoId = 6;
@@ -383,7 +383,7 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/
         canceladoId = 22;
         traspasoId = 25;
       } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        idPublicoGeneral = 27041;
+        publicoGeneral = 27041;
         efectivoId = 1;
         tarjetaCreditoId = 5;
         tarjetaDebitoId = 6;
@@ -425,7 +425,7 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/
           var totalCabecera = currentRecord.getValue("custrecord_ptg_total_reg_serv_cil") || 0;
 
 
-          if((formaPago != efectivoId) && (formaPago != tarjetaCreditoId) && (formaPago != tarjetaDebitoId) && (formaPago != consumoInternoId) && (formaPago != recirculacionId) && (formaPago != canceladoId) && (formaPago != traspasoId) && (formaPago != tarjetaCreditoBancomerId) && (formaPago != tarjetaCreditoHSBCId) && (formaPago != tarjetaCreditoBanamexId) && (formaPago != tarjetaDebitoBanamexId) && (formaPago != tarjetaDebitoBancomerId) && (formaPago != tarjetaDebitoHSBCId) && clienteServCilindros == idPublicoGeneral){
+          if((formaPago != efectivoId) && (formaPago != tarjetaCreditoId) && (formaPago != tarjetaDebitoId) && (formaPago != consumoInternoId) && (formaPago != recirculacionId) && (formaPago != canceladoId) && (formaPago != traspasoId) && (formaPago != tarjetaCreditoBancomerId) && (formaPago != tarjetaCreditoHSBCId) && (formaPago != tarjetaCreditoBanamexId) && (formaPago != tarjetaDebitoBanamexId) && (formaPago != tarjetaDebitoBancomerId) && (formaPago != tarjetaDebitoHSBCId) && clienteServCilindros == publicoGeneral){
             var options = {
               title: "Restricción",
               message: "No se puede registrar el servicio a Público General.",
