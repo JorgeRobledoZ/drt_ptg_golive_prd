@@ -2,11 +2,12 @@
  *@NApiVersion 2.1
  *@NScriptType Restlet
  */
-define(["N/search"], function(search) {
+define(["N/search", "SuiteScripts/drt_custom_module/drt_mapid_cm"], function(search, drt_mapid_cm) {
 
     function consultaCasos(request) {
         try {
-
+            const customVars = drt_mapid_cm.getVariables();
+            const statusCasoCerrado = customVars.statusCasoCerrado;
             let idEmpleado = request.id_empleado;
             var arrayCasos = [];
             var objCasos = {};
@@ -17,7 +18,7 @@ define(["N/search"], function(search) {
                 [
                    ["assigned","anyof", idEmpleado], 
                    "AND", 
-                   ["status","anyof","5"]
+                   ["status","anyof",statusCasoCerrado]
                 ],
                 columns:
                 [

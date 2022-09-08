@@ -30,6 +30,28 @@ define(
                         urlSgcWebProcesar      : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
                         urlSgcLocalDbUser      : "root",
                         urlSgcLocalDbPass      : "root",
+                        statusCasoEnCurso      : 2,
+                        statusCasoCerrado      : 5,
+                        tipoClienteIndustrial  : 1,
+                        tipoClienteIntercom    : 2,
+                        tipoClienteDomestico   : 3,
+                        tipoClienteOtraComp    : 4,
+                        tipoClienteComercial   : 5,
+                        tipoClienteDD          : 6,
+                        tipoClienteDG          : 7,
+                        tipoClienteFYE         : 8,
+                        tipoServicioCil        : 1,
+                        tipoServicioEst        : 2,
+                        tipoServicioCarb       : 3,
+                        tipoServicioAmbos      : 4,
+                        tipoServicioVentaAnden : 5,
+                        tipoServicioMontacarga : 6,
+                        tipoServicioViajeEsp   : 7,
+                        tipoAlianzaComContrato : 1,
+                        tipoAlianzaComCredito  : 2,
+                        tipoAlianzaComContado  : 3,
+                        formOrdenTransladoCarb : 266
+                        //Aqui inician los de Iztac
                     },
                     [ runtime.EnvType.SANDBOX ]: {
                         customFormOppPotogas   : 305, // Oportunidad-Potogas
@@ -48,6 +70,28 @@ define(
                         urlSgcWebProcesar      : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
                         urlSgcLocalDbUser      : "root",
                         urlSgcLocalDbPass      : "ROOT",
+                        statusCasoEnCurso      : 2,
+                        statusCasoCerrado      : 5,
+                        tipoClienteIndustrial  : 1,
+                        tipoClienteIntercom    : 2,
+                        tipoClienteDomestico   : 3,
+                        tipoClienteOtraComp    : 4,
+                        tipoClienteComercial   : 5,
+                        tipoClienteDD          : 6,
+                        tipoClienteDG          : 7,
+                        tipoClienteFYE         : 8,
+                        tipoServicioCil        : 1,
+                        tipoServicioEst        : 2,
+                        tipoServicioCarb       : 3,
+                        tipoServicioAmbos      : 4,
+                        tipoServicioVentaAnden : 5,
+                        tipoServicioMontacarga : 6,
+                        tipoServicioViajeEsp   : 7,
+                        tipoAlianzaComContrato : 1,
+                        tipoAlianzaComCredito  : 2,
+                        tipoAlianzaComContado  : 3,
+                        formOrdenTransladoCarb : 313
+                        //Aqui inician los de Iztac
                     }
                 }
                 respuesta = mapObj[ runtime.envType ];

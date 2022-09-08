@@ -2,7 +2,7 @@
  *@NApiVersion 2.1
  *@NScriptType Restlet
  */
-define(['N/record', 'N/search'], function (record, search) {
+define(['N/record', 'N/search', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (record, search, drt_mapid_cm) {
 
     // se crea estructura donde se cargarà toda la data
     const responseData = {
@@ -17,6 +17,7 @@ define(['N/record', 'N/search'], function (record, search) {
      */
     function _post(request) {
         let opportunityList = [];
+        const customVars = drt_mapid_cm.getVariables();
         try {
 
             request.transferOrder.forEach((tOrder) => {
@@ -38,7 +39,8 @@ define(['N/record', 'N/search'], function (record, search) {
                     idTransferOrder.setValue({
                         fieldId: 'customform',
                         //value: 313 sbx
-                        value: 266
+                        // value: 266
+                        value: customVars.formOrdenTransladoCarb
                     });
 
                     idTransferOrder.setValue({
