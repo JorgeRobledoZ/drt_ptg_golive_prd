@@ -45,14 +45,14 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         var unidad20 = 0;
         var unidad30 = 0;
         var unidad45 = 0;
-        var cuentaAjuste = 0;
+        var cuentaAjusteInventario = 0;
           
         if (runtime.envType === runtime.EnvType.SANDBOX) {
           unidad10 = 24;
           unidad20 = 25;
           unidad30 = 26;
           unidad45 = 27;
-          cuentaAjuste = 218;
+          cuentaAjusteInventario = 218;
           gasLPUnidades = 4693;
           gasLP = 4088;
         } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
@@ -60,7 +60,7 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
           unidad20 = 13;
           unidad30 = 14;
           unidad45 = 15;
-          cuentaAjuste = 218;
+          cuentaAjusteInventario = 218;
           gasLPUnidades = 4216;
           gasLP = 4216;
         }
@@ -106,7 +106,7 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         recAjusteInventario.setValue("subsidiary", subsidiaria);
         recAjusteInventario.setValue("adjlocation", localizacion);
         recAjusteInventario.setValue("memo", "Ajuste por Inventario Fisico");
-        recAjusteInventario.setValue("account", cuentaAjuste);
+        recAjusteInventario.setValue("account", cuentaAjusteInventario);
 
         for (var k = 0; k < lineCountCilindros; k++) {
           recAjusteInventario.selectLine("inventory", k);

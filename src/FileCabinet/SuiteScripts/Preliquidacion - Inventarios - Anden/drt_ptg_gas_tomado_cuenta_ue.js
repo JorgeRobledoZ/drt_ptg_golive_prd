@@ -82,8 +82,8 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         var transaccionAjuste = newRecord.getValue("custrecord_ptg_ajuste_inventario_gtc");
         var transaccionNota = newRecord.getValue("custrecord_ptg_nota_credito_gtc");
         var idOportunidad = newRecord.getValue("custrecord_ptg_ord_venta_gas_cuenta_");
-        var idGasLP = 0;
-        var cuentaAjuste = 0;
+        var gasLP = 0;
+        var cuentaAjusteInventario = 0;
         var formularioNotaCredito = 0;
         var objUpdate = {};
         var rate = 0;
@@ -94,12 +94,12 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         log.audit("transaccionNota", transaccionNota);
 
         if (runtime.envType === runtime.EnvType.SANDBOX) {
-          cuentaAjuste = 218;
-          idGasLP = 4088;
+          cuentaAjusteInventario = 218;
+          gasLP = 4088;
           formularioNotaCredito = 435;
         } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          cuentaAjuste = 218;
-          idGasLP = 4216;
+          cuentaAjusteInventario = 218;
+          gasLP = 4216;
           formularioNotaCredito = 307;
         }
 
@@ -158,11 +158,11 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
           
           recAjusteInventario.setValue("subsidiary", subsidiaria);
           recAjusteInventario.setValue("adjlocation", idAlmacenCentral);
-          recAjusteInventario.setValue("account", cuentaAjuste);
+          recAjusteInventario.setValue("account", cuentaAjusteInventario);
           
           for (var k = 0; k < 1; k++) {
             recAjusteInventario.selectLine("inventory", k);
-            recAjusteInventario.setCurrentSublistValue("inventory", "item", idGasLP);
+            recAjusteInventario.setCurrentSublistValue("inventory", "item", gasLP);
             recAjusteInventario.setCurrentSublistValue("inventory", "location", idAlmacenCentral);
             recAjusteInventario.setCurrentSublistValue("inventory", "adjustqtyby", kilogramos);
             recAjusteInventario.commitLine("inventory");
@@ -188,7 +188,7 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
           
           for (var k = 0; k < 1; k++) {
             recNotaCredito.selectLine("item", k);
-            recNotaCredito.setCurrentSublistValue("item", "item", idGasLP);
+            recNotaCredito.setCurrentSublistValue("item", "item", gasLP);
             recNotaCredito.setCurrentSublistValue("item", "quantity", kilogramos);
             recNotaCredito.setCurrentSublistValue("item", "rate", rate);
             recNotaCredito.commitLine("item");

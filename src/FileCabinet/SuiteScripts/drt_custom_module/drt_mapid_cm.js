@@ -297,6 +297,7 @@ define(
                         planta: 1505,
                         unidadLitros: 11,
                         envaseCilindro: 5,
+                        formularioNotaCredito: 307,
                     },
                     [runtime.EnvType.SANDBOX]: {
                         formularioCilindro: 172,
@@ -424,6 +425,7 @@ define(
                         planta: 1142,
                         unidadLitros: 23,
                         envaseCilindro: 5,
+                        formularioNotaCredito: 435,
                     }
                 }
                 respuesta = mapObj[runtime.envType];
