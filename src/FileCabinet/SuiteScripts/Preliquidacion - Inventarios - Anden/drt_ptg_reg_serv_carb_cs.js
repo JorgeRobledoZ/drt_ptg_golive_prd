@@ -23,16 +23,16 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/
             var sublistFieldName = context.fieldId;
             var estacionCarburacion = currentRecord.getValue("custrecord_ptg_estacion_reg_serv_carb");
             var articuloCilindro = 0;
-            var estatusViejaEnCurso = 0;
+            var estatusViejeEnCurso = 0;
             var articuloEnvase = 0;
 
             if (runtime.envType === runtime.EnvType.SANDBOX) {
               articuloCilindro = 1;
-              estatusViejaEnCurso = 3;
+              estatusViejeEnCurso = 3;
               articuloEnvase = 5;
             } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
               articuloCilindro = 1;
-              estatusViejaEnCurso = 3;
+              estatusViejeEnCurso = 3;
               articuloEnvase = 5;
             }
 
@@ -50,7 +50,7 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/
               //BÚSQUEDA GUARDADA: PTG - Viaje activo SS
               var viajeActivoObj = search.create({
                   type: "customrecord_ptg_tabladeviaje_enc2_",
-                  filters:[["custrecord_ptg_vehiculo_tabladeviajes_","anyof",vehiculoDestino], "AND", ["custrecord_ptg_estatus_tabladeviajes_","anyof",estatusViejaEnCurso]],
+                  filters:[["custrecord_ptg_vehiculo_tabladeviajes_","anyof",vehiculoDestino], "AND", ["custrecord_ptg_estatus_tabladeviajes_","anyof",estatusViejeEnCurso]],
                   columns:[
                      search.createColumn({name: "internalid", sort: search.Sort.DESC, label: "Internal ID"}),
                   ]

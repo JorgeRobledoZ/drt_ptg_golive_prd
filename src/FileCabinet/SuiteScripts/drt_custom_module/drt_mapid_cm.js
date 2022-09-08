@@ -353,7 +353,6 @@ define(
                         tarjetaDebitoBanamexId: 34,
                         tarjetaDebitoBancomerId: 35,
                         tarjetaDebitoHSBCId: 36,
-
                         paqueteMySuite: 2,
                         plantillaDocumentoElectronico: 119,
                         metodoDeEnvio: 10,
@@ -361,6 +360,8 @@ define(
                         clienteNoIdentificado: 27042,
                         cuenta: 2809,
                         formularioPago: 296,
+
+                        estatusViejeEnCurso: 3,
                     },
                     [runtime.EnvType.SANDBOX]: {
                         formularioCilindro: 172,
@@ -544,7 +545,6 @@ define(
                         tarjetaDebitoBanamexId: 34,
                         tarjetaDebitoBancomerId: 35,
                         tarjetaDebitoHSBCId: 36,
-
                         paqueteMySuite: 2,
                         plantillaDocumentoElectronico: 135,
                         metodoDeEnvio: 11,
@@ -552,6 +552,8 @@ define(
                         clienteNoIdentificado: 322141,
                         cuenta: 2809,
                         formularioPago: 70,
+
+                        estatusViejeEnCurso: 3,
                     }
                 }
                 respuesta = mapObj[runtime.envType];
