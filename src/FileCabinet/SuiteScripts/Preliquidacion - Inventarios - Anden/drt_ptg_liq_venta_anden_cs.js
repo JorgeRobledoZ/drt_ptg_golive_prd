@@ -12,8 +12,8 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
- define(['N/https', 'N/currentRecord', 'N/url', 'N/ui/message', 'N/ui/dialog', 'N/search', 'N/runtime', 'N/record', 'N/error', 'N/currency', 'N/format'], 
- function (https, currentRecord, url, message, dialog, search, runtime, record, error, currency, format) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/https', 'N/currentRecord', 'N/url', 'N/ui/message', 'N/ui/dialog', 'N/search', 'N/runtime', 'N/record', 'N/error', 'N/currency', 'N/format'],
+ function (drt_mapid_cm, https, currentRecord, url, message, dialog, search, runtime, record, error, currency, format) {
   function pageInit(context) {
     try {
         debugger;
@@ -192,10 +192,9 @@ if(efectivoTotales){
     try {
       log.audit("facturar cambio pestana facturar");
       var estatusFacturacionAnden = 0;
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        estatusFacturacionAnden = 4;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        estatusFacturacionAnden = 4;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        estatusFacturacionAnden = objMap.estatusFacturacionAnden;
       }
 
             recObj = currentRecord.get();

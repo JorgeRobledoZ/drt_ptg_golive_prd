@@ -12,7 +12,7 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
-define(["N/record", "N/search", "N/error", "N/currentRecord", 'N/ui/dialog', "N/runtime"], function (record, search, error, currentRecord, dialog, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/currentRecord", 'N/ui/dialog', "N/runtime"], function (drt_mapid_cm, record, search, error, currentRecord, dialog, runtime) {
     function fieldChanged(context) {
         try {
             debugger;
@@ -22,10 +22,9 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", 'N/ui/dialog', "N/
             var vehiculoTXT = currentRecord.getText("custrecord_ptg_vehiculo_transpor_");
             var numViaje = currentRecord.getValue("custrecord_ptg_numviaje_entrada_transpor");
             var estatusEnCurso = 0;
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-              estatusEnCurso = 3;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-              estatusEnCurso = 3;
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+              estatusEnCurso = objMap.estatusEnCurso;
             }
             
             if(vehiculo && cabeceraFieldName === "custrecord_ptg_vehiculo_transpor_"){

@@ -12,20 +12,18 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
-define(["N/record", "N/search", "N/error", "N/runtime", "N/ui/dialog"], function (record, search, error, runtime, dialog) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm',"N/record", "N/search", "N/error", "N/runtime", "N/ui/dialog"], function (drt_mapid_cm, record, search, error, runtime, dialog) {
 
   function fieldChanged(context) {
     try {
-
+      var objMap=drt_mapid_cm.drt_liquidacion();
       var currentRecord = context.currentRecord;
       var sublistName = context.sublistId;
       var sublistFieldName = context.fieldId;
       var cliente = currentRecord.getValue("custrecord_ptg_cliente_reg_oport");
       var publicoGeneral = 0;
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        publicoGeneral = 14508;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        publicoGeneral = 27041;
+      if (Object.keys(objMap).length>0) {
+        publicoGeneral = objMap.publicoGeneral;
       }
 
       if(cliente && sublistFieldName === "custrecord_ptg_cliente_reg_oport"){

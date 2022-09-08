@@ -12,7 +12,7 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", "N/task", "N/runtime"], function (record, search, task, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/task", "N/runtime"], function (drt_mapid_cm, record, search, task, runtime) {
   
   function beforeLoad(context) {
     try {
@@ -26,10 +26,9 @@ define(["N/record", "N/search", "N/task", "N/runtime"], function (record, search
           var status = newRecord.getValue("custrecord_ptg_etapa_reg_serv_carb");
           log.debug("status", status);
           var estatusEtapa = 0;
-          if (runtime.envType === runtime.EnvType.SANDBOX) {
-            estatusEtapa = 1;
-          } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-            estatusEtapa = 1;
+          var objMap=drt_mapid_cm.drt_liquidacion();
+          if (Object.keys(objMap).length>0) {
+            estatusEtapa = objMap.estatusEtapa;
           }
           
           if (status == estatusEtapa) {
@@ -64,10 +63,9 @@ define(["N/record", "N/search", "N/task", "N/runtime"], function (record, search
         var estacionCarburacion = newRecord.getValue("custrecord_ptg_estacion_reg_serv_carb")
         var etapa = newRecord.getValue("custrecord_ptg_etapa_reg_serv_carb");
         var estatusEtapaProcesado = 0;
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          estatusEtapaProcesado = 2;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          estatusEtapaProcesado = 2;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          estatusEtapaProcesado = objMap.estatusEtapaProcesado;
         }
         log.audit("recId", recId);
         log.audit("etapa", etapa);

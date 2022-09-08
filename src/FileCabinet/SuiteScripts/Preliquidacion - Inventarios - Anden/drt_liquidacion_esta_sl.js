@@ -13,7 +13,7 @@
  * @NScriptType Suitelet
  * @NModuleScope public
  */
- define(['N/search', 'N/record', 'N/ui/message', 'N/ui/dialog', 'N/task', 'N/runtime', "N/redirect", "N/log", "N/url"], function (search, record, message, dialog, task, runtime, redirect, log, url) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/search', 'N/record', 'N/ui/message', 'N/ui/dialog', 'N/task', 'N/runtime', "N/redirect", "N/log", "N/url"], function (drt_mapid_cm, search, record, message, dialog, task, runtime, redirect, log, url) {
     function onRequest(context) {
         try {
             var req_param = context.request.parameters;
@@ -45,31 +45,19 @@
             var restriccion = false;
             var conteoRestriccion = 0;
 
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-                prepagoBanorte = 2;
-                prepagoTransferencia = 8;
-                creditoCliente = 9;
-                consumoInterno = 12;
-                prepagoBancomer = 13;
-                prepagoHSBC = 14;
-                prepagoBanamex = 15;
-                prepagoSantander = 16;
-                prepagoScotian = 17;
-                publicoGeneral = 14508;
-                urlPago = "https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=503&id=";
-
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                prepagoBanorte = 2;
-                prepagoTransferencia = 8;
-                creditoCliente = 9;
-                consumoInterno = 12;
-                prepagoBancomer = 13;
-                prepagoHSBC = 14;
-                prepagoBanamex = 15;
-                prepagoSantander = 16;
-                prepagoScotian = 17;
-                publicoGeneral = 27041;
-                urlPago = "https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=587&id=";
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+                prepagoBanorte = objMap.prepagoBanorte;
+                prepagoTransferencia = objMap.prepagoTransferencia;
+                creditoCliente = objMap.creditoCliente;
+                consumoInterno = objMap.consumoInterno;
+                prepagoBancomer = objMap.prepagoBancomer;
+                prepagoHSBC = objMap.prepagoHSBC;
+                prepagoBanamex = objMap.prepagoBanamex;
+                prepagoSantander = objMap.prepagoSantander;
+                prepagoScotian = objMap.prepagoScotian;
+                publicoGeneral = objMap.publicoGeneral;
+                urlPago = objMap.urlPago;
 
             }
 

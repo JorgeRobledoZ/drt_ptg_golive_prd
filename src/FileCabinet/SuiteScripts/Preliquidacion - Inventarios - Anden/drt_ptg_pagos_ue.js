@@ -13,7 +13,7 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
- define(["N/record", "N/search", "N/runtime", 'N/https', 'N/url', 'N/ui/serverWidget'], function (record, search, runtime, https, url, serverWidget) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime", 'N/https', 'N/url', 'N/ui/serverWidget'], function (drt_mapid_cm, record, search, runtime, https, url, serverWidget) {
  
   function afterSubmit(context) {
       try {
@@ -56,32 +56,20 @@
               var canceladoId = 0;
               var multipleId = 0;
 
-              if (runtime.envType === runtime.EnvType.SANDBOX) {
-                prepagoBanorteId = 2;
-                multipleId = 7;
-                prepagoTransferenciaId = 8;
-                saldoAFavorId = 11;
-                consumoInternoId = 12;
-                prepagoBancomerId = 13;
-                prepagoHSBCId = 14;
-                prepagoBanamexId = 15;
-                prepagoSantanderId = 16;
-                prepagoScotianId = 17;
-                recirculacionId = 21;
-                canceladoId = 22;
-              } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                prepagoBanorteId = 2;
-                multipleId = 7;
-                prepagoTransferenciaId = 8;
-                saldoAFavorId = 11;
-                consumoInternoId = 12;
-                prepagoBancomerId = 13;
-                prepagoHSBCId = 14;
-                prepagoBanamexId = 15;
-                prepagoSantanderId = 16;
-                prepagoScotianId = 17;
-                recirculacionId = 21;
-                canceladoId = 22;
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+                prepagoBanorteId = objMap.prepagoBanorteId;
+                multipleId = objMap.multipleId;
+                prepagoTransferenciaId = objMap.prepagoTransferenciaId;
+                saldoAFavorId = objMap.saldoAFavorId;
+                consumoInternoId = objMap.consumoInternoId;
+                prepagoBancomerId = objMap.prepagoBancomerId;
+                prepagoHSBCId = objMap.prepagoHSBCId;
+                prepagoBanamexId = objMap.prepagoBanamexId;
+                prepagoSantanderId = objMap.prepagoSantanderId;
+                prepagoScotianId = objMap.prepagoScotianId;
+                recirculacionId = objMap.recirculacionId;
+                canceladoId = objMap.canceladoId;
               }
 
               log.audit("oportunidadID", oportunidadID);

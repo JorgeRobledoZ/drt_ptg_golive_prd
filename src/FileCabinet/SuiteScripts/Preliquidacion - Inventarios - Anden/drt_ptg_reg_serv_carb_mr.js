@@ -13,7 +13,7 @@
  *@NApiVersion 2.x
  *@NScriptType MapReduceScript
  */
- define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https'], function (runtime, search, record, email, error, url, https) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https'], function (drt_mapid_cm, runtime, search, record, email, error, url, https) {
 
     function getInputData() {
         try {
@@ -109,28 +109,18 @@
             var rfcGenerico = "";
             var rfcPublicoGeneral = "";
 
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-                condretado = 13;
-                pagoSGCContado = 1;
-                equipo = "2051";
-                traspasoId = 25;
-                formularioRecepcion = 258;
-                formularioOportunidadCarburacion = 307;
-                servicioCarburacion = 3;
-                formularioOrdenTraslado = 313;
-                rfcGenerico = "XAXX010101000";
-                rfcPublicoGeneral = "AAA010101AAA";
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                condretado = 13;
-                pagoSGCContado = 1;
-                equipo = "2051";
-                traspasoId = 25;
-                formularioRecepcion = 270;
-                formularioOportunidadCarburacion = 264;
-                servicioCarburacion = 3;
-                formularioOrdenTraslado = 266;
-                rfcGenerico = "XAXX010101000";
-                rfcPublicoGeneral = "AAA010101AAA";
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+                condretado = objMap.condretado;
+                pagoSGCContado = objMap.pagoSGCContado;
+                equipo = objMap.equipo;
+                traspasoId = objMap.traspasoId;
+                formularioRecepcion = objMap.formularioRecepcion;
+                formularioOportunidadCarburacion = objMap.formularioOportunidadCarburacion;
+                servicioCarburacion = objMap.servicioCarburacion;
+                formularioOrdenTraslado = objMap.formularioOrdenTraslado;
+                rfcGenerico = objMap.rfcGenerico;
+                rfcPublicoGeneral = objMap.rfcPublicoGeneral;
             }
             
             

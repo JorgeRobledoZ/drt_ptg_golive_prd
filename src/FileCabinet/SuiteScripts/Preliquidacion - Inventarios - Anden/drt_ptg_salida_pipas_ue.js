@@ -13,7 +13,7 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
-define(["N/record", "N/search", "N/runtime", 'N/https', 'N/url', 'N/config', 'N/format'], function (record, search, runtime, https, url, config, format) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm',"N/record", "N/search", "N/runtime", 'N/https', 'N/url', 'N/config', 'N/format'], function (drt_mapid_cm, record, search, runtime, https, url, config, format) {
     function beforeSubmit(context) {
         try {
           var newRecord = context.newRecord;
@@ -54,12 +54,10 @@ define(["N/record", "N/search", "N/runtime", 'N/https', 'N/url', 'N/config', 'N/
                 log.audit("horaSalida", horaSalida);
                 var turnoMatutino = 0;
                 var turnoVespertino = 0;
-                if (runtime.envType === runtime.EnvType.SANDBOX) {
-                    turnoMatutino = 1;
-                    turnoVespertino = 2;
-                } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                    turnoMatutino = 1;
-                    turnoVespertino = 2;
+                var objMap=drt_mapid_cm.drt_liquidacion();
+                if (Object.keys(objMap).length>0) {
+                    turnoMatutino = objMap.turnoMatutino;
+                    turnoVespertino = objMap.turnoVespertino;
                 }
 
                 var d = new Date();

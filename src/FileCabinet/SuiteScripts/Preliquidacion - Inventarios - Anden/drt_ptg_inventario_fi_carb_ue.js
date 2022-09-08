@@ -12,7 +12,7 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", "N/runtime"], function (record, search, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime"], function (drt_mapid_cm, record, search, runtime) {
   function afterSubmit(context) {
     try {
       //if (context.type == "create") {
@@ -46,23 +46,16 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         var unidad30 = 0;
         var unidad45 = 0;
         var cuentaAjuste = 0;
-          
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          unidad10 = 24;
-          unidad20 = 25;
-          unidad30 = 26;
-          unidad45 = 27;
-          cuentaAjuste = 218;
-          gasLPUnidades = 4693;
-          gasLP = 4088;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          unidad10 = 12;
-          unidad20 = 13;
-          unidad30 = 14;
-          unidad45 = 15;
-          cuentaAjuste = 218;
-          gasLPUnidades = 4216;
-          gasLP = 4216;
+
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+          unidad10 = objMap.unidad10;
+          unidad20 = objMap.unidad20;
+          unidad30 = objMap.unidad30;
+          unidad45 = objMap.unidad45;
+          cuentaAjuste = objMap.cuentaAjuste;
+          gasLPUnidades = objMap.gasLPUnidades;
+          gasLP = objMap.gasLP;
         }
 
 

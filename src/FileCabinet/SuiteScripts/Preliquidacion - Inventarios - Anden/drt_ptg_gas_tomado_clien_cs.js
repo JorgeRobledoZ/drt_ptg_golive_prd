@@ -12,7 +12,7 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
-define(["N/record", "N/search", "N/error", "N/runtime", "N/ui/dialog"], function (record, search, error, runtime, dialog) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/runtime", "N/ui/dialog"], function (drt_mapid_cm, record, search, error, runtime, dialog) {
   function fieldChanged(context) {
     try {
 
@@ -64,10 +64,9 @@ define(["N/record", "N/search", "N/error", "N/runtime", "N/ui/dialog"], function
       var totalCabeceraPF = 0;
       var idRegistroDeServicios = "recmachcustrecord_ptg_gascliente_";
       var gasLP = 0;
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        gasLP = 4088;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        gasLP = 4216;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        gasLP = objMap.gasLP;
       }
     
 

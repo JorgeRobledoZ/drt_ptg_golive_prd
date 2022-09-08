@@ -12,7 +12,7 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", "N/task", "N/runtime"], function (record, search, task, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/task", "N/runtime"], function (drt_mapid_cm, record, search, task, runtime) {
   
   function beforeLoad(context) {
     try {
@@ -25,16 +25,12 @@ define(["N/record", "N/search", "N/task", "N/runtime"], function (record, search
         var estatusProcesado = 0;
         var servicioCilindros = 0;
         var servicioEstacionarios = 0;
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          estatusEtapa = 1;
-          estatusProcesado = 2;
-          servicioCilindros = 1;
-          servicioEstacionarios = 2;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          estatusEtapa = 1;
-          estatusProcesado = 2;
-          servicioCilindros = 1;
-          servicioEstacionarios = 2;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          estatusEtapa = objMap.estatusEtapa;
+          estatusProcesado = objMap.estatusProcesado;
+          servicioCilindros = objMap.servicioCilindros;
+          servicioEstacionarios = objMap.servicioEstacionarios;
         }
 
         if (type_event == "view") {
@@ -84,10 +80,9 @@ define(["N/record", "N/search", "N/task", "N/runtime"], function (record, search
         var numViaje = newRecord.getValue("custrecord_ptg_num_viaje_reg_serv_cil");
         var etapa = newRecord.getValue("custrecord_ptg_etapa_reg_serv_cil");
         var estatusEtapaProcesado = 0;
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          estatusEtapaProcesado = 2;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          estatusEtapaProcesado = 2;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          estatusEtapaProcesado = objMap.estatusEtapaProcesado;
         }
 
         if (etapa != estatusEtapaProcesado) {

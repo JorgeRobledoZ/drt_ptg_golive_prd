@@ -13,7 +13,7 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
-define(["N/record", "N/search", "N/runtime", "N/format", "N/config"], function (record, search, runtime, format, config) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime", "N/format", "N/config"], function (drt_mapid_cm, record, search, runtime, format, config) {
   function beforeSubmit(context) {
     if (context.type == "create") {
       var customRec = context.newRecord;
@@ -27,17 +27,13 @@ define(["N/record", "N/search", "N/runtime", "N/format", "N/config"], function (
       var servicioComp = 0;
       var tipoPagoComp = 0;
       var tipoPagoCreditoComp = 0;
-      
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        formularioComp = 307;
-        servicioComp = 3;
-        tipoPagoComp = 2;
-        tipoPagoCreditoComp = 5;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        formularioComp = 264;
-        servicioComp = 3;
-        tipoPagoComp = 2;
-        tipoPagoCreditoComp = 5;
+
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        formularioComp = objMap.formularioComp;
+        servicioComp = objMap.servicioComp;
+        tipoPagoComp = objMap.tipoPagoComp;
+        tipoPagoCreditoComp = objMap.tipoPagoCreditoComp;
       }
 
 
@@ -80,10 +76,9 @@ define(["N/record", "N/search", "N/runtime", "N/format", "N/config"], function (
       var estadoOport = customRec.getValue("custbody_ptg_estado_pedido");
       var entregadoEstadoPedido = 0;
 
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        entregadoEstadoPedido = 3;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        entregadoEstadoPedido = 3;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        entregadoEstadoPedido = objMap.entregadoEstadoPedido;
       }
 
       if (numeroViaje && !numConsecut && estadoOport == entregadoEstadoPedido) {
@@ -136,17 +131,13 @@ define(["N/record", "N/search", "N/runtime", "N/format", "N/config"], function (
         var articuloArray = [];
         var cantidadArray = [];
         var tasaArray = [];
-      
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          formularioComp = 307;
-          articuloEstacionario = 2;
-          servicioComp = 3;
-          tipoPagoVariosComp = 7;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          formularioComp = 264;
-          articuloEstacionario = 2;
-          servicioComp = 3;
-          tipoPagoVariosComp = 7;
+
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          formularioComp = objMap.formularioComp;
+          articuloEstacionario = objMap.articuloEstacionario;
+          servicioComp = objMap.servicioComp;
+          tipoPagoVariosComp = objMap.tipoPagoVariosComp;
         }
 
         log.audit("total", total);
@@ -393,22 +384,15 @@ define(["N/record", "N/search", "N/runtime", "N/format", "N/config"], function (
         var formularioComp = 0;
         var servicioComp = 0;
 
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          idArticuloDescuento = 4528;
-          articuloCilindro = 1;
-          articuloEstacionario = 2;
-          articuloEnvase = 5;
-          tipoPagoVariosComp = 7;
-          formularioComp = 307;
-          servicioComp = 3;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          idArticuloDescuento = 4217;
-          articuloCilindro = 1;
-          articuloEstacionario = 2;
-          articuloEnvase = 5;
-          tipoPagoVariosComp = 7;
-          formularioComp = 264;
-          servicioComp = 3;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          idArticuloDescuento = objMap.idArticuloDescuento;
+          articuloCilindro = objMap.articuloCilindro;
+          articuloEstacionario = objMap.articuloEstacionario;
+          articuloEnvase = objMap.articuloEnvase;
+          tipoPagoVariosComp = objMap.tipoPagoVariosComp;
+          formularioComp = objMap.formularioComp;
+          servicioComp = objMap.servicioComp;
         }
 
 

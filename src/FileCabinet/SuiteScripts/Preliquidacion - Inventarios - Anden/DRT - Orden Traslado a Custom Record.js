@@ -13,7 +13,7 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
- define(["N/record", "N/search", "N/runtime"], function (record, search, runtime) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime"], function (drt_mapid_cm, record, search, runtime) {
     function afterSubmit(context) {
       try {
 
@@ -45,27 +45,18 @@
           var unidad20 = 0;
           var unidad30 = 0;
           var unidad45 = 0;
-          
-          if (runtime.envType === runtime.EnvType.SANDBOX) {
-            cilindro10 = 4094;
-            cilindro20 = 4095;
-            cilindro30 = 4096;
-            cilindro45 = 4602;
-            articuloEstacionario = 2;
-            unidad10 = 24;
-            unidad20 = 25;
-            unidad30 = 26;
-            unidad45 = 27;
-          } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-            cilindro10 = 4210;
-            cilindro20 = 4211;
-            cilindro30 = 4212;
-            cilindro45 = 4213; 
-            articuloEstacionario = 2; 
-            unidad10 = 12;
-            unidad20 = 13;
-            unidad30 = 14;
-            unidad45 = 15;  
+
+          var objMap=drt_mapid_cm.drt_liquidacion();
+          if (Object.keys(objMap).length>0) {
+            cilindro10 = objMap.cilindro10;
+            cilindro20 = objMap.cilindro20;
+            cilindro30 = objMap.cilindro30;
+            cilindro45 = objMap.cilindro45;
+            articuloEstacionario = objMap.articuloEstacionario;
+            unidad10 = objMap.unidad10;
+            unidad20 = objMap.unidad20;
+            unidad30 = objMap.unidad30;
+            unidad45 = objMap.unidad45;
           }
 
           //if(numeroViaje && numeroViajeDestino) {

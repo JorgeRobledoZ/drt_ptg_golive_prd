@@ -13,7 +13,7 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
-define(["N/record", "N/search", 'N/ui/serverWidget', "N/runtime"], function (record, search, serverWidget, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", 'N/ui/serverWidget', "N/runtime"], function (drt_mapid_cm, record, search, serverWidget, runtime) {
 
   function afterSubmit(context) {
     
@@ -45,24 +45,16 @@ define(["N/record", "N/search", 'N/ui/serverWidget', "N/runtime"], function (rec
       var prepagoSantander = 0;
       var prepagoScotian = 0;
       var estatusFacturacion = 0;
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        prepagoBanorte = 2;
-        prepagoTransferencia = 8;
-        prepagoBancomer = 13;
-        prepagoHSBC = 14;
-        prepagoBanamex = 15;
-        prepagoSantander = 16;
-        prepagoScotian = 17;
-        estatusFacturacion = 4;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        prepagoBanorte = 2;
-        prepagoTransferencia = 8;
-        prepagoBancomer = 13;
-        prepagoHSBC = 14;
-        prepagoBanamex = 15;
-        prepagoSantander = 16;
-        prepagoScotian = 17;
-        estatusFacturacion = 4;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        prepagoBanorte = objMap.prepagoBanorte;
+        prepagoTransferencia = objMap.prepagoTransferencia;
+        prepagoBancomer = objMap.prepagoBancomer;
+        prepagoHSBC = objMap.prepagoHSBC;
+        prepagoBanamex = objMap.prepagoBanamex;
+        prepagoSantander = objMap.prepagoSantander;
+        prepagoScotian = objMap.prepagoScotian;
+        estatusFacturacion = objMap.estatusFacturacion;
       }
 
       if(statusPreliquidacion != estatusFacturacion) {

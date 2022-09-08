@@ -13,7 +13,7 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
-define(["N/record", "N/search", "N/runtime", 'N/https', 'N/url', 'N/format'], function (record, search, runtime, https, url, format) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime", 'N/https', 'N/url', 'N/format'], function (drt_mapid_cm, record, search, runtime, https, url, format) {
   
     function afterSubmit(context) {
         try {
@@ -92,98 +92,56 @@ define(["N/record", "N/search", "N/runtime", 'N/https', 'N/url', 'N/format'], fu
                 var envase45 = 0;
                 var gasLP = 0;
 
-                if (runtime.envType === runtime.EnvType.SANDBOX) {
-                    efectivo = 1;
-                    prepagoBanorte = 2;
-                    vale = 3;
-                    cortesia = 4;
-                    tarjetaCredito = 5;
-                    tarjetaDebito = 6;
-                    multiple = 7;
-                    prepagoTransferencia = 8;
-                    creditoCliente = 9;
-                    reposicion = 10;
-                    saldoAFavor = 11;
-                    consumoInterno = 12;
-                    prepagoBancomer = 13;
-                    prepagoHSBC = 14;
-                    prepagoBanamex = 15;
-                    prepagoSantander = 16;
-                    prepagoScotian = 17;
-                    bonificacion = 18;
-                    ticketCard = 19;
-                    chequeBancomer = 20;
-                    recirculacion = 21;
-                    cancelado = 22;
-                    relleno = 23;
-                    transferencia = 24;
-                    traspaso = 25;
-                    chequeSantander = 26;
-                    chequeScotian = 27;
-                    chequeHSBC = 28;
-                    chequeBanamex = 29;
-                    chequeBanorte = 30;
-                    publicoGeneral = 14508;
-                    urlPago = "https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=503&id=";
-                    estatusRecibido = 2;
-                    cilindro10 = 4094;
-                    cilindro20 = 4095;
-                    cilindro30 = 4096;
-                    cilindro45 = 4602;
-                    envase10 = 4097;
-                    envase20 = 4099;
-                    envase30 = 4098;
-                    envase45 = 4604;
-                    gasLP = 4088;
-                } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                    efectivo = 1;
-                    prepagoBanorte = 2;
-                    vale = 3;
-                    cortesia = 4;
-                    tarjetaCredito = 5;
-                    tarjetaDebito = 6;
-                    multiple = 7;
-                    prepagoTransferencia = 8;
-                    creditoCliente = 9;
-                    reposicion = 10;
-                    saldoAFavor = 11;
-                    consumoInterno = 12;
-                    prepagoBancomer = 13;
-                    prepagoHSBC = 14;
-                    prepagoBanamex = 15;
-                    prepagoSantander = 16;
-                    prepagoScotian = 17;
-                    bonificacion = 18;
-                    ticketCard = 19;
-                    chequeBancomer = 20;
-                    recirculacion = 21;
-                    cancelado = 22;
-                    relleno = 23;
-                    transferencia = 24;
-                    traspaso = 25;
-                    chequeSantander = 26;
-                    chequeScotian = 27;
-                    chequeHSBC = 28;
-                    chequeBanamex = 29;
-                    chequeBanorte = 30;
-                    tarjetaCreditoBancomer = 31;
-                    tarjetaCreditoHSBC = 32;
-                    tarjetaCreditoBanamex = 33;
-                    tarjetaDebitoBanamex = 34;
-                    tarjetaDebitoBancomer = 35;
-                    tarjetaDebitoHSBC = 36;
-                    publicoGeneral = 27041;
-                    urlPago = "https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=587&id=";
-                    estatusRecibido = 2;
-                    cilindro10 = 4210;
-                    cilindro20 = 4211;
-                    cilindro30 = 4212;
-                    cilindro45 = 4213;
-                    envase10 = 4206;
-                    envase20 = 4207;
-                    envase30 = 4208;
-                    envase45 = 4209;
-                    gasLP = 4216;
+                var objMap=drt_mapid_cm.drt_liquidacion();
+                if (Object.keys(objMap).length>0) {
+                    efectivo = objMap.efectivo;
+                    prepagoBanorte = objMap.prepagoBanorte;
+                    vale = objMap.vale;
+                    cortesia = objMap.cortesia;
+                    tarjetaCredito = objMap.tarjetaCredito;
+                    tarjetaDebito = objMap.tarjetaDebito;
+                    multiple = objMap.multiple;
+                    prepagoTransferencia = objMap.prepagoTransferencia;
+                    creditoCliente = objMap.creditoCliente;
+                    reposicion = objMap.reposicion;
+                    saldoAFavor = objMap.saldoAFavor;
+                    consumoInterno = objMap.consumoInterno;
+                    prepagoBancomer = objMap.prepagoBancomer;
+                    prepagoHSBC = objMap.prepagoHSBC;
+                    prepagoBanamex = objMap.prepagoBanamex;
+                    prepagoSantander = objMap.prepagoSantander;
+                    prepagoScotian = objMap.prepagoScotian;
+                    bonificacion = objMap.bonificacion;
+                    ticketCard = objMap.ticketCard;
+                    chequeBancomer = objMap.chequeBancomer;
+                    recirculacion = objMap.recirculacion;
+                    cancelado = objMap.cancelado;
+                    relleno = objMap.relleno;
+                    transferencia = objMap.transferencia;
+                    traspaso = objMap.traspaso;
+                    chequeSantander = objMap.chequeSantander;
+                    chequeScotian = objMap.chequeScotian;
+                    chequeHSBC = objMap.chequeHSBC;
+                    chequeBanamex = objMap.chequeBanamex;
+                    chequeBanorte = objMap.chequeBanorte;
+                    tarjetaCreditoBancomer = objMap.tarjetaCreditoBancomer;
+                    tarjetaCreditoHSBC = objMap.tarjetaCreditoHSBC;
+                    tarjetaCreditoBanamex = objMap.tarjetaCreditoBanamex;
+                    tarjetaDebitoBanamex = objMap.tarjetaDebitoBanamex;
+                    tarjetaDebitoBancomer = objMap.tarjetaDebitoBancomer;
+                    tarjetaDebitoHSBC = objMap.tarjetaDebitoHSBC;
+                    publicoGeneral = objMap.publicoGeneral;
+                    urlPago = objMap.urlPago;
+                    estatusRecibido = objMap.estatusRecibido;
+                    cilindro10 = objMap.cilindro10;
+                    cilindro20 = objMap.cilindro20;
+                    cilindro30 = objMap.cilindro30;
+                    cilindro45 = objMap.cilindro45;
+                    envase10 = objMap.envase10;
+                    envase20 = objMap.envase20;
+                    envase30 = objMap.envase30;
+                    envase45 = objMap.envase45;
+                    gasLP = objMap.gasLP;
                 }
 
                     

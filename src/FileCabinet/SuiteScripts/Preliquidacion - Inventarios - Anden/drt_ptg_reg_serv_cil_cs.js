@@ -12,7 +12,7 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
-define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/runtime"], function (record, search, error, currentRecord, dialog, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/runtime"], function (drt_mapid_cm, record, search, error, currentRecord, dialog, runtime) {
     function pageInit(context) {
         try {
             debugger;
@@ -47,16 +47,8 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/
             var estatusViejeEnCurso = 0;
             var articuloEnvase = 0;
 
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-              cilindro10 = 4094;
-              cilindro20 = 4095;
-              cilindro30 = 4096;
-              cilindro45 = 4602;
-              descuentoPorcentaje = 1;
-              descuentoPeso = 2;
-              estatusViejeEnCurso = 3;
-              articuloEnvase = 5;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
               cilindro10 = 4210;
               cilindro20 = 4211;
               cilindro30 = 4212;
@@ -372,32 +364,23 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/
       var tarjetaDebitoBancomerId = 0;
       var tarjetaDebitoHSBCId = 0;
 
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        idPublicoGeneral = 14508;
-        efectivoId = 1;
-        tarjetaCreditoId = 5;
-        tarjetaDebitoId = 6;
-        consumoInternoId = 12;
-        ticketCardId = 19;
-        recirculacionId = 21;
-        canceladoId = 22;
-        traspasoId = 25;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        idPublicoGeneral = 27041;
-        efectivoId = 1;
-        tarjetaCreditoId = 5;
-        tarjetaDebitoId = 6;
-        consumoInternoId = 12;
-        ticketCardId = 19;
-        recirculacionId = 21;
-        canceladoId = 22;
-        traspasoId = 25;  
-        tarjetaCreditoBancomerId = 31;
-        tarjetaCreditoHSBCId = 32;
-        tarjetaCreditoBanamexId = 33;
-        tarjetaDebitoBanamexId = 34;
-        tarjetaDebitoBancomerId = 35;
-        tarjetaDebitoHSBCId = 36;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        idPublicoGeneral = objMap.idPublicoGeneral;
+        efectivoId = objMap.efectivoId;
+        tarjetaCreditoId = objMap.tarjetaCreditoId;
+        tarjetaDebitoId = objMap.tarjetaDebitoId;
+        consumoInternoId = objMap.consumoInternoId;
+        ticketCardId = objMap.ticketCardId;
+        recirculacionId = objMap.recirculacionId;
+        canceladoId = objMap.canceladoId;
+        traspasoId = objMap.traspasoId;
+        tarjetaCreditoBancomerId = objMap.tarjetaCreditoBancomerId;
+        tarjetaCreditoHSBCId = objMap.tarjetaCreditoHSBCId;
+        tarjetaCreditoBanamexId = objMap.tarjetaCreditoBanamexId;
+        tarjetaDebitoBanamexId = objMap.tarjetaDebitoBanamexId;
+        tarjetaDebitoBancomerId = objMap.tarjetaDebitoBancomerId;
+        tarjetaDebitoHSBCId = objMap.tarjetaDebitoHSBCId;
       }
 
       if (sublistName === idRegistroDeServicios) {
@@ -505,18 +488,13 @@ define(["N/record", "N/search", "N/error", "N/currentRecord", "N/ui/dialog", "N/
           var urlEstacionarios = "";
           var etapaProcesado = 0;
 
-          if (runtime.envType === runtime.EnvType.SANDBOX) {
-            servicioCilindro = 1;
-            servicioEstacionario = 2;
-            urlCilindros = 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=497&whence=&vehiculo=';
-            urlEstacionarios = 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=495&whence=&vehiculo=';
-            etapaProcesado = 2;
-          } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-            servicioCilindro = 1;
-            servicioEstacionario = 2;
-            urlCilindros = 'https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=585&whence=&vehiculo=';
-            urlEstacionarios = 'https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=659&whence=&vehiculo=';
-            etapaProcesado = 2;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+            servicioCilindro = objMap.servicioCilindro;
+            servicioEstacionario = objMap.servicioEstacionario;
+            urlCilindros = objMap.urlCilindros;
+            urlEstacionarios = objMap.urlEstacionarios;
+            etapaProcesado = objMap.etapaProcesado;
           }
 
           var numeViaje = recordObj.getValue("custrecord_ptg_num_viaje_reg_serv_cil");

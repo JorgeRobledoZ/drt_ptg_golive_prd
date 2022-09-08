@@ -13,9 +13,10 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
-define(["N/record", "N/search", "N/runtime", 'N/https', 'N/url', 'N/format'], function (record, search, runtime, https, url, format) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm',"N/record", "N/search", "N/runtime", 'N/https', 'N/url', 'N/format'], function (drt_mapid_cm, record, search, runtime, https, url, format) {
     function beforeLoad(scriptContext) {
         try {
+            var objMap=drt_mapid_cm.drt_liquidacion();
             var customRec = scriptContext.newRecord;
             var recId = customRec.id;
             var type_interface = runtime.executionContext;
@@ -29,14 +30,10 @@ define(["N/record", "N/search", "N/runtime", 'N/https', 'N/url', 'N/format'], fu
             var estatusRecibido = 0;
             var formularioCustomRecord = 0;
 
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-                estatusPendiente = 1;
-                estatusRecibido = 2;
-                formularioCustomRecord = 324;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                estatusPendiente = 1;
-                estatusRecibido = 2;
-                formularioCustomRecord = 189;
+            if (Object.keys(objMap).length>0) {
+                estatusPendiente = objMap.estatusPendiente;
+                estatusRecibido = objMap.estatusRecibido;
+                formularioCustomRecord = objMap.formularioCustomRecord;
             }
 
 
@@ -92,25 +89,16 @@ define(["N/record", "N/search", "N/runtime", 'N/https', 'N/url', 'N/format'], fu
             var unidad30 = 0;
             var unidad45 = 0;
             var formularioOrdenTraslado = 0;
-
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-                estatusPendiente = 1;
-                zonaPrecio = 274;
-                unidad10 = 24;
-                unidad20 = 25;
-                unidad30 = 26;
-                unidad45 = 27;
-                formularioOrdenTraslado = 313;
-                gasLPUnidades = 4693;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                estatusPendiente = 1;
-                zonaPrecio = 101;
-                unidad10 = 12;
-                unidad20 = 13;
-                unidad30 = 14;
-                unidad45 = 15;
-                formularioOrdenTraslado = 266;
-                gasLPUnidades = 4216;
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+                estatusPendiente = objMap.estatusPendiente;
+                zonaPrecio = objMap.zonaPrecio;
+                unidad10 = objMap.unidad10;
+                unidad20 = objMap.unidad20;
+                unidad30 = objMap.unidad30;
+                unidad45 = objMap.unidad45;
+                formularioOrdenTraslado = objMap.formularioOrdenTraslado;
+                gasLPUnidades = objMap.gasLPUnidades;
             }
 
             if(!ordenTraslado){

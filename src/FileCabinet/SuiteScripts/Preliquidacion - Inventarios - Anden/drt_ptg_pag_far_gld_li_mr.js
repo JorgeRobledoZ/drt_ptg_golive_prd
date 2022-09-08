@@ -13,7 +13,7 @@
  *@NApiVersion 2.x
  *@NScriptType MapReduceScript
  */
- define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https', 'N/format'], function (runtime, search, record, email, error, url, https, format) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https', 'N/format'], function (drt_mapid_cm, runtime, search, record, email, error, url, https, format) {
 
     function getInputData() {
         try {
@@ -112,14 +112,11 @@
             var cuenta = 0;
             var formularioPago = 0;
 
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-                clienteNoIdentificado = 322141;
-                cuenta = 2809;
-                formularioPago = 70;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-                clienteNoIdentificado = 27042;
-                cuenta = 2809;
-                formularioPago = 296;
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+                clienteNoIdentificado = objMap.clienteNoIdentificado;
+                cuenta = objMap.cuenta;
+                formularioPago = objMap.formularioPago;
             }
 
             var formatof = fechaPSS.substring(0, 2) + '/' + fechaPSS.substring(3, 4) + '/' + fechaPSS.substring(5, 10);

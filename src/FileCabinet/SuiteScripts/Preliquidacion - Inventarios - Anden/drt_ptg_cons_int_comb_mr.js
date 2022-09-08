@@ -13,7 +13,7 @@
  *@NApiVersion 2.x
  *@NScriptType MapReduceScript
  */
- define(['N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https'], function (runtime, search, record, email, error, url, https) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https'], function (drt_mapid_cm, runtime, search, record, email, error, url, https) {
 
     function getInputData() {
         try {
@@ -81,14 +81,11 @@
             log.debug("planta", planta);
             log.debug("subsidiaria", subsidiaria);
 
-            if (runtime.envType === runtime.EnvType.SANDBOX) {
-              idAlmacenGasolina = 1524;
-              idArticuloGasolina = 4605;
-              cuentaAjuste = 994;
-            } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-              idAlmacenGasolina = 1524;
-              idArticuloGasolina = 4605;
-              cuentaAjuste = 994;
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+              idAlmacenGasolina = objMap.idAlmacenGasolina;
+              idArticuloGasolina = objMap.idArticuloGasolina;
+              cuentaAjuste = objMap.cuentaAjuste;
             }
 
             var cantidadLitros = parseFloat(litros) * -1;

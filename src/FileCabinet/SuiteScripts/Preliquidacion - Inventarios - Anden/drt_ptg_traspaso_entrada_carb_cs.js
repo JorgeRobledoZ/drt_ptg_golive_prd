@@ -12,17 +12,16 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
-define(["N/record", "N/search", "N/error", "N/runtime", "N/ui/dialog"], function (record, search, error, runtime, dialog) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm',"N/record", "N/search", "N/error", "N/runtime", "N/ui/dialog"], function (drt_mapid_cm, record, search, error, runtime, dialog) {
     function fieldChanged(context) {
       var currentRecord = context.currentRecord;
       var fieldName = context.fieldId;
       var numViaje = currentRecord.getValue("custrecord_ptg_numvijae_dot_est_carb_");
       var vehiculo = currentRecord.getValue("custrecord_ptg_pipa_dot_est_carb_");
       var estatusViajeEnCurso = 0;
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        estatusViajeEnCurso = 3;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        estatusViajeEnCurso = 3;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        estatusViajeEnCurso = objMap.estatusViajeEnCurso = 3;
       }
       log.audit("numViaje", numViaje);
       log.audit("vehiculo", vehiculo);
@@ -62,10 +61,9 @@ define(["N/record", "N/search", "N/error", "N/runtime", "N/ui/dialog"], function
       var pipa = currentRecord.getValue("custrecord_ptg_pipa_dot_est_carb_");
       var articulo = 0;
       var cantidadDotacion = currentRecord.getValue("custrecord_ptg_litros_recibidos_");
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        articulo = 4088;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        articulo = 4216;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        articulo = objMap.articulo;
       }
 
       if (pipa) {

@@ -12,7 +12,7 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
- define(["N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog"], function (record, search, error, runtime, dialog) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog"], function (drt_mapid_cm, record, search, error, runtime, dialog) {
      function fieldChanged(context) {
       var currentRecord = context.currentRecord;
       var fieldName = context.fieldId;
@@ -23,10 +23,9 @@
       log.audit("vehiculo", vehiculo);
       log.audit("ultimoServicioEntradaPipa", ultimoServicioEntradaPipa);
       var estatusEnCurso = 0;
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        estatusEnCurso = 3;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        estatusEnCurso = 3;
+       var objMap=drt_mapid_cm.drt_liquidacion();
+       if (Object.keys(objMap).length>0) {
+        estatusEnCurso = objMap.estatusEnCurso;
       }
 
 

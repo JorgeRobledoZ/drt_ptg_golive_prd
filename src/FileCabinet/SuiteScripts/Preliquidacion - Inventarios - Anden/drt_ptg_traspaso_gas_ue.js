@@ -12,7 +12,7 @@
  * @NApiVersion 2.x
  * @NScriptType UserEventScript
  */
-define(["N/record", "N/search", "N/runtime"], function (record, search, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm',"N/record", "N/search", "N/runtime"], function (drt_mapid_cm, record, search, runtime) {
   function afterSubmit(context) {
     try {
         var newRecord = context.newRecord;
@@ -21,13 +21,10 @@ define(["N/record", "N/search", "N/runtime"], function (record, search, runtime)
         var ubicacionDestino = newRecord.getValue("custrecord_ptg_ubidest_trasp_gas_");
         var transaccion = newRecord.getValue("custrecord_ptg_transferencia_inv_tdg");
         var gasLP = 0;
-        
-        if (runtime.envType === runtime.EnvType.SANDBOX) {
-          gasLP = 4088;
-        } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-          gasLP = 4216;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+          gasLP = objMap.gasLP;
         }
-
         
         var localizacionObj = record.load({
           type: record.Type.LOCATION,

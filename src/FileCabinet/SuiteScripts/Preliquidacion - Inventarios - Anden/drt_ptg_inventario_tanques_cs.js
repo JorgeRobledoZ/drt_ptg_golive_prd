@@ -12,7 +12,7 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
- define(["N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog"], function (record, search, error, runtime, dialog) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog"], function (drt_mapid_cm, record, search, error, runtime, dialog) {
     
   function pageInit(context){
     try {
@@ -45,10 +45,9 @@
       var tanquesObjCount = 0;
       var capacidadTotal = 0;
 
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        gasLP = 4088;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        gasLP = 4216;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        gasLP = objMap.gasLP;
       }
 
       if (plantaTanques && fieldName === 'custrecord_ptg_planta_inv_tanques_'){

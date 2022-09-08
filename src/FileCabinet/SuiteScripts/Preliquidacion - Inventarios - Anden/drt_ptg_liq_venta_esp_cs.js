@@ -12,8 +12,8 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
- define(['N/https', 'N/currentRecord', 'N/url', 'N/ui/message', 'N/ui/dialog', 'N/search', 'N/runtime', 'N/record', 'N/error', 'N/currency', 'N/format'], 
- function (https, currentRecord, url, message, dialog, search, runtime, record, error, currency, format) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/https', 'N/currentRecord', 'N/url', 'N/ui/message', 'N/ui/dialog', 'N/search', 'N/runtime', 'N/record', 'N/error', 'N/currency', 'N/format'],
+ function (drt_mapid_cm, https, currentRecord, url, message, dialog, search, runtime, record, error, currency, format) {
   function pageInit(context) {
     try {
         debugger;
@@ -106,18 +106,16 @@ function fieldChanged(context) {
     var tarjetaDebitoBancomerId = 0;
     var tarjetaDebitoHSBCId = 0;
 
-    if (runtime.envType === runtime.EnvType.SANDBOX) {
-      tarjetaCreditoId = 5;
-      tarjetaDebitoId = 6;
-    } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-      tarjetaCreditoId = 5;
-      tarjetaDebitoId = 6;
-      tarjetaCreditoBancomerId = 31;
-      tarjetaCreditoHSBCId = 32;
-      tarjetaCreditoBanamexId = 33;
-      tarjetaDebitoBanamexId = 34;
-      tarjetaDebitoBancomerId = 35;
-      tarjetaDebitoHSBCId = 36;
+    var objMap=drt_mapid_cm.drt_liquidacion();
+    if (Object.keys(objMap).length>0) {
+      tarjetaCreditoId = objMap.tarjetaCreditoId;
+      tarjetaDebitoId = objMap.tarjetaDebitoId;
+      tarjetaCreditoBancomerId = objMap.tarjetaCreditoBancomerId;
+      tarjetaCreditoHSBCId = objMap.tarjetaCreditoHSBCId;
+      tarjetaCreditoBanamexId = objMap.tarjetaCreditoBanamexId;
+      tarjetaDebitoBanamexId = objMap.tarjetaDebitoBanamexId;
+      tarjetaDebitoBancomerId = objMap.tarjetaDebitoBancomerId;
+      tarjetaDebitoHSBCId = objMap.tarjetaDebitoHSBCId;
     }
 
     if (sublistName === idRegistroDeServicios) {

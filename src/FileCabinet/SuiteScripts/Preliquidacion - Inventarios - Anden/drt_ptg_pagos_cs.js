@@ -12,8 +12,8 @@
  *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
-define(["N/https", "N/currentRecord", "N/url", "N/ui/message", "N/ui/dialog", "N/search", "N/runtime", "N/record", "N/error", "N/currency",], 
-function (https, currentRecord, url, message, dialog, search, runtime, record, error, currenc) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/https", "N/currentRecord", "N/url", "N/ui/message", "N/ui/dialog", "N/search", "N/runtime", "N/record", "N/error", "N/currency",],
+function (drt_mapid_cm, https, currentRecord, url, message, dialog, search, runtime, record, error, currenc) {
   function saveRecord(context) {
     try {
       var currentRecord = context.currentRecord;
@@ -106,10 +106,9 @@ function (https, currentRecord, url, message, dialog, search, runtime, record, e
       var cabeceraFieldName = context.fieldId;
       var vehiculo = currentRecord.getValue("custrecord_ptg_vehiculo_consumo_interno");
       var estatusViejeEnCurso = 0;
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        estatusViejeEnCurso = 3;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        estatusViejeEnCurso = 3;
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        estatusViejeEnCurso = objMap.estatusViejeEnCurso;
       }
 
       if(vehiculo && cabeceraFieldName === "custrecord_ptg_vehiculo_consumo_interno"){

@@ -13,7 +13,7 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
-define(["N/record", "N/search", "N/runtime"], function (record, search, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime"], function (drt_mapid_cm, record, search, runtime) {
 
 function beforeSubmit(context) {
   try {
@@ -67,18 +67,13 @@ function beforeSubmit(context) {
       var formularioOrdenTraslado = 0;
       var gasLP = 0;
 
-      if (runtime.envType === runtime.EnvType.SANDBOX) {
-        paqueteMySuite = 2;
-        plantillaDocumentoElectronico = 135;
-        metodoDeEnvio = 11;
-        formularioOrdenTraslado = 313;
-        gasLP = 4088;
-      } else if (runtime.envType === runtime.EnvType.PRODUCTION) {
-        paqueteMySuite = 2;
-        plantillaDocumentoElectronico = 119;
-        metodoDeEnvio = 10;
-        formularioOrdenTraslado = 266;
-        gasLP = 4216;   
+      var objMap=drt_mapid_cm.drt_liquidacion();
+      if (Object.keys(objMap).length>0) {
+        paqueteMySuite = objMap.paqueteMySuite;
+        plantillaDocumentoElectronico = objMap.plantillaDocumentoElectronico;
+        metodoDeEnvio = objMap.metodoDeEnvio;
+        formularioOrdenTraslado = objMap.formularioOrdenTraslado;
+        gasLP = objMap.gasLP;
       }
 
       if(!transacciones || transacciones == ""){
