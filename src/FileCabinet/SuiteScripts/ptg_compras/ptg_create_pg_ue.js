@@ -2,7 +2,7 @@
  *@NApiVersion 2.1
  *@NScriptType UserEventScript
  */
-define(["N/record", "N/search"], function (record, search) {
+define(["SuiteScripts/drt_custom_module/drt_mapid_cm","N/record", "N/search"], function (drt_mapid_cm, record, search) {
 
     function afterSubmit(context) {
         try {
@@ -16,6 +16,12 @@ define(["N/record", "N/search"], function (record, search) {
 
                 var objRecepcion = {};
                 var arrayRecepcion =[];
+
+                let ubicacion_desvio_planta_receipt = 0;
+                var objMap=drt_mapid_cm.drt_compras();
+                if (Object.keys(objMap).length>0) {
+                    ubicacion_desvio_planta_receipt = objMap.ubicacion_desvio_planta_receipt;
+                }
 
                 for (var i = 0; i < lineas; i++) {
                     var pg_asignado = currentRecord.getSublistValue({
@@ -150,7 +156,7 @@ define(["N/record", "N/search"], function (record, search) {
     
                         recepcionDesvio.setValue({
                             fieldId: 'location', 
-                            value: 1525
+                            value: ubicacion_desvio_planta_receipt
                         })
     
                         var lineasRecepcion = recepcionDesvio.getLineCount({
