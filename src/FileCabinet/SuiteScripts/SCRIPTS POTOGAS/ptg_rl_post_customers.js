@@ -4,7 +4,7 @@
  *@Author Jorge Macias
  *@description creación de clientes potogas
  */
- define(["N/log", "N/record", "N/search", 'SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors'], function (log, /** @type {import('N/record')} */ record, search, error) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/log", "N/record", "N/search", 'SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors'], function (drt_mapid_cm, log, /** @type {import('N/record')} */ record, search, error) {
 
     // se crea estructura donde se cargará toda la data
     const responseData = {
@@ -426,7 +426,7 @@
         let customersList = [];
 
         try {
-
+            var mapObj=drt_mapid_cm.getVariables();
 
             request.customers.forEach((customer) => {
                 let customerRecord = record.create({
@@ -437,8 +437,7 @@
 
                 customerRecord.setValue({
                     fieldId: 'customform',
-                    //value: '194' sbx
-                    value: '180'
+                    value: drt_mapid_cm.customformCustomer
                 })
 
                 if (customer.nombre) {

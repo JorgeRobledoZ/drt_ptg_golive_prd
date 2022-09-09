@@ -4,7 +4,7 @@
  *@Author Jorge Macias
  *@description Creacion de servicio de antojados
  */
-define(['N/log', 'SuiteScripts/SCRIPTS POTOGAS/ptg_modulos', 'SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors', 'N/record', 'N/format'], function (log, opport, error, record, format) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/log', 'SuiteScripts/SCRIPTS POTOGAS/ptg_modulos', 'SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors', 'N/record', 'N/format'], function (drt_mapid_cm, log, opport, error, record, format) {
 
     // se crea estructura donde se cargarà toda la data
     const responseData = {
@@ -35,6 +35,7 @@ define(['N/log', 'SuiteScripts/SCRIPTS POTOGAS/ptg_modulos', 'SuiteScripts/SCRIP
         let opportunityList = [];
         log.audit('request', request.opportunities);
         try {
+            var mapObj=drt_mapid_cm.getVariables();
             // se recorreo la oportunidad ingresada por request para setear información
             request.opportunities.forEach((opportunity) => {
                 let opportunityRecord = record.create({
@@ -44,7 +45,7 @@ define(['N/log', 'SuiteScripts/SCRIPTS POTOGAS/ptg_modulos', 'SuiteScripts/SCRIP
 
                 opportunityRecord.setValue({
                     fieldId: 'customform',
-                    value: '124'
+                    value: mapObj.customformOpportunity
                 }); // Estados de oportunidad cancelado. reprogramado o modificado
                 opportunityRecord.setValue({
                     fieldId: 'entitystatus',

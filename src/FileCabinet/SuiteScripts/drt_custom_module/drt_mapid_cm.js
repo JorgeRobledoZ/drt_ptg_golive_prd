@@ -54,6 +54,11 @@ define(
                         //Aqui inician los de Iztac
                         ,
                         tipo_vehiculo:"Camión Cilindros",
+                        statusOpportunityCancelada: "14",
+                        statusOpportunityReprograma:"11",
+                        statusOpportunityResponseData:"13",
+                        customformOpportunity:"124",
+                        customformCustomer:"180",
 
                     },
                     [ runtime.EnvType.SANDBOX ]: {
@@ -95,6 +100,14 @@ define(
                         tipoAlianzaComContado  : 3,
                         formOrdenTransladoCarb : 313
                         //Aqui inician los de Iztac
+                        ,
+                        tipo_vehiculo:"Camión Cilindros",
+                        statusOpportunityCancelada: "14",
+                        statusOpportunityReprograma:"11",
+                        statusOpportunityResponseData:"13",
+                        customformOpportunity:"124",
+                        customformCustomer:"194",
+
 
                     }
                 }
