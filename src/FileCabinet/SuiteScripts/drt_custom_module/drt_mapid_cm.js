@@ -557,7 +557,7 @@ define(
                         form_transfer_order: 57,
                         ubicacion_transfer_order: 1525,
                         form_full_filment: 40,
-                        form_item_receipt: 208,
+                        form_item_receipt: 268,
                         form_intercompany_invoice: 286,
                         subcidiary_intercompany_invoice: 25,
                         ubicacion_intercompany_invoice: 762
