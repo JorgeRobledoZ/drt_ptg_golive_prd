@@ -9,7 +9,7 @@
  * File: drt_ptg_serv_no_conciliados_lib.js
  ******************************************************************/
 /**
- * @NApiVersion 2.x
+ * @NApiVersion 2.1
  */
 define(['N/search', 'N/config', 'N/record', 'N/log'],
 

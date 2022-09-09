@@ -9,7 +9,7 @@
  * File: drt_recibir_apor_cil_ecarb_ue.js
  ******************************************************************/
 /**
- * @NApiVersion 2.0
+ * @NApiVersion 2.1
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */

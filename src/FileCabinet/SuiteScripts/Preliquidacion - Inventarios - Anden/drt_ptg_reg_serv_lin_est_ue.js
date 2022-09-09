@@ -9,7 +9,7 @@
  * File: drt_ptg_reg_serv_lin_est_ue.js
  ******************************************************************/
 /**
- * @NApiVersion 2.x
+ * @NApiVersion 2.1
  * @NScriptType UserEventScript
  */
 define(["N/record", "N/search"], function (record, search) {

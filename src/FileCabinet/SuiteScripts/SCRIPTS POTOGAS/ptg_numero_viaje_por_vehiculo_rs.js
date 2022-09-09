@@ -2,20 +2,20 @@
  *@NApiVersion 2.1
  *@NScriptType Restlet
  */
-define(["N/search"], function (search) {
+define(["N/search", "SuiteScripts/drt_custom_module/drt_mapid_cm"], function (search, drt_mapid_cm) {
 
     function _post(request) {
         try {
             let arrayViajes = [];
             let objViajes = {};
             let idVehiculo = request.id;
-
+            const customVars = drt_mapid_cm.getVariables();
             var customrecord_ptg_tabladeviaje_enc2_SearchObj = search.create({
                 type: "customrecord_ptg_tabladeviaje_enc2_",
                 filters: [
                     ["custrecord_ptg_vehiculo_tabladeviajes_", "anyof", idVehiculo],
                     "AND",
-                    ["custrecord_ptg_estatus_tabladeviajes_", "anyof", "3"]
+                    ["custrecord_ptg_estatus_tabladeviajes_", "anyof", customVars.statusTablaViajeEnCurs]
                 ],
                 columns: [
                     search.createColumn({

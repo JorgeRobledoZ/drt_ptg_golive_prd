@@ -9,7 +9,7 @@
  * File: drt_ptg_colonias_rutas_cs.js
  ******************************************************************/
 /**
- *@NApiVersion 2.x
+ *@NApiVersion 2.1
  *@NScriptType ClientScript
  */
  define(["N/record", "N/search", "N/error", "N/runtime", "N/ui/dialog",], function (record, search, error, runtime, dialog) {

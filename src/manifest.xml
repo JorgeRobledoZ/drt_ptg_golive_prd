@@ -15,5 +15,9 @@
       <object>customrecord_ptg_articulos_por_zona_</object>
       <object>customrecord_ptg_politicadeventa_</object>
     </objects>
+    <files>
+      <file>/SuiteScripts/dev/ptg_ue_request_consumption_policy.js</file>
+      <file>/SuiteScripts/dev/ptg_ue_request_sales_policy.js</file>
+    </files>
   </dependencies>
 </manifest>

@@ -9,7 +9,7 @@
  * File: drt_ptg_liq_venta_anden_cs.js
  ******************************************************************/
 /**
- *@NApiVersion 2.x
+ *@NApiVersion 2.1
  *@NScriptType ClientScript
  */
  define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/https', 'N/currentRecord', 'N/url', 'N/ui/message', 'N/ui/dialog', 'N/search', 'N/runtime', 'N/record', 'N/error', 'N/currency', 'N/format'],

@@ -9,7 +9,7 @@
  * File: drt_ptg_pag_far_gld_li_ue.js
  ******************************************************************/
 /**
- *@NApiVersion 2.x
+ *@NApiVersion 2.1
  *@NScriptType UserEventScript
  */
  define(['N/record', 'N/format', 'N/search'], function (record, format, search) {

@@ -9,7 +9,7 @@
  * File: drt_liquidacion_carb_ue2_copy.js
  ******************************************************************/
 /**
- * @NApiVersion 2.0
+ * @NApiVersion 2.1
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */

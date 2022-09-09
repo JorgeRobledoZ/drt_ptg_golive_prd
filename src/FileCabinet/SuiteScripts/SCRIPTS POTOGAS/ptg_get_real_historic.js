@@ -2,7 +2,7 @@
  *@NApiVersion 2.1
  *@NScriptType Restlet
  */
-define(['N/search'], function (search) {
+define(['N/search', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (search, drt_mapid_cm) {
 
     const responseData = {
         success: false,
@@ -14,6 +14,7 @@ define(['N/search'], function (search) {
     function _get(request) {
 
         try {
+            var customVars = drt_mapid_cm.getVariables();
             var transactionSearchObj = search.create({
                 type: "transaction",
                 filters:
@@ -26,7 +27,7 @@ define(['N/search'], function (search) {
                     "AND", 
                     ["name","anyof",request.cliente],
                     "AND", 
-                    ["custbody_ptg_estado_pedido","anyof","3"],
+                    ["custbody_ptg_estado_pedido","anyof",customVars.statusPedidoEntregado],
                     "AND", 
                     ["shippingaddress.internalid","anyof",request.idAddress]
                 ],

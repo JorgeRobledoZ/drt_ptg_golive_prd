@@ -9,7 +9,7 @@
  * File: drt_ptg_entrada_pipas_cs.js
  ******************************************************************/
 /**
- *@NApiVersion 2.x
+ *@NApiVersion 2.1
  *@NScriptType ClientScript
  */
  define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog"], function (drt_mapid_cm, record, search, error, runtime, dialog) {
