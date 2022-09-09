@@ -9,7 +9,7 @@
  * File: DRT - PTG Validar stock - CS.js
  ******************************************************************/
 /**
- * @NApiVersion 2.x
+ * @NApiVersion 2.1
  * @NScriptType ClientScript
  * @NModuleScope SameAccount
  */

@@ -9,7 +9,7 @@
  * File: drt_ptg_liq_venta_esp_ue.js
  ******************************************************************/
 /**
- * @NApiVersion 2.x
+ * @NApiVersion 2.1
  * @NScriptType UserEventScript
  */
 //define(["N/record", "N/search", "N/task"], function (record, search, task) {

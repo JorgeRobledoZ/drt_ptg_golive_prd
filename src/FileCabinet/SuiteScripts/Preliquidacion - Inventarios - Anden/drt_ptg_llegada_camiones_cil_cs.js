@@ -9,7 +9,7 @@
  * File: drt_ptg_llegada_camiones_cil_cs.js
  ******************************************************************/
 /**
- *@NApiVersion 2.x
+ *@NApiVersion 2.1
  *@NScriptType ClientScript
  */
 define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/currentRecord", 'N/ui/dialog', "N/runtime"], function (drt_mapid_cm, record, search, error, currentRecord, dialog, runtime) {

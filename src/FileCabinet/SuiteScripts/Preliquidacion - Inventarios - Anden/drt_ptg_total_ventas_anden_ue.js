@@ -9,7 +9,7 @@
  * File: drt_ptg_total_ventas_anden_ue.js
  ******************************************************************/
 /**
- * @NApiVersion 2.x
+ * @NApiVersion 2.1
  * @NScriptType UserEventScript
  */
 define(["N/record", "N/search", "N/task", "N/format", 'N/config'], function (record, search, task, format, config) {
