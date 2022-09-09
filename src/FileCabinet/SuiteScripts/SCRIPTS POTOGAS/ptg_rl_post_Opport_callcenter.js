@@ -4,7 +4,7 @@
  *@Author Jorge Macias
  *@description Creacion de una busqueda guardada de oportunidades
  */
-define(['N/log', 'SuiteScripts/SCRIPTS POTOGAS/ptg_modulos', 'SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors', 'N/record', 'N/format', 'N/search'], function (log, opport, error, record, format, search) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/log', 'SuiteScripts/SCRIPTS POTOGAS/ptg_modulos', 'SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors', 'N/record', 'N/format', 'N/search'], function (drt_mapid_cm, log, opport, error, record, format, search) {
 
     // se crea estructura donde se cargarà toda la data
     const responseData = {
@@ -33,6 +33,7 @@ define(['N/log', 'SuiteScripts/SCRIPTS POTOGAS/ptg_modulos', 'SuiteScripts/SCRIP
         log.audit('request', request.opportunities);
         try {
             // se recorreo la oportunidad ingresada por request para setear información
+            var mapObj=drt_mapid_cm.getVariables();
             request.opportunities.forEach((opportunity) => {
                 let opportunityRecord = record.create({
                     type: record.Type.OPPORTUNITY,
@@ -41,8 +42,7 @@ define(['N/log', 'SuiteScripts/SCRIPTS POTOGAS/ptg_modulos', 'SuiteScripts/SCRIP
 
                 opportunityRecord.setValue({ // Estados de oportunidad cancelado. reprogramado o modificado
                     fieldId: 'customform',
-                    //value: '305' sbx
-                    value : '265'
+                    value : mapObj.customFormOppPotogas
                 });
 
                 // opportunityRecord.setValue({ // Estados de oportunidad cancelado. reprogramado o modificado
@@ -284,7 +284,7 @@ define(['N/log', 'SuiteScripts/SCRIPTS POTOGAS/ptg_modulos', 'SuiteScripts/SCRIP
             // se captura el error 
         } catch (err) {
             responseData.apiErrorPost.push(error.errorNotParameter(err.message)) //errorNotParameter
-            log.audit({
+            log.error({
                 title: "Error",
                 details: err
             })
@@ -530,13 +530,14 @@ define(['N/log', 'SuiteScripts/SCRIPTS POTOGAS/ptg_modulos', 'SuiteScripts/SCRIP
     }
 
     const getTravel = (route) => {
+        var objMap=drt_mapid_cm.drt_liquidacion();
         let customrecord_ptg_tabladeviaje_enc2_SearchObj = search.create({
             type: "customrecord_ptg_tabladeviaje_enc2_",
             filters:
                 [
                     ["custrecord_ptg_fecha_viaje_en_curso", "within", "today"],
                     "AND",
-                    ["custrecord_ptg_estatus_tabladeviajes_", "anyof", "3"],
+                    ["custrecord_ptg_estatus_tabladeviajes_", "anyof", objMap.estatus],
                     "AND",
                     ["custrecord_ptg_ruta", "anyof", route]
                 ],

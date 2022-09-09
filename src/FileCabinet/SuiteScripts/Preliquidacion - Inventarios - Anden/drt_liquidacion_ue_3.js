@@ -2,14 +2,14 @@
  * * DisrupTT * DisrupTT Developers *
  * ****************************************************************
  * Date: 12/2021
- * Script name: DRT - Liquidacion 3 UE COPY
- * Script id: customscript_drt_liquidacion_ue_3_c
- * customer Deployment id: customdeploy_drt_liquidacion_ue_3_c
+ * Script name: DRT - Liquidacion 3 UE
+ * Script id: customscript_drt_liquidacion_ue_3
+ * customer Deployment id: customdeploy_drt_liquidacion_ue_3
  * Applied to: PTG - PreLiquidación de Cilindros
- * File: drt_liquidacion_ue_3_copy.js
+ * File: drt_liquidacion_ue_3.js
  ******************************************************************/
 /**
- * @NApiVersion 2.0
+ * @NApiVersion 2.1
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */

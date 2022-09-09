@@ -9,7 +9,7 @@
  * File: drt_ptg_ventas_estacionarios_ue.js
  ******************************************************************/
 /**
- * @NApiVersion 2.0
+ * @NApiVersion 2.1
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */

@@ -9,7 +9,7 @@
  * File: drt_ptg_detalle_gas_tipo_pago_ue.js
  ******************************************************************/
 /**
- * @NApiVersion 2.0
+ * @NApiVersion 2.1
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */

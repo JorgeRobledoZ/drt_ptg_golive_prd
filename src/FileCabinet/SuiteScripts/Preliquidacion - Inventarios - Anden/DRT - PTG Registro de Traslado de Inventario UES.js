@@ -9,7 +9,7 @@
  * File: DRT - PTG Registro de Traslado de Inventario UES.js
  ******************************************************************/
 /**
- * @NApiVersion 2.x
+ * @NApiVersion 2.1
  * @NScriptType UserEventScript
  */
 define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", 'N/config', 'N/format', "N/runtime"], function (drt_mapid_cm, record, search, config, format, runtime) {

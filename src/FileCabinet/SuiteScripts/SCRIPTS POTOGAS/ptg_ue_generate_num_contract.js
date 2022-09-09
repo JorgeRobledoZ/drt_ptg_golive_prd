@@ -52,7 +52,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
                     type: record.Type.CUSTOMER,
                     id: id
                 })
-                const mapObj=drt_mapid_cm.drt_liquidacion();
+                const mapObj=drt_mapid_cm.drt_modulo_general();
                 let isContract = customer.getValue({fieldId : 'custentity_ptg_alianza_comercial_cliente'});
                 log.debug('isContract', isContract)
                 if (runtime.executionContext == 'RESTLET' && isContract == mapObj.tipoAlianzaComContrato && (scriptContext.type == 'create' || scriptContext.type == scriptContext.UserEventType.CREATE)) {

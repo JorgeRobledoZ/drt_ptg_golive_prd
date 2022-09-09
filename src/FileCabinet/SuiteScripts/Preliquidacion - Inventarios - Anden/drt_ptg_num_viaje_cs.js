@@ -9,7 +9,7 @@
  * File: drt_ptg_num_viaje_cs.js
  ******************************************************************/
 /**
- *@NApiVersion 2.x
+ *@NApiVersion 2.1
  *@NScriptType ClientScript
  */
  define(["N/record", "N/search", "N/error", "N/runtime"], function (record, search, error, runtime) {

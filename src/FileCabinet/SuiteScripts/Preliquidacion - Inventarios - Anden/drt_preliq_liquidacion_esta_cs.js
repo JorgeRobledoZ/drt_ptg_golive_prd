@@ -9,7 +9,7 @@
  * File: drt_preliq_liquidacion_esta_cs.js
  ******************************************************************/
 /**
- *@NApiVersion 2.x
+ *@NApiVersion 2.1
  *@NScriptType ClientScript
  */
  define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/https', 'N/currentRecord', 'N/url', 'N/ui/message', 'N/ui/dialog', 'N/search', 'N/runtime', 'N/record', 'N/error', ['N/currency']],

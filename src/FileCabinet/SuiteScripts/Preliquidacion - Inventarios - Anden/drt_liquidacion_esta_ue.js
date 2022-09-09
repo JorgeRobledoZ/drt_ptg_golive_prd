@@ -2,14 +2,14 @@
  * * DisrupTT * DisrupTT Developers *
  * ****************************************************************
  * Date: 02/2022
- * Script name: DRT - Liquidacion Estacionarios UE COPY
- * Script id: customscript_drt_liquidacion_esta_ue_c
- * customer Deployment id: customdeploy_drt_liquidacion_esta_ue_c
+ * Script name: DRT - Liquidacion Estacionarios UE
+ * Script id: customscript_drt_liquidacion_esta_ue
+ * customer Deployment id: customdeploy_drt_liquidacion_esta_ue
  * Applied to: PTG - PreLiquidacion Estacionarios
- * File: drt_liquidacion_esta_ue_copy.js
+ * File: drt_liquidacion_esta_ue.js
  ******************************************************************/
 /**
- * @NApiVersion 2.0
+ * @NApiVersion 2.1
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */

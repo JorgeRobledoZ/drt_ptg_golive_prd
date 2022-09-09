@@ -9,7 +9,7 @@
  * File: DRT - Recepcion Articulo a Custom Record.js
  ******************************************************************/
 /**
- * @NApiVersion 2.0
+ * @NApiVersion 2.1
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */

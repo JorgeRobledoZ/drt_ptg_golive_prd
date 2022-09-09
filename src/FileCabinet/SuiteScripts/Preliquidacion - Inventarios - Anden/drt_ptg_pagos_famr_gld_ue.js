@@ -9,7 +9,7 @@
  * File: drt_ptg_pagos_famr_gld_ue.js
  ******************************************************************/
 /**
- *@NApiVersion 2.x
+ *@NApiVersion 2.1
  *@NScriptType UserEventScript
  */
  define(['N/record', 'N/xml', 'N/file', 'N/format', 'N/task', 'N/runtime'], function (record, xml, file, format, task, runtime) {
