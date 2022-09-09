@@ -149,7 +149,7 @@ define(
                         statusViajeEjecutado   : 3,
                         statusViajeFacturacion : 4,  
                         //Aqui inician los de Iztac
-                        ,
+
                         tipo_vehiculo:"Camión Cilindros",
                         statusOpportunityCancelada: "14",
                         statusOpportunityReprograma:"11",
