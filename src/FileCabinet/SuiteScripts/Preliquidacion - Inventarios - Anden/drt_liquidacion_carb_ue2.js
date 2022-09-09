@@ -2,11 +2,11 @@
  * * DisrupTT * DisrupTT Developers *
  * ****************************************************************
  * Date: 03/2022
- * Script name: DRT - Liquidacion Carburacion UE 2 COPY
- * Script id: customscript_drt_liquidacion_carb_ue_2_c
- * customer Deployment id: customdeploy_drt_liquidacion_carb_ue_2_c
+ * Script name: DRT - Liquidacion Carburacion UE 2
+ * Script id: customscript_drt_liquidacion_carb_ue_2
+ * customer Deployment id: customdeploy_drt_liquidacion_carb_ue_2
  * Applied to: PTG - Preliquidación EstaciónCarburación
- * File: drt_liquidacion_carb_ue2_copy.js
+ * File: drt_liquidacion_carb_ue2.js
  ******************************************************************/
 /**
  * @NApiVersion 2.1

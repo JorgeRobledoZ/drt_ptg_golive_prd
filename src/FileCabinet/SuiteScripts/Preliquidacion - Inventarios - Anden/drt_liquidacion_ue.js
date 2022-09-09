@@ -2,18 +2,17 @@
  * * DisrupTT * DisrupTT Developers *
  * ****************************************************************
  * Date: 12/2021
- * Script name: DRT - Liquidacion UE COPY
- * Script id: customscript_drt_liquidacion_ue_c
- * customer Deployment id: customdeploy_drt_liquidacion_ue_c
+ * Script name: DRT - Liquidacion UE
+ * Script id: customscript_drt_liquidacion_ue
+ * customer Deployment id: customdeploy_drt_liquidacion_ue
  * Applied to: PTG - PreLiquidación de Cilindros
- * File: drt_liquidacion_ue_copy.js
+ * File: drt_liquidacion_ue.js
  ******************************************************************/
 /**
  * @NApiVersion 2.1
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
-//define(["N/record", "N/search", "N/runtime", 'N/task'], function (record, search, runtime, task) {
 define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime", 'N/task', 'N/url', 'N/https', "N/redirect", "N/log", 'N/currentRecord'],
     function (drt_mapid_cm, record, search, runtime, task, url, https, redirect, log, currentRecord) {
     function beforeLoad(scriptContext) {
