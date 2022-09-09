@@ -2,7 +2,7 @@
  *@NApiVersion 2.1
  *@NScriptType Restlet
  */
- define(['N/search'], function (search) {
+ define(['N/search', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (search, drt_mapid_cm) {
 
     const responseData = {
         success: false,
@@ -14,6 +14,7 @@
     function _getOportunidades(request) {
         log.audit('test mac')
         try {
+            var customVars = drt_mapid_cm.getVariables();
             var jsonPrincipal = {};
             var arrayOportunidades = [];
             var objOportunidades = {};
@@ -637,34 +638,34 @@
 
                 var caseAsignado = fieldEmployeeLookUp
 
-                if (caseStatus == 1) {
+                if (caseStatus == customVars.statusCasoNoIniciado) {
                     nombreEstado = 'No iniciado'
-                } else if (caseStatus == 2) {
+                } else if (caseStatus == customVars.statusCasoEnCurso) {
                     nombreEstado = 'En curso'
-                } else if (caseStatus == 3) {
+                } else if (caseStatus == customVars.statusCasoEscalado) {
                     nombreEstado = 'Escalado'
-                } else if (caseStatus == 4) {
+                } else if (caseStatus == customVars.statusCasoReabierto) {
                     nombreEstado = 'Reabierto'
-                } else if (caseStatus == 5) {
+                } else if (caseStatus == customVars.statusCasoCerrado) {
                     nombreEstado = 'Cerrado'
                 }
 
 
-                if (idPriority == 1) {
+                if (idPriority == customVars.prioridadCasoAlto) {
                     nombrePrioridad = 'Alto'
-                } else if (idPriority == 2) {
+                } else if (idPriority == customVars.prioridadCasoMedio) {
                     nombrePrioridad = 'Medio'
-                } else if (idPriority == 3) {
+                } else if (idPriority == customVars.prioridadCasoBajo) {
                     nombrePrioridad = 'Bajo'
                 }
                 let nombreTipoServicio = '';
-                if (category == 1) {
+                if (category == customVars.tipoServicioCil) {
                     nombreTipoServicio = 'Cilindro'
-                } else if (category == 2) {
+                } else if (category == customVars.tipoServicioEst) {
                     nombreTipoServicio = 'Estacionario'
-                } else if (category == 3) {
+                } else if (category == customVars.tipoServicioCarb) {
                     nombreTipoServicio = 'Carburación'
-                } else if (category == 4) {
+                } else if (category == customVars.tipoServicioAmbos) {
                     nombreTipoServicio = 'Otros'
                 }
 

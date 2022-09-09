@@ -2,7 +2,7 @@
  *@NApiVersion 2.1
  *@NScriptType Restlet
  */
- define(['N/search'], function (search) {
+ define(['N/search', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (search, drt_mapid_cm) {
 
     const responseData = {
         isSuccessful: false,
@@ -14,6 +14,7 @@
     function _getZona(request) {
 
         try {
+            const customVars = drt_mapid_cm.getVariables();
             var arrayOportunidadesM = [];
             var objOportunidadesM = {};
 
@@ -30,9 +31,9 @@
                    "AND", 
                    ["custrecord_ptg_vehiculo_tabladeviajes_","is", idVehiculo],
                    "AND",
-                   ["custrecord_ptg_estatus_tabladeviajes_","anyof","3"],
+                   ["custrecord_ptg_estatus_tabladeviajes_","anyof",customVars.statusTablaViajeEnCurs],
                   	"AND",
-                  	["custrecord_ptg_estatusdeviaje_","anyof","1"],
+                  	["custrecord_ptg_estatusdeviaje_","anyof",customVars.statusViajePreliqui],
                 ],
                 columns:
                 [

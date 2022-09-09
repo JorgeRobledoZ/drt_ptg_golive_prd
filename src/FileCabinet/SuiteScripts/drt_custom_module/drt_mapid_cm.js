@@ -30,8 +30,16 @@ define(
                         urlSgcWebProcesar      : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
                         urlSgcLocalDbUser      : "root",
                         urlSgcLocalDbPass      : "root",
+                        statusCasoNoIniciado   : 1,
                         statusCasoEnCurso      : 2,
+                        statusCasoEscalado     : 3,
+                        statusCasoReabierto    : 4,
                         statusCasoCerrado      : 5,
+                        statusCasoReprogramar  : 6,
+                        statusCasoAtendido     : 7,
+                        prioridadCasoAlto      : 1,
+                        prioridadCasoMedio     : 2,
+                        prioridadCasoBajo      : 3,
                         tipoClienteIndustrial  : 1,
                         tipoClienteIntercom    : 2,
                         tipoClienteDomestico   : 3,
@@ -60,10 +68,14 @@ define(
                         subsidiariaSanLuisGas  : 23,
                         subsidiariaDistPotosi  : 26,
                         subsidiariaEliminacion : 28,
-                        // 20 gas
-                        // 22 Corpo gas
-                        // 23 San Luis Gas
-                        // 26 Distribuidora potosina
+                        statusTablaViajeConclu : 1,
+                        statusTablaViajeCancel : 2,
+                        statusTablaViajeEnCurs : 3,
+                        statusTablaViajeNoIni  : 4,
+                        statusViajePreliqui    : 1,
+                        statusViajeLiquidacion : 2,
+                        statusViajeEjecutado   : 3,
+                        statusViajeFacturacion : 4,  
                         //Aqui inician los de Iztac
                         tipo_vehiculo:"Camión Cilindros",
 
@@ -85,8 +97,16 @@ define(
                         urlSgcWebProcesar      : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
                         urlSgcLocalDbUser      : "root",
                         urlSgcLocalDbPass      : "ROOT",
+                        statusCasoNoIniciado   : 1,
                         statusCasoEnCurso      : 2,
+                        statusCasoEscalado     : 3,
+                        statusCasoReabierto    : 4,
                         statusCasoCerrado      : 5,
+                        statusCasoReprogramar  : 6,
+                        statusCasoAtendido     : 7,
+                        prioridadCasoAlto      : 1,
+                        prioridadCasoMedio     : 2,
+                        prioridadCasoBajo      : 3,
                         tipoClienteIndustrial  : 1,
                         tipoClienteIntercom    : 2,
                         tipoClienteDomestico   : 3,
@@ -115,10 +135,14 @@ define(
                         subsidiariaSanLuisGas  : 23,
                         subsidiariaDistPotosi  : 25,
                         subsidiariaEliminacion : 31,
-                        // 20 gas
-                        // 22 Corpo gas
-                        // 23 San Luis Gas
-                        // 26 Distribuidora potosina
+                        statusTablaViajeConclu : 1,
+                        statusTablaViajeCancel : 2,
+                        statusTablaViajeEnCurs : 3,
+                        statusTablaViajeNoIni  : 4,
+                        statusViajePreliqui    : 1,
+                        statusViajeLiquidacion : 2,
+                        statusViajeEjecutado   : 3,
+                        statusViajeFacturacion : 4,  
                         //Aqui inician los de Iztac
 
                     }
