@@ -548,11 +548,32 @@ define(
             }
         }
 
+        const ptgSuitletsCallCenterMonitor = () => {
+            let respuesta = {};
+            try {
+                const mapObj = {
+                    [runtime.EnvType.PRODUCTION]:{
+                       roles : [1225, 1195,1202,1177]
+                    },
+                    [runtime.EnvType.SANDBOX]: {
+                       roles : [1162, 1213, 1167, 1165]
+                    }
+                }
+                respuesta = mapObj[runtime.envType];
+            } catch (error_compras) {
+                log.error(`error drt_compras`, error_compras)     
+            } finally {
+                log.debug(`respuesta drt_compras ${runtime.envType}`, respuesta);
+                return respuesta;
+            }
+        }
+
         return {
             drt_liquidacion,
             getVariables,
             drt_modulo_general,
-            drt_compras
+            drt_compras,
+            ptgSuitletsCallCenterMonitor
         };
 
     });

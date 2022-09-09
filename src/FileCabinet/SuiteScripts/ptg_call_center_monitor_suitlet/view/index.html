@@ -10,6 +10,7 @@
     <meta name="keywords" content="Call Center, clientes, pedidos, potogas">
     <!-- App favicon -->
     <link rel="shortcut icon" href="https://5298967.app.netsuite.com/core/media/media.nl?id=220951&c=5298967&h=nHZy1bhYBxW3Y6ljy8cEFE1FHeTdYOT8VJEWpIPzvcI5WmLN&_xt=.ico">
+    <!--<link rel="shortcut icon" href="https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=108997&c=5298967_SB1&h=MqKO6RyzbmQKiMqwc6-9rA2wJSTQZ0yi96oPgnj9KQwozioR&_xt=.ico">-->
 
     <!-- Select 2 -->
     <link href="https://themesbrand.com/skote/layouts/assets/libs/select2/css/select2.min.css" rel="stylesheet"
@@ -226,11 +227,13 @@
 
         .content-input-primary .form-ptg-primary[type="date"]::-webkit-calendar-picker-indicator {
             background: url(https://5298967.app.netsuite.com/core/media/media.nl?id=220955&c=5298967&h=BIVgVsv-993f8BwEpQNqTwbSd3jb_s-tp_kX9mjugRyfJGiW) center/80% no-repeat;
+            /*background: url(https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=108994&c=5298967_SB1&h=TZdf2C4l2Y6fG6GOHYfluLN8kg0dvo3J-bUwrhd1rbdlhL_3) center/80% no-repeat;*/
             cursor: pointer;
         }
 
         .content-input-primary .form-ptg-primary[type="time"]::-webkit-calendar-picker-indicator {
             background: url(https://5298967.app.netsuite.com/core/media/media.nl?id=220931&c=5298967&h=EhZ6vnw3ymfx-k5XfjKFIE7s-BaBC4sy6dp7CHGfj8z27omb) center/80% no-repeat;
+            /*background: url(https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=109002&c=5298967_SB1&h=8T8_xbgLaXGq57So_VQ-KoCwOPoyvxXLL-O9cpcfxC44F6Do) center/80% no-repeat;*/
             cursor: pointer;
         }
 
@@ -723,6 +726,10 @@
             <div class="col-auto p-0">
                 <img id="logo" class="invisible" src="https://5298967.app.netsuite.com/core/media/media.nl?id=220946&c=5298967&h=TmNPxzZvfG_Oi7trmAX5TMK6qKjzmK2ex8uG0mdt2vQhbtGx"
                     alt="" height="56">
+                <!--
+                    <img id="logo" class="invisible" src="https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=108998&c=5298967_SB1&h=58fXy2zvwjIT_OA9h721BFfwCFF1pYHerADEgGg1wbWxKFPt"
+                    alt="" height="56">
+                -->
             </div>
             <div id="header-title" class="col">
                 Call Center
@@ -751,6 +758,10 @@
                         <div class="chip bg-primary-cc">
                             <img
                                 src="https://5298967.app.netsuite.com/core/media/media.nl?id=220953&c=5298967&h=HbE7Ixbs-Kyan3scm5bkMA8HbeDjjJu9CYknf_4qaHw6qKOj">
+                            <!-- 
+                                <img
+                                src="https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=108996&c=5298967_SB1&h=64w8opEXTYUI8Zk4V_YCr91jyFiSRorKvI31OBBt0vD9Su8V">
+                            -->    
                             <span class="user-name">Alexis Chiw</span>
                         </div>
                     </div>
@@ -1693,6 +1704,10 @@
                         <div class="col-auto">
                             <img src="https://5298967.app.netsuite.com/core/media/media.nl?id=220945&c=5298967&h=Cww6Z8Rn9x082LA03PmFIYbQFicQaqEJzxcEG_J8g33Pg9GI"
                             alt="" width="120">
+                            <!--
+                                <img src="https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=110815&c=5298967_SB1&h=he-4rJolZ3J7WidhKv2oNWSuYY-s45IhArkF-ivqlvB7sd_A"
+                            alt="" width="120">
+                            -->
                         </div>
                         <div class="col text-center">
                             <label class="fw-bold" style="font-size: 22px;" id="verDetallesCliente"></label><br>
@@ -3438,8 +3453,10 @@
 
         if(userSubsidiary == "23") { // san luis gas
             $("#logo").attr("src", "https://5298967.app.netsuite.com/core/media/media.nl?id=220937&c=5298967&h=3rP3RguWNSer94ioah5BW1mH2SG8S2rA8WXhIaItFBYeXjtJ")
+            //$("#logo").attr("src", "https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=133844&c=5298967_SB1&h=aEKg2txWkUnSLlh1Evt74heLK0S1v-EPa3EvPye1rRm8exho")
         } else if(userSubsidiary == "22") { // corpo gas
             $("#logo").attr("src", "https://5298967.app.netsuite.com/core/media/media.nl?id=220937&c=5298967&h=3rP3RguWNSer94ioah5BW1mH2SG8S2rA8WXhIaItFBYeXjtJ")
+            //$("#logo").attr("src", "https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=133844&c=5298967_SB1&h=aEKg2txWkUnSLlh1Evt74heLK0S1v-EPa3EvPye1rRm8exho")
         }
 
         $("#logo").removeClass("invisible");
@@ -4159,27 +4176,51 @@
 
     <!-- Archivo de javascript de Conrado y Christian (test.js) -->
     <script class="dynamic-url" src="https://5298967.app.netsuite.com/core/media/media.nl?id=220933&c=5298967&h=MqLZw7QIEhqez_OK5Ov75aksfiHxI0lr-HCEB00gBaNkfDo0&_xt=.js"></script>
-    
+    <!--
+        <script class="dynamic-url" src="https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=109001&c=5298967_SB1&h=Or0iEXdlb60UL8oLPvgtGx5TuAIlxkg2nuDOrQMRopQkqPaU&_xt=.js"></script>        
+    -->
+
     <!-- Archivo para las funciones de cálculo y formateo de fecha y hora (timefunctions.js) -->
     <script class="dynamic-url" src="https://5298967.app.netsuite.com/core/media/media.nl?id=220932&c=5298967&h=40Qhf1wpcR6_zHcqa8Gq18uuwN3xlzU-hdQzjejJaEC8mG5F&_xt=.js"></script>
+    <!--
+        <script class="dynamic-url" src="https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=111208&c=5298967_SB1&h=ZUhaS9BkKGbYxVAnFddioklTYZyx4jcQ_f3qGIHJF0g_dERT&_xt=.js"></script>        
+    -->
         
     <!-- Archivo para las llamadas de estados, ciudades, colonias y zonas (lugares.js) -->
     <script class="dynamic-url" src="https://5298967.app.netsuite.com/core/media/media.nl?id=220944&c=5298967&h=nPr9X3vI8fEgArHnJy1X-8RRZqAaZNVFQoJj-9-vWqiOJFcN&_xt=.js"></script>
+    <!--
+        <script class="dynamic-url" src="https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=108999&c=5298967_SB1&h=KZ9uTCp4Xl91myJAOPLkubFLt7ehqts8lXAzCSzs3ieW7k6Y&_xt=.js"></script>        
+    -->
 
     <!-- Archivo para los métodos y funciones de clientes (clientes.js) -->
     <script class="dynamic-url" src="https://5298967.app.netsuite.com/core/media/media.nl?id=220954&c=5298967&h=KjJXU8JELsXE8Ip9ZCIVRIHAQTjm2w9P9Y8G9UoN_uHx6bim&_xt=.js"></script>
+    <!--
+        <script class="dynamic-url" src="https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=108995&c=5298967_SB1&h=RfBDkO2lz8EiWYp5XhwzHm24ZauvlQ9jiDi1AlxEcJo29QV9&_xt=.js"></script>        
+    -->
 
     <!-- Archivo para métodos de direcciones (direcciones.js) -->
     <script class="dynamic-url" src="https://5298967.app.netsuite.com/core/media/media.nl?id=220952&c=5298967&h=i3UD_WPRbKH7fpXZKyvBbOASBnbJvBSGCu54pb0KAFgQG5h2&_xt=.js"></script>
+    <!--
+        <script class="dynamic-url" src="https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=161774&c=5298967_SB1&h=opp8EWY0wgvtI54rU1FWIox3MtilQepr_OgKp53fR1cepFz6&_xt=.js"></script>        
+    -->
 
     <!-- Archivo para pedidos (pedidos.js) -->
     <script class="dynamic-url" src="https://5298967.app.netsuite.com/core/media/media.nl?id=220940&c=5298967&h=E1s6OlNoQ6okVBFVJx8jXJDYxhubO_NEab4ft4ScQOqQokJ2&_xt=.js"></script>
+    <!--
+        <script class="dynamic-url" src="https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=109000&c=5298967_SB1&h=_rK1v0syyFwEdnlT3PbUjW5_ThyZEB_9slMy6Pb7GHH1gWHr&_xt=.js"></script>        
+    -->
 
     <!-- Archivo para fugas y quejas (fugasQuejas.js) -->
     <script class="dynamic-url" src="https://5298967.app.netsuite.com/core/media/media.nl?id=220950&c=5298967&h=VRFOe4seiefjTvihxSAcVHOSSUZTrAsGXBhfVadiHX8t2m43&_xt=.js"></script>
+    <!--
+        <script class="dynamic-url" src="https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=110690&c=5298967_SB1&h=AIoFrYKLxwKcvOcS_8ecyxWzz45hkzkB9ckr7PwpOrRdA7dq&_xt=.js"></script>        
+    -->
 
     <!-- Notas de crédito (notasCredito.js) -->
     <script class="dynamic-url" src="https://5298967.app.netsuite.com/core/media/media.nl?id=220941&c=5298967&h=aH8siT2JJjO9nnX1omyvr6BS-gO7Gkq3BfhUV8PaiYhpTtIx&_xt=.js" ></script>
+    <!--
+        <script class="dynamic-url" src="https://5298967-sb1.app.netsuite.com/core/media/media.nl?id=116096&c=5298967_SB1&h=GcnlKk2xWGWknWb09Rfu5jAImZIg5DxDaUNDQh1aClx9qXpt&_xt=.js"></script>        
+    -->
 
     <script>
 
