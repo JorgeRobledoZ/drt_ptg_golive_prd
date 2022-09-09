@@ -9,7 +9,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/search"], function (dr
             let arrayRutas = [];
             let objRutas = {};
             let idSubcidiaria = request.id;
-            const mapObj=drt_mapid_cm.drt_liquidacion();
+            const mapObj=drt_mapid_cm.getVariables();
             log.audit('request', request)
             var customrecord_ptg_equiposSearchObj = search.create({
                 type: "customrecord_ptg_equipos",

@@ -5,13 +5,14 @@
  *@description script principal que contiene los estados implementados en el Front-End
  */
 define([
+    'SuiteScripts/drt_custom_module/drt_mapid_cm',
     "N/log",
     "SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors",
     "SuiteScripts/SCRIPTS POTOGAS/ptg_modulos",
     "N/record",
     "N/format",
     "N/search",
-  ], function (log, error, opport, record, format, search) {
+  ], function (drt_mapid_cm, log, error, opport, record, format, search) {
     const responseData = {
       isSuccessful: false,
       message: "Some errors occured",
@@ -37,18 +38,19 @@ define([
       }
   
       try {
+        var mapObj=drt_mapid_cm.getVariables();
         switch (status) {
           case "1": // oportunidad cancelada
-            opport.changeStatusOpportunity(request, responseData, "14");
+            opport.changeStatusOpportunity(request, responseData,mapObj.statusOpportunityCancelada);
             break;
   
           case "2": // oportunidad se reprograma
-            opport.changeStatusOpportunity(request, responseData, "11");
+            opport.changeStatusOpportunity(request, responseData, mapObj.statusOpportunityReprograma);
             break;
   
           case "3": //confimar
            // opport.createOrder(request, responseData);
-            opport.changeStatusOpportunity(request, responseData, "13");
+            opport.changeStatusOpportunity(request, responseData, mapObj.statusOpportunityResponseData);
             break;
   //
           case "4": //modificar

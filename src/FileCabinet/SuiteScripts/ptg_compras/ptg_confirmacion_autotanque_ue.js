@@ -2,7 +2,7 @@
  *@NApiVersion 2.1
  *@NScriptType UserEventScript
  */
-define(["N/record", "N/search"], function (record, search) {
+define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "N/runtime"], function (drt_mapid_cm, record, search, runtime) {
 
     function afterSubmit(context) {
         try {
@@ -18,6 +18,33 @@ define(["N/record", "N/search"], function (record, search) {
                 let idSaveTransferOrder = '';
                 let saveinvoice = '';
                 let idFacturaInter = '';
+
+                let ubicacion_desvio_planta_receipt = 0;
+                let form_desvio_cliente_invoice = 0;
+                let form_vendor_bill = 0;
+                let item_vendor_bill_flete = 0;
+                let form_transfer_order = 0;
+                let ubicacion_transfer_order = 0;
+                let form_full_filment = 0;
+                let form_item_receipt = 0;
+                let form_intercompany_invoice = 0;
+                let subcidiary_intercompany_invoice = 0;
+                let ubicacion_intercompany_invoice = 0;
+
+                var objMap=drt_mapid_cm.drt_compras();
+                if (Object.keys(objMap).length>0) {
+                    ubicacion_desvio_planta_receipt = objMap.ubicacion_desvio_planta_receipt;
+                    form_desvio_cliente_invoice = objMap.form_desvio_cliente_invoice;
+                    form_vendor_bill = objMap.form_vendor_bill;
+                    item_vendor_bill_flete = objMap.item_vendor_bill_flete;
+                    form_transfer_order = objMap.form_transfer_order;
+                    ubicacion_transfer_order = objMap.ubicacion_transfer_order;
+                    form_full_filment = objMap.form_full_filment;
+                    form_item_receipt = objMap.form_item_receipt;
+                    form_intercompany_invoice = objMap.form_intercompany_invoice;
+                    subcidiary_intercompany_invoice = objMap.subcidiary_intercompany_invoice;
+                    ubicacion_intercompany_invoice = objMap.ubicacion_intercompany_invoice;
+                }
 
                 var precioTarifa = currentRecord.getValue({
                     fieldId: 'custrecord_ptg_tarifporkilogramo_csa_'
@@ -286,7 +313,7 @@ define(["N/record", "N/search"], function (record, search) {
 
                             createInvoice.setValue({
                                 fieldId: 'customform',
-                                value: 286
+                                value: form_desvio_cliente_invoice
                             });
 
                             createInvoice.setValue({
@@ -357,7 +384,7 @@ define(["N/record", "N/search"], function (record, search) {
 
                         vendorBill.setValue({
                             fieldId: 'customform',
-                            value: 300
+                            value: form_vendor_bill
                         });
 
                         let lineas = vendorBill.getLineCount('item');
@@ -577,7 +604,7 @@ define(["N/record", "N/search"], function (record, search) {
                         facturaFlete.setCurrentSublistValue({
                             sublistId: "item",
                             fieldId: 'item',
-                            value: 4114
+                            value: item_vendor_bill_flete
                         });
 
                         //facturaFlete.setCurrentSublistValue({
@@ -640,7 +667,7 @@ define(["N/record", "N/search"], function (record, search) {
 
                             createTransferOrder.setValue({
                                 fieldId: 'customform',
-                                value: 57
+                                value: form_transfer_order
                             });
 
                             createTransferOrder.setValue({
@@ -650,7 +677,7 @@ define(["N/record", "N/search"], function (record, search) {
 
                             createTransferOrder.setValue({
                                 fieldId: 'location',
-                                value: 1525
+                                value: ubicacion_transfer_order
                             });
 
                             if (arrayPo[po]['tipo_desvio'] == 4) {
@@ -714,7 +741,7 @@ define(["N/record", "N/search"], function (record, search) {
 
                                 fulfillment.setValue({
                                     fieldId: 'customform',
-                                    value: 40
+                                    value: form_full_filment
                                 });
 
                                 let saveItemFulfilemnt = fulfillment.save({
@@ -734,7 +761,7 @@ define(["N/record", "N/search"], function (record, search) {
 
                                     receiptOrder.setValue({
                                         fieldId: 'customform',
-                                        value: 268
+                                        value: form_item_receipt
                                     });
 
                                     receiptOrder.setValue({
@@ -840,7 +867,7 @@ define(["N/record", "N/search"], function (record, search) {
 
                                 invoiceInter.setValue({
                                     fieldId: 'customform',
-                                    value: 286
+                                    value: form_intercompany_invoice
                                 });
 
                                 invoiceInter.setValue({
@@ -850,7 +877,7 @@ define(["N/record", "N/search"], function (record, search) {
 
                                 invoiceInter.setValue({
                                     fieldId: 'subsidiary',
-                                    value: 25
+                                    value: subcidiary_intercompany_invoice
                                 });
 
                                 if (arrayPo[po]['tipo_desvio'] == 4) {
@@ -861,7 +888,7 @@ define(["N/record", "N/search"], function (record, search) {
                                 } else {
                                     invoiceInter.setValue({
                                         fieldId: 'location',
-                                        value: 762
+                                        value: ubicacion_intercompany_invoice
                                     });
                                 }
 
@@ -891,7 +918,7 @@ define(["N/record", "N/search"], function (record, search) {
                                     invoiceInter.setCurrentSublistValue({
                                         sublistId: "item",
                                         fieldId: "location",
-                                        value: 762
+                                        value: ubicacion_intercompany_invoice
                                     });
 
                                 }
