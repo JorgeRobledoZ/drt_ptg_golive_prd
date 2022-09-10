@@ -12,7 +12,6 @@
  * @NApiVersion 2.1
  * @NScriptType UserEventScript
  */
-//define(["N/record", "N/search", "N/task"], function (record, search, task) {
 define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https'], function (drt_mapid_cm, runtime, search, record, email, error, url, https) {
   function afterSubmit(context) {
     try {

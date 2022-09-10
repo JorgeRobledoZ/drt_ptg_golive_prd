@@ -248,6 +248,7 @@ define(
                         envase30: 4208,
                         envase45: 4209,
                         gasLP: 4216,
+                        urlRegistroCliente: "https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=645&planta=",
                     },
                     [runtime.EnvType.SANDBOX]: {
                         efectivo: 1,
@@ -292,6 +293,7 @@ define(
                         envase30: 4098,
                         envase45: 4604,
                         gasLP: 4088,
+                        urlRegistroCliente: "https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1070&planta=",
                     }
                 }
                 respuesta = mapObj[runtime.envType];
