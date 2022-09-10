@@ -12,7 +12,7 @@
  *@NApiVersion 2.1
  *@NScriptType ClientScript
  */
- define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog"], function (drt_mapid_cm, record, search, error, runtime, dialog) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'SuiteScripts/drt_custom_module/drt_ptg_library', "N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog"], function (drt_mapid_cm, /*library,*/ record, search, error, runtime, dialog) {
     function pageInit(context) {
         try {
           var currentRecord = context.currentRecord;
@@ -176,11 +176,21 @@
             };
             dialog.alert(options);
             return false;
-          }
-
-          if(formulario == formularioCilindro){
+          } else if(formulario == formularioCilindro){
+            log.audit("entra 172");
             if(lineasDotacion > 0){
-              var viajeEstacionarioObj = search.create({
+              var filters = [
+                ["custrecord_ptg_vehiculo_tabladeviajes_","anyof",vehiculo], "AND", 
+                ["custrecord_ptg_estatus_tabladeviajes_","anyof",estatus]
+              ];
+              var columns = [
+                search.createColumn({name: "internalid", label: "ID interno"})
+              ];
+
+              //var viajeEstacionarioObj = library.searchRecord("customrecord_ptg_tabladeviaje_enc2_", filters, columns);
+              //log.debug("viajeEstacionarioObj", viajeEstacionarioObj);
+
+              /*var viajeEstacionarioObj = search.create({
                 type: "customrecord_ptg_tabladeviaje_enc2_",
                 filters: [
                    ["custrecord_ptg_vehiculo_tabladeviajes_","anyof",vehiculo], "AND", 
@@ -191,6 +201,7 @@
                 ]
              });
              var viajeEstacionarioObjCount = viajeEstacionarioObj.runPaged().count;
+             log.audit("viajeEstacionarioObjCount", viajeEstacionarioObjCount);
              if(viajeEstacionarioObjCount > 0){
               var viajeEstacionarioObjResults = viajeEstacionarioObj.run().getRange({
                 start: 0,
@@ -208,8 +219,8 @@
                 return false;
               }
              }
-              //return true;
-              return true;
+              return true;*/
+              return false;
             } else {
               var options = {
                 title: "Dotación",
@@ -218,6 +229,10 @@
               dialog.alert(options);
             }
           } else {
+            log.audit("tst_2");
+            log.audit("vehiculo", vehiculo);
+           log.audit("estatus", estatus);
+            log.audit("entra else");
             var viajeEstacionarioObj = search.create({
               type: "customrecord_ptg_tabladeviaje_enc2_",
               filters: [
@@ -229,6 +244,7 @@
               ]
            });
            var viajeEstacionarioObjCount = viajeEstacionarioObj.runPaged().count;
+           log.audit("viajeEstacionarioObjCount else", viajeEstacionarioObjCount);
            if(viajeEstacionarioObjCount > 0){
             var viajeEstacionarioObjResults = viajeEstacionarioObj.run().getRange({
               start: 0,

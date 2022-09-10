@@ -197,6 +197,7 @@ define(
 
           const drt_liquidacion = () => {
             let respuesta = {};
+            log.debug("respuesta1", respuesta);
             try {
                 const mapObj = {
                     [runtime.EnvType.PRODUCTION]: {
@@ -338,7 +339,9 @@ define(
                         urlRegistroCliente: "https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1070&planta=",
                     }
                 }
-                respuesta = mapObj[runtime.envType];
+                respuesta = {
+                    ...drt_modulo_general()
+                };
             } catch (error) {
                 log.error(`error drt_liquidacion`, error);
             } finally {
