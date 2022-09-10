@@ -1,5 +1,5 @@
 /**
- *@NApiVersion 2.x
+ *@NApiVersion 2.1
  *@NScriptType Restlet
  */
 define(["N/search", "SuiteScripts/drt_custom_module/drt_mapid_cm"], function (search, drt_mapid_cm) {

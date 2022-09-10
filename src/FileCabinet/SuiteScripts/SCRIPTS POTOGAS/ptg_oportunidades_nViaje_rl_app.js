@@ -2,11 +2,12 @@
  *@NApiVersion 2.1
  *@NScriptType Restlet
  */
-define(['N/search', 'N/record'], function (search, record) {
+define(['N/search', 'N/record', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (search, record, drt_mapid_cm) {
 
     function _getOportunidadesPorNviajeApp(request) {
 
         try {
+            const customVars = drt_mapid_cm.getVariables();
             var response = {
                 success : false,
                 data : []
@@ -30,7 +31,7 @@ define(['N/search', 'N/record'], function (search, record) {
                     // "AND",
                     // ["subsidiary", "anyof", "20", "14", "16", "13"],
                     "AND",
-                    ["custbody_ptg_estado_pedido", "anyof", "2"],
+                    ["custbody_ptg_estado_pedido", "anyof", customVars.statusPedidoAsignado],
                     "AND",
                     ["custbody_ptg_numero_viaje", "anyof", numViaje]
                 ],

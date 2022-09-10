@@ -1,10 +1,11 @@
   /**
- *@NApiVersion 2.x
+ *@NApiVersion 2.1
  *@NScriptType Restlet
  */
-define(["N/search"], function (search) {
+define(["N/search", "SuiteScripts/drt_custom_module/drt_mapid_cm"], function (search, drt_mapid_cm) {
 
     function _get(context) {
+        const customVars = drt_mapid_cm.getVariables();
         var start = 0;
         var end = 55;
         var arrayNumeroViajes = [];
@@ -18,9 +19,11 @@ define(["N/search"], function (search) {
                "AND", 
                ["mainline","is","T"], 
                "AND", 
-               ["customermain.custentityptg_tipodecontacto_","anyof","2"], 
+               ["customermain.custentityptg_tipodecontacto_","anyof",customVars.tipoContactoAviso], 
                "AND", 
-               ["subsidiary","anyof","13","16"]
+               ["subsidiary", "anyof", customVars.subsidiariaGas, customVars.subsidiariaCorpoGas, 
+                    customVars.subsidiariaSanLuisGas, customVars.subsidiariaDistPotosi, customVars.subsidiariaEliminacion]
+            //    ["subsidiary","anyof","13","16"]
             ],
             columns:
             [

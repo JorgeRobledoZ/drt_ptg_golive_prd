@@ -4,7 +4,7 @@
  *@Author Manuel Mateos Tiburcio
  *@description consulta de clientes por medio de filtros
  */
- define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors'], function (log, search, record, error) {
+ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (log, search, record, error, drt_mapid_cm) {
 
     // se crea la estructura donde se cargará toda la data
 
@@ -174,7 +174,7 @@
     }
 
     function customSearch(request, arrayResult, responseData) {
-
+        var customVars = drt_mapid_cm.getVariables();
         var filter = [];
         try {
 
@@ -329,15 +329,15 @@
 
                     let typeCustomer = '';
 
-                    if(idtypeCustomer == 1){
+                    if(idtypeCustomer == customVars.tipoClienteIndustrial){
                         typeCustomer = "Industrial"
-                    } else if (idtypeCustomer == 2){
+                    } else if (idtypeCustomer == customVars.tipoClienteIntercom){
                         typeCustomer = "Intercompañía"
-                    } else if (idtypeCustomer == 3){
+                    } else if (idtypeCustomer == customVars.tipoClienteDomestico){
                         typeCustomer = "Doméstico"
-                    } else if (idtypeCustomer == 4){
+                    } else if (idtypeCustomer == customVars.tipoClienteOtraComp){
                         typeCustomer = "Otras Compañias"
-                    } else if (idtypeCustomer == 5){
+                    } else if (idtypeCustomer == customVars.tipoClienteComercial){
                         typeCustomer = "Comercial"
                     } 
 
@@ -367,13 +367,13 @@
                         name: 'custentity_ptg_tipodeservicio_'
                     });
 
-                    if(idTipoServicio == 1){
+                    if(idTipoServicio == customVars.tipoServicioCil){
                         tipoServicio = 'Cilindro'
-                    } else if(idTipoServicio == 2){
+                    } else if(idTipoServicio == customVars.tipoServicioEst){
                         tipoServicio = 'Estacionario'
-                    } else if(idTipoServicio == 3){
+                    } else if(idTipoServicio == customVars.tipoServicioCarb){
                         tipoServicio = 'Carburación'
-                    } else if(idTipoServicio == 4){
+                    } else if(idTipoServicio == customVars.tipoServicioAmbos){
                         tipoServicio = 'Otros'
                     }
 
