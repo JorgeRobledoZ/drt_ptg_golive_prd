@@ -16,7 +16,7 @@ define(
                     [ runtime.EnvType.PRODUCTION ]: {
                         customFormOppPotogas   : 265, // Oportunidad-Potogas
                         customFormOppCarb      : 264, // Oportunidad-Carburación
-                        productgasLpId         : 4216,
+                        productgasLpId         : 4216,// Gas LP
                         publicoGeneralId       : 27041,
                         currency               : 1,// Pesos
                         tipoServicioEst        : 2,// Estacionario
@@ -76,6 +76,19 @@ define(
                         statusViajeLiquidacion : 2,
                         statusViajeEjecutado   : 3,
                         statusViajeFacturacion : 4,  
+                        tipoContactoTelefono   : 1,
+                        tipoContactoAviso      : 2,
+                        tipoContactoEjecutiva  : 3,
+                        opcionPagoEfectivo     : 1,
+                        opcionPagoPrepagoBanor : 2,
+                        opcionPagoVale         : 3,
+                        opcionpagoCortesia     : 4,
+                        opcionPagoTarCredBanor : 5,
+                        opcionPagoTarDebBanor  : 6,
+                        opcionPagoMultiple     : 7,
+                        opcionPagoPrepago      : 8,
+                        tipoNotaNotaCliente    : 13,
+
                         //Aqui inician los de Iztac
                         tipo_vehiculo:"Camión Cilindros",
                         statusOpportunityCancelada: "14",
@@ -88,7 +101,7 @@ define(
                     [ runtime.EnvType.SANDBOX ]: {
                         customFormOppPotogas   : 305, // Oportunidad-Potogas
                         customFormOppCarb      : 307, // Oportunidad-Carburación
-                        productgasLpId         : 4088,
+                        productgasLpId         : 4088,// Gas LP
                         publicoGeneralId       : 14508,
                         currency               : 1,// Pesos
                         tipoServicioEst        : 2,// Estacionario
@@ -148,6 +161,19 @@ define(
                         statusViajeLiquidacion : 2,
                         statusViajeEjecutado   : 3,
                         statusViajeFacturacion : 4,  
+                        tipoContactoTelefono   : 1,
+                        tipoContactoAviso      : 2,
+                        tipoContactoEjecutiva  : 3,
+                        opcionPagoEfectivo     : 1,
+                        opcionPagoPrepagoBanor : 2,
+                        opcionPagoVale         : 3,
+                        opcionpagoCortesia     : 4,
+                        opcionPagoTarCredBanor : 5,
+                        opcionPagoTarDebBanor  : 6,
+                        opcionPagoMultiple     : 7,
+                        opcionPagoPrepago      : 8,
+                        tipoNotaNotaCliente    : 13,
+
                         //Aqui inician los de Iztac
 
                         tipo_vehiculo:"Camión Cilindros",
@@ -243,6 +269,7 @@ define(
                         recirculacionId : 21,
                         chequeBanamexId : 29,
                         estadoEntregado : 3,
+                        urlRegistroCliente: "https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=645&planta=",
                     },
                     [runtime.EnvType.SANDBOX]: {
                         efectivo: 1,
@@ -308,6 +335,7 @@ define(
                         recirculacionId : 21,
                         chequeBanamexId : 29,
                         estadoEntregado : 3,
+                        urlRegistroCliente: "https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1070&planta=",
                     }
                 }
                 respuesta = mapObj[runtime.envType];

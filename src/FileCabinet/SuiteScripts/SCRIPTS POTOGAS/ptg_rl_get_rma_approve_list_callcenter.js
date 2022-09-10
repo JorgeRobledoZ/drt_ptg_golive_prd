@@ -2,11 +2,11 @@
  * @NApiVersion 2.1
  * @NScriptType Restlet
  */
-define(['N/search'],
+define(['N/search', 'SuiteScripts/drt_custom_module/drt_mapid_cm'],
     /**
  * @param{search} search
  */
-    (search) => {
+    (search, drt_mapid_cm) => {
         /**
          * Defines the function that is executed when a GET request is sent to a RESTlet.
          * @param {Object} requestParams - Parameters from HTTP request URL; parameters passed as an Object (for all supported
@@ -47,6 +47,7 @@ define(['N/search'],
             };
 
             try {
+                const customVars = drt_mapid_cm.getVariables();
                 var returnauthorizationSearchObj = search.create({
                     type: "returnauthorization",
                     filters:
@@ -58,7 +59,7 @@ define(['N/search'],
                             ["taxline", "is", "F"],
                             "AND",
                             //["item.internalid", "anyof", "4088"], sbx
-                            ["item.internalid", "anyof", "4216"],
+                            ["item.internalid", "anyof", customVars.productgasLpId],
                             "AND",
                             ["status","anyof","RtnAuth:B","RtnAuth:F"]
                             //["status", "anyof", "RtnAuth:F"]

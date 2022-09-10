@@ -4,7 +4,7 @@
  *@Author Jorge Macias
  *@description consulta de clientes por medio de filtros
  */
-define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors'], function (log, search, record, error) {
+define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (log, search, record, error, drt_mapid_cm) {
 
     // se crea la estructura donde se cargará toda la data
 
@@ -17,7 +17,7 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
 
     function loadAddresses(customerId) {
         let addresses = [];
-
+        let customVars = drt_mapid_cm.getVariables();
         let customSearch = search.create({
             type: search.Type.CUSTOMER,
             filters: ["internalid", "anyof", customerId],
@@ -151,13 +151,13 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     join: "Address"
                 })
                 let tipoServicio = '';
-                if (idTipoServicio == 1) {
+                if (idTipoServicio == customVars.tipoServicioCil) {
                     tipoServicio = 'Cilindro'
-                } else if (idTipoServicio == 2) {
+                } else if (idTipoServicio == customVars.tipoServicioEst) {
                     tipoServicio = 'Estacionario'
-                } else if (idTipoServicio == 3) {
+                } else if (idTipoServicio == customVars.tipoServicioCarb) {
                     tipoServicio = 'Carburación'
-                } else if (idTipoServicio == 4) {
+                } else if (idTipoServicio == customVars.tipoServicioAmbos) {
                     tipoServicio = 'Otros'
                 }
 
@@ -325,7 +325,7 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
     }
 
     function customSearch(request, arrayResult, responseData) {
-
+        let customVars = drt_mapid_cm.getVariables();
         var filter = [];
         log.audit('request', request);
         try {
@@ -588,7 +588,7 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     // }
 
                     let objInfoComercial = {};
-                    if(idAlianzaComercial == 1){
+                    if(idAlianzaComercial == customVars.tipoAlianzaComContrato){// Contrato, este ya no se usa
                         objInfoComercial.contrato = contrato;
                         objInfoComercial.terms = terminos;
                         objInfoComercial.limiteCredito = limiteCredito;
@@ -603,7 +603,7 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                         //     name: 'custentity_ptg_descuento_asignar'
                         // });  
 
-                    }else if(idAlianzaComercial == 2 ){
+                    }else if(idAlianzaComercial == customVars.tipoAlianzaComCredito ){// Crédito
                         //objInfoComercial.contrato = contrato;
                         objInfoComercial.terms = terminos;
                         objInfoComercial.limiteCredito = limiteCredito;

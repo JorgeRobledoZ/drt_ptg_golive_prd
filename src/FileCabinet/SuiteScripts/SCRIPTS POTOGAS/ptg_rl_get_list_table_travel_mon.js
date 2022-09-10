@@ -2,11 +2,11 @@
  * @NApiVersion 2.1
  * @NScriptType Restlet
  */
-define(['N/search'],
+define(['N/search', 'SuiteScripts/drt_custom_module/drt_mapid_cm'],
     /**
  * @param{search} search
  */
-    (search) => {
+    (search, drt_mapid_cm) => {
         /**
          * Defines the function that is executed when a GET request is sent to a RESTlet.
          * @param {Object} requestParams - Parameters from HTTP request URL; parameters passed as an Object (for all supported
@@ -44,6 +44,8 @@ define(['N/search'],
             let response = {
                 success: false
             };
+            const customVars = drt_mapid_cm.getVariables();
+
 
             log.debug('requestBody', requestBody)
             try {
@@ -53,7 +55,8 @@ define(['N/search'],
                         [
                             ["created", "within", "today"],
                             "AND",
-                            ["custrecord_ptg_estatus_tabladeviajes_", "anyof", "3"],
+                            // ["custrecord_ptg_estatus_tabladeviajes_", "anyof", "3"],
+                            ["custrecord_ptg_estatus_tabladeviajes_", "anyof", customVars.statusTablaViajeEnCurs],
                             "AND",
                             ["custrecord_ptg_planta_tabladeviajes_", "contains", requestBody.namePlanta]
                         ],
