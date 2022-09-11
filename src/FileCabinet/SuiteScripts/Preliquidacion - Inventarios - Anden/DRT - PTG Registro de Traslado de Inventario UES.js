@@ -74,6 +74,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
 
 
       var objMap=drt_mapid_cm.drt_liquidacion();
+      log.audit("objMap", objMap);
       if (Object.keys(objMap).length>0) {
           plantillaDocumentoElectronico = objMap.plantillaDocumentoElectronico;
           metodoDeEnvio = objMap.metodoDeEnvio;
@@ -81,14 +82,13 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
           unidad20 = objMap.unidad20;
           unidad30 = objMap.unidad30;
           unidad45 = objMap.unidad45;
-          formularioCilindros = objMap.formularioCilindros;
-          formularioEstacionarios = objMap.formularioEstacionarios;
+          formularioCilindros = objMap.formularioCilindro;
+          formularioEstacionarios = objMap.formularioEstacionario;
           paqueteMySuite = objMap.paqueteMySuite;
           estatusEnCurso = objMap.estatusEnCurso;
           formularioTrasladoCarburacion = objMap.formularioTrasladoCarburacion;
           gasLPUnidades = objMap.gasLPUnidades;
         }
-
 
         var locationObj = record.load({
           type: search.Type.LOCATION,
@@ -114,8 +114,14 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
 
         
 
+        log.audit("estatus", estatus);
+        log.audit("estatusEnCurso", estatusEnCurso);
+        log.audit("fechaEnCurso", fechaEnCurso);
       if (estatus == estatusEnCurso && !fechaEnCurso) {
 
+        log.audit("formulario", formulario);
+        log.audit("formularioCilindros", formularioCilindros);
+        log.audit("transacciones", transacciones);
         if (formulario == formularioCilindros && !transacciones) {
           //BÚSQUEDA GUARDADA: DRT - PTG Dotacion
           log.audit("entra cilindros");
@@ -316,6 +322,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
           });
         }
         log.debug("No entra validacion");
+        log.audit("formularioEstacionarios", formularioEstacionarios);
 
         if (formulario == formularioEstacionarios) {
           //BÚSQUEDA GUARDADA: DRT - PTG Dotacion estacionarios
@@ -398,7 +405,63 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
               newRecord.setValue("custrecord_ptg_viaje_tabladeviajes_", numeroEntero);
               newRecord.setValue("name", numeroEntero.toFixed(0));
         }
-      }
+      } else if (context.type == "edit"){
+        var newRecord = context.newRecord;
+        var recId = newRecord.id;
+        var tipoRegistro = newRecord.type;
+        var transaccionesCreadas = newRecord.getValue("custrecord_drt_ptg_transferencia_tv");
+        var transacciones = transaccionesCreadas[0];
+        if(transacciones){
+          var registro = record.load({
+            type: newRecord.type,
+            id: newRecord.id,
+          });
+          log.debug("registro", registro);
+          var nombreSublistaDotacion = "recmachcustrecord_ptg_numviaje_dot_";
+          var lineasOld = context.oldRecord.getLineCount(nombreSublistaDotacion);
+          var lineasNew = newRecord.getLineCount(nombreSublistaDotacion);
+          for(var i = 0; i < lineasOld; i++){
+            var articuloOld = context.oldRecord.getSublistValue({
+              sublistId: nombreSublistaDotacion,
+              fieldId:'custrecord_ptg_cilindro_dotacion_',
+              line: i
+            });
+
+            newRecord.setSublistValue({
+              sublistId: nombreSublistaDotacion,
+              fieldId: 'custrecord_ptg_cilindro_dotacion_',
+              line: i,
+              value: articuloOld
+            })
+            
+            var cantidadOld  = context.oldRecord.getSublistValue({
+              sublistId: nombreSublistaDotacion,
+              fieldId:'custrecord_ptg_dotacion_cilindros',
+              line: i
+            });
+
+            newRecord.setSublistValue({
+              sublistId: nombreSublistaDotacion,
+              fieldId: 'custrecord_ptg_dotacion_cilindros',
+              line: i,
+              value: cantidadOld
+            })
+          }
+
+          for(var j = lineasOld; j < lineasNew; j++){
+            newRecord.removeLine({
+              sublistId: nombreSublistaDotacion,
+              line: lineasOld,
+              ignoreRecalc: true,
+            });
+          }
+
+
+          }
+  
+          
+        }
+        
         
     } catch (e) {
       log.error({
