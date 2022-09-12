@@ -20,12 +20,7 @@ define([
                 ) &&
                 scriptContext.newRecord.type == record.Type.CUSTOMER
             ) {
-                const arrayAddress_entity = drt_address_cm.addresEntity(scriptContext.newRecord.id);
-                if (
-                    arrayAddress_entity.length > 0
-                ) {
-
-                }
+                drt_address_cm.addresEntity(scriptContext.newRecord.id);
             }
         }
 

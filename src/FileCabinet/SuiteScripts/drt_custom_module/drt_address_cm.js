@@ -12,9 +12,7 @@ define([
     ) => {
 
         const addresEntity = (param_entity) => {
-            const respuesta = [];
             try {
-
                 log.debug(`addresEntity`, param_entity);
                 const idSublist = "address";
                 const columns = [
@@ -79,7 +77,6 @@ define([
                     ["internalid", search.Operator.IS, param_entity],
                     columns
                 );
-
                 const columsCustomRecord = [
                     {
                         name: "custrecord_ptg_cliente_dir",
@@ -103,13 +100,11 @@ define([
                     ],
                     columsCustomRecord
                 );
-
                 const objRepeat = {};
                 const objSobrante = {};
                 arrayAddressEntity.forEach((addE) => {
                     let existeEnCatalogo = false;
-                    const entityName =
-                        `${addE.altname}`;
+                    const entityName = `${addE.altname}`;
                     const objValue = {
                         name: `${addE.addresslabeladdress || ""} ${entityName} ${addE.custrecord_ptg_streetaddress} ${addE.custrecord_ptg_exterior_numberaddress} ${addE.custrecord_ptg_interior_numberaddress} ${addE.custrecord_ptg_codigo_postaladdress} ${addE.custrecord_ptg_nombre_coloniaaddress} ${addE.custrecord_ptg_estadoaddress}`,
                         custrecord_ptg_cliente_dir: addE.id || "",
@@ -172,7 +167,6 @@ define([
                 log.debug(`objSobrante`, objSobrante);
                 for (const sobrante in objSobrante) {
                     if (objSobrante[sobrante] == arrayAddressEntity.length) {
-                        log.debug(`sobrante`, sobrante);
                         updateRecord(
                             "customrecord_ptg_direcciones",
                             sobrante,
@@ -185,9 +179,6 @@ define([
                 log.debug(`objRepeat`, objRepeat);
             } catch (error_addresEntity) {
                 log.error(`error addresEntity`, error_addresEntity)
-            } finally {
-                log.debug(`respuesta addresEntity`, respuesta);
-                return respuesta;
             }
         }
 
@@ -283,7 +274,5 @@ define([
             addresEntity
         };
 
-    },
-    [
-        'N/search'
-    ]);
+    }
+);
