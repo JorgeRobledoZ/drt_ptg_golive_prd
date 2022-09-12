@@ -487,7 +487,24 @@ define(
                         envaseCilindro: 5,
                         descuentoPorcentaje: 1,
                         descuentoPeso: 2,
-                        estatusViejeEnCurso: 3
+                        estatusViejeEnCurso: 3,
+                        efectivoId : 1,
+                        valeId : 3,
+                        cortesiaId : 4,
+                        tarjetaCreditoId : 5,
+                        tarjetaDebitoId : 6,
+                        multipleId : 7,
+                        creditoClienteId : 9,
+                        recirculacionId : 21,
+                        chequeBanamexId : 29,
+
+                        prepagoBanorteId: 2,
+                        prepagoTransferenciaId: 8,
+                        prepagoBancomerId: 13,
+                        prepagoHSBCId: 14,
+                        prepagoBanamexId: 15,
+                        prepagoSantanderId: 16,
+                        prepagoScotianI: 17,
                     },
                     [runtime.EnvType.SANDBOX]: {
                         formularioCilindro: 172,
@@ -616,7 +633,24 @@ define(
                         envaseCilindro: 5,
                         descuentoPorcentaje: 1,
                         descuentoPeso: 2,
-                        estatusViejeEnCurso: 3
+                        estatusViejeEnCurso: 3,
+                        efectivoId : 1,
+                        valeId : 3,
+                        cortesiaId : 4,
+                        tarjetaCreditoId : 5,
+                        tarjetaDebitoId : 6,
+                        multipleId : 7,
+                        creditoClienteId : 9,
+                        recirculacionId : 21,
+                        chequeBanamexId : 29,
+
+                        prepagoBanorteId: 2,
+                        prepagoTransferenciaId: 8,
+                        prepagoBancomerId: 13,
+                        prepagoHSBCId: 14,
+                        prepagoBanamexId: 15,
+                        prepagoSantanderId: 16,
+                        prepagoScotianI: 17,
                     }
                 }
                 respuesta = mapObj[runtime.envType];
