@@ -3,11 +3,11 @@
  * @NScriptType UserEventScript
  */
 define([
-        'SuiteScripts/drt_custom_module/drt_address_cm',
+        'SuiteScripts/drt_custom_module/drt_ptg_address_cm',
         'N/record'
     ],
     (
-        drt_address_cm,
+        drt_ptg_address_cm,
         record
     ) => {
 
