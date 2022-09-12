@@ -2,11 +2,12 @@
  * @NApiVersion 2.1
  * @NScriptType plugintypeimpl
  */
-define(
-    [
+define([
+        'N/record',
         'N/search'
     ],
     (
+        record,
         search
     ) => {
 
@@ -41,6 +42,37 @@ define(
                         name: "address",
                         join: idSublist,
                     },
+                    {
+                        name: "custrecord_ptg_zona_precio_especial",
+                        join: idSublist,
+                    },
+                    {
+                        name: "altname",
+                    },
+                    {
+                        name: "custrecord_ptg_street",
+                        join: idSublist,
+                    },
+                    {
+                        name: "custrecord_ptg_exterior_number",
+                        join: idSublist,
+                    },
+                    {
+                        name: "custrecord_ptg_interior_number",
+                        join: idSublist,
+                    },
+                    {
+                        name: "custrecord_ptg_codigo_postal",
+                        join: idSublist,
+                    },
+                    {
+                        name: "custrecord_ptg_nombre_colonia",
+                        join: idSublist,
+                    },
+                    {
+                        name: "custrecord_ptg_estado",
+                        join: idSublist,
+                    },
                 ];
                 const arrayAddressEntity = arraySearchRecord(
                     search.Type.ENTITY,
@@ -64,21 +96,93 @@ define(
                 ]
                 const arrayAddressCustomRecord = arraySearchRecord(
                     "customrecord_ptg_direcciones",
-                    ["custrecord_ptg_cliente_dir", search.Operator.IS, param_entity],
+                    [
+                        ["isinactive", search.Operator.IS, "F"],
+                        "AND",
+                        ["custrecord_ptg_cliente_dir", search.Operator.IS, param_entity]
+                    ],
                     columsCustomRecord
                 );
-                if (
-                    arrayAddressEntity.length == 0 &&
-                    arrayAddressCustomRecord.length > 0
-                ) {
-                    // borrar todo
-                }else if (
-                    arrayAddressEntity.length  > 0 &&
-                    arrayAddressCustomRecord.length == 0
-                ) {
-                    // crear todo
-                }
 
+                const objRepeat = {};
+                const objSobrante = {};
+                arrayAddressEntity.forEach((addE) => {
+                    let existeEnCatalogo = false;
+                    const entityName =
+                        `${addE.altname}`;
+                    const objValue = {
+                        name: `${addE.addresslabeladdress || ""} ${entityName} ${addE.custrecord_ptg_streetaddress} ${addE.custrecord_ptg_exterior_numberaddress} ${addE.custrecord_ptg_interior_numberaddress} ${addE.custrecord_ptg_codigo_postaladdress} ${addE.custrecord_ptg_nombre_coloniaaddress} ${addE.custrecord_ptg_estadoaddress}`,
+                        custrecord_ptg_cliente_dir: addE.id || "",
+                        custrecord_ptg_direccion_dir: addE.addressaddress || "",
+                        custrecord_ptg_direccion: addE.internalidaddress || "",
+                        custrecord_ptg_zona_precios: addE.custrecord_ptg_zona_precio_especialaddress || "",
+                    };
+                    arrayAddressCustomRecord.forEach((addCR) => {
+                        const existObj = addCR.custrecord_ptg_cliente_dir === addE.id && addCR.custrecord_ptg_direccion === addE.internalidaddress;
+                        const keyRepeat = `${addCR.custrecord_ptg_cliente_dir}_${addCR.custrecord_ptg_direccion}`;
+                        if (existObj) {
+                            existeEnCatalogo = true;
+                            if (
+                                !objRepeat[keyRepeat]
+                            ) {
+                                objRepeat[keyRepeat] = 0;
+                                updateRecord(
+                                    "customrecord_ptg_direcciones",
+                                    addCR.id,
+                                    {
+                                        isinactive: false,
+                                        ...objValue,
+                                    }
+                                );
+                            }
+                            objRepeat[keyRepeat]++;
+                            if (
+                                objRepeat[keyRepeat] > 1
+                            ) {
+                                updateRecord(
+                                    "customrecord_ptg_direcciones",
+                                    addCR.id,
+                                    {
+                                        isinactive: true,
+                                        ...objValue,
+                                    }
+                                );
+                            }
+                        } else {
+                            if (!objSobrante[addCR.id]) {
+                                objSobrante[addCR.id] = 0;
+                            }
+                            objSobrante[addCR.id]++;
+                        }
+                    });
+
+                    if (
+                        !existeEnCatalogo
+                    ) {
+                        createRecord(
+                            record.create({
+                                type: "customrecord_ptg_direcciones",
+                                isDynamic: true,
+                                defaultValues: {}
+                            }),
+                            objValue
+                        );
+                    }
+                });
+                log.debug(`objSobrante`, objSobrante);
+                for (const sobrante in objSobrante) {
+                    if (objSobrante[sobrante] == arrayAddressEntity.length) {
+                        log.debug(`sobrante`, sobrante);
+                        updateRecord(
+                            "customrecord_ptg_direcciones",
+                            sobrante,
+                            {
+                                isinactive: true,
+                            }
+                        );
+                    }
+                }
+                log.debug(`objRepeat`, objRepeat);
             } catch (error_addresEntity) {
                 log.error(`error addresEntity`, error_addresEntity)
             } finally {
@@ -86,7 +190,6 @@ define(
                 return respuesta;
             }
         }
-
 
         const arraySearchRecord = (param_type, param_filters, param_columns) => {
             const respuesta = [];
@@ -101,7 +204,7 @@ define(
 
                 log.debug(`objSearch count`, objSearch.runPaged().count);
                 objSearch.run().each(function (result) {
-                   // log.debug(`objSearch result`, result);
+                    // log.debug(`objSearch result`, result);
                     const objRessult = {
                         id: result.id,
                         recordType: result.recordType,
@@ -120,11 +223,67 @@ define(
                 return respuesta;
             }
         }
-        
+
+        const createRecord = (objRecord, objField) => {
+            const respuesta = {
+                success: false,
+                data: ""
+            };
+            try {
+                log.debug(`createRecord`, objField);
+
+                for (const field in objField) {
+                    objRecord.setValue({
+                        fieldId: field,
+                        value: objField[field]
+                    });
+                }
+
+                respuesta.data = objRecord.save({
+                    enableSourcing: false,
+                    ignoreMandatoryFields: false
+                }) || "";
+                respuesta.success = !!respuesta.data;
+            } catch (error) {
+                log.error(`error createRecord`, error);
+            } finally {
+                log.debug(`respuesta createRecord`, respuesta);
+                return respuesta;
+            }
+        }
+
+        const updateRecord = (param_type, param_id, param_values) => {
+            const respuesta = {
+                success: true,
+                data: ""
+            };
+            try {
+                log.debug(`updateRecord param_type: ${param_type} param_id: ${param_id} `, param_values);
+                if (
+                    !!param_type &&
+                    !!param_id &&
+                    !!param_values &&
+                    Object.keys(param_values).length > 0
+                )
+                    respuesta.data = record.submitFields({
+                        type: param_type,
+                        id: param_id,
+                        values: param_values,
+                    });
+            } catch (error) {
+                log.error(`error updateRecord param_type: ${param_type} param_id: ${param_id}`, error);
+            } finally {
+                log.debug(`respuesta updateRecord param_type: ${param_type} param_id: ${param_id}`, respuesta);
+                return respuesta;
+            }
+        }
 
         return {
             arraySearchRecord,
             addresEntity
         };
 
-    });
+    },
+    [
+        'N/search'
+    ]);
