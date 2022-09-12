@@ -48,6 +48,12 @@ define(
                         tipoClienteDD          : 6,
                         tipoClienteDG          : 7,
                         tipoClienteFYE         : 8,
+                        //Tipo de servicios a nivel dirección
+                        tipoServDirCil         : 1,
+                        tipoServDirEst         : 2,
+                        tipoServDirMontacarga  : 3,
+                        tipoServDirCarb        : 4,
+                        // Tipo de servicios a nivel cliente
                         tipoServicioCil        : 1,
                         tipoServicioEst        : 2,
                         tipoServicioCarb       : 3,
@@ -133,6 +139,12 @@ define(
                         tipoClienteDD          : 6,
                         tipoClienteDG          : 7,
                         tipoClienteFYE         : 8,
+                        //Tipo de servicios a nivel dirección
+                        tipoServDirCil         : 1,
+                        tipoServDirEst         : 2,
+                        tipoServDirMontacarga  : 3,
+                        tipoServDirCarb        : 4,
+                        // Tipo de servicios a nivel cliente
                         tipoServicioCil        : 1,
                         tipoServicioEst        : 2,
                         tipoServicioCarb       : 3,

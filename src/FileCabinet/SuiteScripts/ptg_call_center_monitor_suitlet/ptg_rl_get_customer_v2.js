@@ -2,7 +2,7 @@
  * @NApiVersion 2.1
  * @NScriptType Restlet
  */
-define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors'], function (log, search, record, error) {
+define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (log, search, record, error, drt_mapid_cm) {
 
     // se crea la estructura donde se cargará toda la data
 
@@ -284,6 +284,8 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
             ]
         });
 
+        const cusVars = drt_mapid_cm.getVariables();
+
         let customSearchPagedData = customSearch.runPaged({
             pageSize: 1000
         })
@@ -300,13 +302,13 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     join: "Address"
                 })
                 let tipoServicio = '';
-                if (idTipoServicio == 1) {
+                if (idTipoServicio == cusVars.tipoServDirCil) {
                     tipoServicio = 'Cilindro'
-                } else if (idTipoServicio == 2) {
+                } else if (idTipoServicio == cusVars.tipoServDirEst) {
                     tipoServicio = 'Estacionario'
-                } else if (idTipoServicio == 3) {
+                } else if (idTipoServicio == cusVars.tipoServDirMontacarga) {
                     tipoServicio = 'Montacarga'
-                } else if (idTipoServicio == 4) {
+                } else if (idTipoServicio == cusVars.tipoServDirCarb) {
                     tipoServicio = 'Otros'
                 }
 
@@ -973,7 +975,7 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     })
 
                     let objInfoComercial = {};
-                    if (idAlianzaComercial == 1) {
+                    if (idAlianzaComercial == cusVars.tipoAlianzaComContrato) {
                         objInfoComercial.terms = terminos;
                         objInfoComercial.limiteCredito = limiteCredito;
                         objInfoComercial.creditoUtilizado = creditoUtilizado;
@@ -987,7 +989,7 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                         //     name: 'custentity_ptg_descuento_asignar'
                         // });  
 
-                    } else if (idAlianzaComercial == 2) {
+                    } else if (idAlianzaComercial == cusVars.tipoAlianzaComCredito) {
                         objInfoComercial.terms = terminos;
                         objInfoComercial.limiteCredito = limiteCredito;
                         objInfoComercial.creditoUtilizado = creditoUtilizado;
