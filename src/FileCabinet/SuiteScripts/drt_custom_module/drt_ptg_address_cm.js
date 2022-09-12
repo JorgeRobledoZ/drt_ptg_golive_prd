@@ -202,6 +202,7 @@ define([
                     };
                     param_columns.map(element => {
                         objRessult[`${element.name || ""}${element.join || ""}`] = result.getValue(element);
+                        objRessult[`${element.name || ""}${element.join || ""}_text`] = result.getText(element);
                     });
                     respuesta.push(objRessult);
                     return true;
