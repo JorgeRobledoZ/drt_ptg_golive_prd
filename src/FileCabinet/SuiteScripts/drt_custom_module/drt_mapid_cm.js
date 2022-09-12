@@ -1,13 +1,20 @@
 /**
  * @NApiVersion 2.1
  * @NScriptType plugintypeimpl
+ * @NModuleScope public
  */
 define(
     [
-        'N/runtime'
+        'N/record',
+        'N/runtime',
+        'N/search',
+        'N/transaction',
     ],
     (
-        runtime
+        record,
+        runtime,
+        search,
+        transaction
     ) => {
         const getVariables = () => {
             let respuesta = {};
@@ -197,7 +204,6 @@ define(
 
           const drt_liquidacion = () => {
             let respuesta = {};
-            log.debug("respuesta1", respuesta);
             try {
                 const mapObj = {
                     [runtime.EnvType.PRODUCTION]: {
@@ -476,10 +482,12 @@ define(
                         servicioCilindro: 1,
                         idArticuloServicio: 4217,
                         envaseCilindro: 5,
-
                         planta: 1505,
                         unidadLitros: 11,
                         envaseCilindro: 5,
+                        descuentoPorcentaje: 1,
+                        descuentoPeso: 2,
+                        estatusViejeEnCurso: 3
                     },
                     [runtime.EnvType.SANDBOX]: {
                         formularioCilindro: 172,
@@ -603,10 +611,12 @@ define(
                         servicioCilindro: 1,
                         idArticuloServicio: 4528,
                         envaseCilindro: 5,
-
                         planta: 1142,
                         unidadLitros: 23,
                         envaseCilindro: 5,
+                        descuentoPorcentaje: 1,
+                        descuentoPeso: 2,
+                        estatusViejeEnCurso: 3
                     }
                 }
                 respuesta = mapObj[runtime.envType];
@@ -678,12 +688,62 @@ define(
             }
         }
 
+        const searchRecord = (searchType, searchFilters, searchColumns) => {
+            try {
+                log.audit("searchType", searchType);
+                log.audit("searchFilters", searchFilters);
+                log.audit("searchColumns", searchColumns);
+                const respuesta = {
+                    success: false,
+                    data: {},
+                    error: {}
+                };
+
+                const searchObj = search.create({
+                    type: searchType,
+                    filters: searchFilters,
+                    columns: searchColumns
+                });
+                const searchCount = searchObj.runPaged().count;
+                log.audit("searchCount", searchCount);
+                if(searchCount > 0){
+                    const searchObjResult = searchObj.run().getRange({
+                        start: 0,
+                        end: searchCount,
+                    });
+                    log.audit("searchObjResult", searchObjResult);
+                    for(let i = 0; i < searchCount; i++){
+                        respuesta.data[searchObjResult[i].id] = {
+                            id: searchObjResult[i].id,
+                        };
+                        log.audit("respuesta.data", respuesta.data[searchObjResult[i].id]);
+                        for (let column in searchColumns){
+                            respuesta.data[searchObjResult[i].id][searchColumns[column].name] = searchObjResult[i].getValue(searchColumns[column]) || 0
+                            log.audit("respuesta.data", respuesta.data[searchObjResult[i].id][searchColumns[column].name]);
+                        }
+                    }
+                }
+                log.audit("respuesta", respuesta);
+
+                respuesta.success = Object.keys(respuesta.data).length > 0;
+                log.audit("respuesta.success", respuesta.success);
+
+            } catch (error) {
+                log.error("error searchRecord", error);
+                respuesta.error = error;
+            } finally {
+                log.audit("respuesta", respuesta);
+                return respuesta;
+            }
+        }
+
         return {
             drt_liquidacion,
             getVariables,
             drt_modulo_general,
             drt_compras,
-            ptgSuitletsCallCenterMonitor
+            ptgSuitletsCallCenterMonitor,
+            searchRecord
         };
 
     });
