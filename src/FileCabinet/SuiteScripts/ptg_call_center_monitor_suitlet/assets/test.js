@@ -940,7 +940,7 @@ function setTrOppCases(item, type = 'casos', numItems = 1, posicion) {
                     '<li onclick="verNotasAdicionales(this)" class="'+type+' px-2 py-1 c-pointer" style="font-size: 16px">'+
                         '<i class="fa-solid fa-list color-primary"></i> Ver comentarios'+
                     '</li>'+
-                    '<li onclick="verNotasAgregarDescuento(this)" class="'+(type) +' '+ (type == 'oportunidades' && userRoleId == idSupervisor ? '' : 'd-none')+' px-2 py-1 c-pointer" style="font-size: 16px">'+
+                    '<li onclick="verNotasAgregarDescuento(this)" class="'+(type) +' '+ (type == 'oportunidades' && ( userRoleId == idSupervisor || isAdmin ) ? '' : 'd-none')+' px-2 py-1 c-pointer" style="font-size: 16px">'+
                         '<i class="fa-solid fa-tag color-primary"></i> Agregar descuento'+
                     '</li>'+
                     (type == 'oportunidades' && (item.estadoId == idPorNotificar || item.estadoId == idAsignado) && !item.solicitudCancelacion ? '<li onclick="cancelarPedido(this)" class="'+type+' px-2 py-1 c-pointer" style="font-size: 16px">'+

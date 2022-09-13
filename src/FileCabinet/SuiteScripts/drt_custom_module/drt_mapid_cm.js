@@ -18,7 +18,9 @@ define(
                         customFormOppCarb      : 264, // Oportunidad-Carburación
                         productgasLpId         : 4216,// Gas LP
                         articuloDescuentoId    : 4217,// Artículo de descuento
-                        publicoGeneralId       : 27041,
+                        publicoGeneralId       : 27041,// Público general
+                        roleAgenteHEB          : 1195,// Agente HEB
+                        roleSupervisor         : 1202,// Supervisor
                         currency               : 1,// Pesos
                         tipoServicioEst        : 2,// Estacionario
                         tipoServicioCar        : 3,// Carburación
@@ -110,7 +112,9 @@ define(
                         customFormOppCarb      : 307, // Oportunidad-Carburación
                         productgasLpId         : 4088,// Gas LP
                         articuloDescuentoId    : 4528,// Artículo de descuento
-                        publicoGeneralId       : 14508,
+                        publicoGeneralId       : 14508,// Público general
+                        roleAgenteHEB          : 1213,// Agente HEB
+                        roleSupervisor         : 1167,// Supervisor
                         currency               : 1,// Pesos
                         tipoServicioEst        : 2,// Estacionario
                         tipoServicioCar        : 3,// Carburación
