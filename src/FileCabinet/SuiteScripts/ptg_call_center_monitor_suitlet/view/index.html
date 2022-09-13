@@ -3436,6 +3436,7 @@
         urlGetCps = '${ds.getCps}';
         urlGetRealHistoric = '${ds.getRealHistoric}';
         urlPutNotes = '${ds.putNotes}';
+        cusVars = JSON.parse('${ds.cusVars}');
 
         produccion = true;
 
@@ -3464,8 +3465,8 @@
         arrayDaysOfWeek = [];
         resurtidosPendientesCliente = [];
         // Variables globales para artículos, métodos de pago y status
-        articuloGasLp = 4216;
-        articuloDesc  = 4217;
+        articuloGasLp = cusVars.productgasLpId;
+        articuloDesc  = cusVars.articuloDescuentoId;
         saldoAFavorEst = 11;
         metodoMultiple = 7;
         metodoCredito  = 9;

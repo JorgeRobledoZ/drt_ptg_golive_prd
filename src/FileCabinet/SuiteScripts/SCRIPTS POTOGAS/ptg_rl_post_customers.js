@@ -437,7 +437,8 @@
 
                 customerRecord.setValue({
                     fieldId: 'customform',
-                    value: drt_mapid_cm.customformCustomer
+                    value: mapObj.customformCustomer
+                    // value: drt_mapid_cm.customformCustomer
                 })
 
                 if (customer.nombre) {

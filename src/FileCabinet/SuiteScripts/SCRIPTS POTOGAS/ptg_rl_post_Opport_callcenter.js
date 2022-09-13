@@ -1,5 +1,5 @@
 /**
- *@NApiVersion 2.1 
+ *@NApiVersion 2.1
  *@NScriptType Restlet
  *@Author Jorge Macias
  *@description Creacion de una busqueda guardada de oportunidades
@@ -530,14 +530,15 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/log', 'SuiteScripts/SC
     }
 
     const getTravel = (route) => {
-        var objMap=drt_mapid_cm.drt_liquidacion();
+        var objMap=drt_mapid_cm.getVariables();
         let customrecord_ptg_tabladeviaje_enc2_SearchObj = search.create({
             type: "customrecord_ptg_tabladeviaje_enc2_",
             filters:
                 [
                     ["custrecord_ptg_fecha_viaje_en_curso", "within", "today"],
                     "AND",
-                    ["custrecord_ptg_estatus_tabladeviajes_", "anyof", objMap.estatus],
+                    // ["custrecord_ptg_estatus_tabladeviajes_", "anyof", 3],
+                    ["custrecord_ptg_estatus_tabladeviajes_", "anyof", objMap.statusTablaViajeEnCurs],
                     "AND",
                     ["custrecord_ptg_ruta", "anyof", route]
                 ],

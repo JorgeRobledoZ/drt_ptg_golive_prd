@@ -477,11 +477,8 @@ function setDataRutas(items, elem, trigger = true) {
     });
 
     if(Object.keys(items).length == 1) {
-        if(trigger) {
-            elem.val(Object.keys(items)[0]).trigger("change");
-        } else {
-            elem.val(Object.keys(items)[0]);
-        }
+        elem.val(items[Object.keys(items)[0]].name).trigger("change");
+        // elem.val(Object.keys(items)[0].name).trigger("change");
         elem.prop("disabled", true);
     } else {
         elem.val(null);

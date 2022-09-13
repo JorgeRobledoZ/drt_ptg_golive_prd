@@ -24,6 +24,7 @@ define(['N/file', 'N/log', 'N/record', 'N/render', 'N/runtime', 'N/search', 'N/u
 
             //Información general del usuario
             const customVars = drt_mapid_cm.ptgSuitletsCallCenterMonitor();
+            const genVars    = drt_mapid_cm.getVariables();
             let remainingUsage = runtime.getCurrentScript()
             let remainingUser = runtime.getCurrentUser()
             let remainingSession = runtime.getCurrentSession()
@@ -316,6 +317,8 @@ define(['N/file', 'N/log', 'N/record', 'N/render', 'N/runtime', 'N/search', 'N/u
             datasource.getCps = getCps
             datasource.getRealHistoric = getRealHistoric
             datasource.putNotes = putNotes
+            datasource.cusVars = JSON.stringify(genVars)
+
             log.debug('Role usuario', remainingUser.role);
             log.debug('Roles', customVars.roles);
             if (true) {
