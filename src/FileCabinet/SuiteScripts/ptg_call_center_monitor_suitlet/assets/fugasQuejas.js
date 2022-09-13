@@ -1,3 +1,4 @@
+// fugasQuejas.js
 // Función para obtener los giros de negocio
 function getConceptosCasos() {
     let settings = {

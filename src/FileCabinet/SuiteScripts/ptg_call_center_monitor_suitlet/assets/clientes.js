@@ -1,3 +1,4 @@
+// Clientes.js
 // Revisa que acción ejecutará el modal de acuerdo al botón cliqueado
 $("#agregarDirecciones, #agregarDireccion").click( function() {
     let id = $(this).attr('id');

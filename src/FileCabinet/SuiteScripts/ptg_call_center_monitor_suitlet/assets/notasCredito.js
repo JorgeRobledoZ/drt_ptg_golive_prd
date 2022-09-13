@@ -1,3 +1,4 @@
+// notasCredito.js
 // Función para obtener la lista de origen del servicio
 function getPendingCases() {
     let settings = {

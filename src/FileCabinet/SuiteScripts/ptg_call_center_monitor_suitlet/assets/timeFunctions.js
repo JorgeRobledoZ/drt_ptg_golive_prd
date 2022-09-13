@@ -1,4 +1,4 @@
-
+// timeFunctions.js
 function getRestTime(datetime, type = "1") { 
     let hours = Math.abs(new Date().getTime() - datetime.getTime()) / 3600000,
         days = 0;

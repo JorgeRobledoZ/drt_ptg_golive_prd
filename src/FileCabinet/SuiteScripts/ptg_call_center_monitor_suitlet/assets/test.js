@@ -1,3 +1,4 @@
+// test.js
 $(function() {
     $('.select-search-customer').select2({
         ajax: {

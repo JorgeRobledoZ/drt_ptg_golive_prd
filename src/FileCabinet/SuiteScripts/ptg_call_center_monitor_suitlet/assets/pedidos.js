@@ -1,3 +1,4 @@
+// pedidos.js
 //#region Variable de Elementos
 
 let comboArticulos = $('#capacidadFormProductos');

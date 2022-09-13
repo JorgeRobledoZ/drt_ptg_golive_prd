@@ -1,3 +1,4 @@
+// direcciones.js
 // Valida una dirección a guardar
 $('body').delegate('#guardarDireccion', 'click', function () {
     validateAddressFields("guardar");

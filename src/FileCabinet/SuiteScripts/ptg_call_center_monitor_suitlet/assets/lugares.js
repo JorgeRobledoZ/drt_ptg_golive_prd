@@ -1,3 +1,4 @@
+// lugares.js
 // Abre el modal de direcciones
 $("#agregarDirecciones, #agregarDireccion").click(function() {
     //loadMsg();
