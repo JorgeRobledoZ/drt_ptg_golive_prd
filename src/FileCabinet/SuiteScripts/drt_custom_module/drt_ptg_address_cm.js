@@ -108,7 +108,7 @@ define([
                     const objValue = {
                         name: `${addE.addresslabeladdress || ""} ${entityName} ${addE.custrecord_ptg_streetaddress} ${addE.custrecord_ptg_exterior_numberaddress} ${addE.custrecord_ptg_interior_numberaddress} ${addE.custrecord_ptg_codigo_postaladdress} ${addE.custrecord_ptg_nombre_coloniaaddress} ${addE.custrecord_ptg_estadoaddress}`,
                         custrecord_ptg_cliente_dir: addE.id || "",
-                        custrecord_ptg_direccion_dir: addE.addressaddress || "",
+                        custrecord_ptg_direccion_dir: `${addE.custrecord_ptg_streetaddress} ${addE.custrecord_ptg_exterior_numberaddress} ${addE.custrecord_ptg_interior_numberaddress} ${addE.custrecord_ptg_codigo_postaladdress} ${addE.custrecord_ptg_nombre_coloniaaddress} ${addE.custrecord_ptg_estadoaddress}`,
                         custrecord_ptg_direccion: addE.internalidaddress || "",
                         custrecord_ptg_zona_precios: addE.custrecord_ptg_zona_precio_especialaddress || "",
                     };
@@ -164,6 +164,13 @@ define([
                         );
                     }
                 });
+                if (arrayAddressEntity.length <= 0) {
+                    arrayAddressCustomRecord.forEach((addCR) => {
+                        if (!objSobrante[addCR.id]) {
+                            objSobrante[addCR.id] = 0;
+                        }
+                    });
+                }
                 log.debug(`objSobrante`, objSobrante);
                 for (const sobrante in objSobrante) {
                     if (objSobrante[sobrante] == arrayAddressEntity.length) {
