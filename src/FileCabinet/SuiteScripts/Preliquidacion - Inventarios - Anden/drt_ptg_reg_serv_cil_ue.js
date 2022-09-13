@@ -84,22 +84,29 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         if (Object.keys(objMap).length>0) {
           estatusEtapaProcesado = objMap.estatusEtapaProcesado;
         }
+        var type_interface = runtime.executionContext;
+        var type_event = context.type;
+        var recObj = context.newRecord;
+        var form = context.form;
+        var userRoleId = runtime.getCurrentUser().role;
+        log.debug(["type_interface", "type_event", "recType", "recObj.id", "userRoleId",].join(" - "),
+        [type_interface, type_event, recObj.type, recObj.id, userRoleId].join(" - "));
 
-        if (etapa != estatusEtapaProcesado) {
-          log.debug("pasa");
-        var mrTask = task.create({
-          taskType: task.TaskType.MAP_REDUCE,
-          scriptId: 'customscript_drt_ptg_reg_serv_cil_mr',
-          params: {
-            custscript_drt_ptg_vehiculo_serv_cil: vehiculo,
-            custscript_drt_ptg_num_viaje_serv_cil: numViaje,
-            custscript_drt_ptg_id_registro_serv_cil: recId,
-          }
-        });
-        var mrTaskId = mrTask.submit();
-        var taskStatus = task.checkStatus(mrTaskId);
-        log.audit({title: 'taskStatus', details: JSON.stringify(taskStatus)});
-      }
+        if(type_interface === "USERINTERFACE"){
+          var mrTask = task.create({
+            taskType: task.TaskType.MAP_REDUCE,
+            scriptId: 'customscript_drt_ptg_reg_serv_cil_mr',
+            params: {
+              custscript_drt_ptg_vehiculo_serv_cil: vehiculo,
+              custscript_drt_ptg_num_viaje_serv_cil: numViaje,
+              custscript_drt_ptg_id_registro_serv_cil: recId,
+            }
+          });
+          var mrTaskId = mrTask.submit();
+          var taskStatus = task.checkStatus(mrTaskId);
+          log.audit({title: 'taskStatus', details: JSON.stringify(taskStatus)});
+        }
+
     } catch (e) {
       log.error({
         title: e.name,

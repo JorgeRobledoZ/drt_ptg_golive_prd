@@ -506,6 +506,10 @@ define(
                         prepagoSantanderId: 16,
                         prepagoScotianI: 17,
                         terminoContado: 4,
+                        condretado: 13,
+                        formularioRecepcion: 270,
+                        formularioOportunidad: 265,
+                        formularioOrdenTraslado: 266,
                     },
                     [runtime.EnvType.SANDBOX]: {
                         formularioCilindro: 172,
@@ -653,6 +657,10 @@ define(
                         prepagoSantanderId: 16,
                         prepagoScotianI: 17,
                         terminoContado: 4,
+                        condretado: 13,
+                        formularioRecepcion: 258,
+                        formularioOportunidad: 305,
+                        formularioOrdenTraslado: 313,
                     }
                 }
                 respuesta = mapObj[runtime.envType];

@@ -18,6 +18,7 @@
     function getInputData() {
         try {
             var respuesta = '';
+            var valoresProceso = {};
 
             var idRegistro = runtime.getCurrentScript().getParameter({
                 name: 'custscript_drt_ptg_id_registro_serv_cil'
@@ -53,13 +54,22 @@
                 filters: arrayFilters
             });
 
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 1;
 
         } catch (error) {
             log.audit({
                 title: 'error getInputData',
                 details: JSON.stringify(error)
             });
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 3;
         } finally {
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_registro_servicios_cili",
+                id: idRegistro,
+                values: valoresProceso
+            });
+            log.debug("registroCilindros", registroCilindros);
+
             log.audit({
                 title: 'respuesta getInputData Finally',
                 details: JSON.stringify(respuesta)
@@ -232,6 +242,7 @@
                     arrayPagos.push(objPagos);
                     objPagosOportunidad = { pago: arrayPagos };
                     var objValue = JSON.stringify(objPagosOportunidad);
+                    log.debug("objValue 245", objValue);
 
                     for(var j = 0; j < cantidad; j++){
                         var recOportunidad = record.create({
@@ -520,7 +531,24 @@
             log.audit({
                 title: 'context summarize',
                 details: JSON.stringify(context)
-            });            
+            });
+
+            var idRegistro = runtime.getCurrentScript().getParameter({
+                name: 'custscript_drt_ptg_id_registro_serv_cil'
+            }) || '';
+            log.debug("idRegistro", idRegistro);
+
+            var valoresProceso = {};
+
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 2;
+
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_registro_servicios_cili",
+                id: idRegistro,
+                values: valoresProceso
+            });
+            log.debug("registroCilindros", registroCilindros);
+
 			
         } catch (error) {
             log.error({
