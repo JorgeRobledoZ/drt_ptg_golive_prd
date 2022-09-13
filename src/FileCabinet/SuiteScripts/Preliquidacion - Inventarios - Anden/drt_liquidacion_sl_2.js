@@ -156,6 +156,7 @@
                     recTipoPago.setValue("custrecord_ptg_prepago_aplicar_oport", true);    
                 }
                 recTipoPago.setValue("custrecord_ptg_total_", total);
+                recTipoPago.setValue("custrecord_ptg_total_old", total);
                 recTipoPago.setValue("custrecord_ptg_modificar_met_pago_cilind", urlModificarPago);
                 recTipoPago.setValue("custrecord_ptg_cliente_reg_oport", idCliente);
                 recTipoPago.setValue("custrecord_ptg_direccion_registroop_", direccionCliente);

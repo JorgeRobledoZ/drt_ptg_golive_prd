@@ -176,6 +176,7 @@
                 tarjetaDebitoBanamexId = objMap.tarjetaDebitoBanamexId;
                 tarjetaDebitoBancomerId = objMap.tarjetaDebitoBancomerId;
                 tarjetaDebitoHSBCId = objMap.tarjetaDebitoHSBCId;
+                terminoContado = objMap.terminoContado;
             }
 
             var tipoPagoAFacturar = 0;
@@ -229,6 +230,7 @@
                 type: "customrecord_ptg_zonasdeprecio_",
                 id: zonaPrecioID,
             });
+            
             var precioPorLitro = zonaPrecioObj.getValue("custrecord_ptg_precio_");
             var clienteObj = record.load({
                 type: search.Type.CUSTOMER,
@@ -236,6 +238,13 @@
             });
             var clienteAFacturar = clienteObj.getValue("custentity_razon_social_para_facturar");
             nombreClienteAFacturar = clienteAFacturar;
+            var terminosCliente = clienteObj.getValue("terms");
+            var terminos = 0;
+            if(tipoPago != creditoClienteId){
+                terminos = terminoContado;
+            } else {
+                terminos = terminosCliente;
+            }
             
 
             var rutaObj = record.load({
@@ -387,6 +396,7 @@
             //facturaObj.setValue("custbody_psg_ei_sending_method", 11); //MÉTODO DE ENVÍO DE DOCUMENTOS ELECTRÓNICOS
             facturaObj.setValue("custbody_mx_cfdi_usage", cfdiCliente);
             facturaObj.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
+            facturaObj.setValue("terms", terminos);
 
             var formaPagoSAT = searchFormaPagoSAT(subsidiariaOportunidad, tipoPago);
             log.emergency("formaPagoSAT", formaPagoSAT);

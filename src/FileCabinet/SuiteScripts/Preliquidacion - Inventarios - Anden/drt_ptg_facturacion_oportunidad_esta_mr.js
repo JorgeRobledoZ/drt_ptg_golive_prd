@@ -162,6 +162,7 @@
                 tarjetaDebitoBanamexId = objMap.tarjetaDebitoBanamexId;
                 tarjetaDebitoBancomerId = objMap.tarjetaDebitoBancomerId;
                 tarjetaDebitoHSBCId = objMap.tarjetaDebitoHSBCId;
+                terminoContado = objMap.terminoContado;
             }
 
 
@@ -243,6 +244,14 @@
             });
             var clienteAFacturar = clienteObj.getValue("custentity_razon_social_para_facturar");
             nombreClienteAFacturar = clienteAFacturar
+
+            var terminosCliente = clienteObj.getValue("terms");
+            var terminos = 0;
+            if(tipoPago != creditoClienteId){
+                terminos = terminoContado;
+            } else {
+                terminos = terminosCliente;
+            }
 
             
             var rutaObj = record.load({
@@ -363,6 +372,7 @@
             facturaObj.setValue("custbody_psg_ei_status", 3); //ESTADO DEL DOCUMENTO ELECTRÓNICO
             facturaObj.setValue("custbody_mx_cfdi_usage", cfdiCliente);
             facturaObj.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
+            facturaObj.setValue("terms", terminos);
             //facturaObj.setValue("custbody_psg_ei_template", 123); //PLANTILLA DEL DOCUMENTO ELECTRÓNICO
             //facturaObj.setValue("custbody_psg_ei_sending_method", 11); //MÉTODO DE ENVÍO DE DOCUMENTOS ELECTRÓNICOS
 
