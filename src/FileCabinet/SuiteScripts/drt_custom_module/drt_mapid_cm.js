@@ -505,6 +505,7 @@ define(
                         prepagoBanamexId: 15,
                         prepagoSantanderId: 16,
                         prepagoScotianI: 17,
+                        terminoContado: 4,
                     },
                     [runtime.EnvType.SANDBOX]: {
                         formularioCilindro: 172,
@@ -651,6 +652,7 @@ define(
                         prepagoBanamexId: 15,
                         prepagoSantanderId: 16,
                         prepagoScotianI: 17,
+                        terminoContado: 4,
                     }
                 }
                 respuesta = mapObj[runtime.envType];
