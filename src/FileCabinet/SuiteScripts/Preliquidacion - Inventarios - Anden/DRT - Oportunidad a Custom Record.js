@@ -336,6 +336,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var recId = customRec.id;
         var servicioEstacionario = false;
         var cantidadTotalstacionario = 0;
+        var cantidadTotalCilindros = 0;
         var registroCreado = customRec.getValue("custbody_drt_ptg_registro_creado");
         var tipoPagoOld = context.oldRecord.getValue("custbody_ptg_opcion_pago");
         var tipoPagoNew = customRec.getValue("custbody_ptg_opcion_pago");
@@ -436,6 +437,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
 
             litrosTotalesArray[j] = cantidadArray[j] * capacidadArray[j];
             log.debug("litros Totales: "+j, litrosTotalesArray[j]);
+            
+            cantidadTotalCilindros += litrosTotalesArray[j];
   
             tasaArray[j] = customRec.getSublistValue({
               sublistId: "item",
@@ -649,6 +652,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           recPagos.setValue("custrecord_registro_desde_oportunidad_p", true);
           if(servicioEstacionario){
             recPagos.setValue("custrecord_ptg_total_litros_esta", cantidadTotalstacionario);
+          } else {
+            recPagos.setValue("custrecord_ptg_total_litros_esta", cantidadTotalCilindros);
           }
 
           var recIdSavedEstacionariosPagos = recPagos.save();

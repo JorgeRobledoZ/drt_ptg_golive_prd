@@ -149,10 +149,10 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
           //Se agrega la línea de descuento en caso que el cliente tenga descuento
           if(clienteDescuento){
             for (var i = itemCountLine; i < itemDescuentoLine; i++) {
-                recOportunidad.selectLine("item", i);
-                recOportunidad.setCurrentSublistValue("item", "item", idArticuloDescuento);
-                recOportunidad.setCurrentSublistValue("item", "rate", descuentoUnitario);
-                recOportunidad.commitLine("item");
+              oportunidadRec.selectLine("item", i);
+              oportunidadRec.setCurrentSublistValue("item", "item", idArticuloDescuento);
+              oportunidadRec.setCurrentSublistValue("item", "rate", descuentoUnitario);
+              oportunidadRec.commitLine("item");
             }
           }
 

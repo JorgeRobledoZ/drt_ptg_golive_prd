@@ -18,6 +18,7 @@
     function getInputData() {
         try {
             var respuesta = '';
+            var valoresProceso = {};
 
             var idRegistro = runtime.getCurrentScript().getParameter({
                 name: 'custscript_drt_ptg_id_registro_serv_cil'
@@ -53,13 +54,23 @@
                 filters: arrayFilters
             });
 
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 1;
 
         } catch (error) {
             log.audit({
                 title: 'error getInputData',
                 details: JSON.stringify(error)
             });
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 3;
         } finally {
+            
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_registro_servicios_cili",
+                id: idRegistro,
+                values: valoresProceso
+            });
+            log.debug("registroCilindros", registroCilindros);
+
             log.audit({
                 title: 'respuesta getInputData Finally',
                 details: JSON.stringify(respuesta)
@@ -74,6 +85,10 @@
                 title: 'context map',
                 details: JSON.stringify(context)
             });
+            var idRegistro = runtime.getCurrentScript().getParameter({
+                name: 'custscript_drt_ptg_id_registro_serv_cil'
+            }) || '';
+            log.debug("idRegistro", idRegistro);
 
             var objValue = JSON.parse(context.value);
             var idRegistroCilindroLinea = objValue.id;
@@ -82,6 +97,7 @@
             var objPagosOportunidad = {};
             var regServCilUpdate = {};
             var oportunidadArray = [];
+            var valoresProceso = {};
             var publicoGeneral = 0;
             var cilindro10 = 0;
             var cilindro20 = 0;
@@ -134,7 +150,8 @@
                 unidad20 = objMap.unidad20;
                 unidad30 = objMap.unidad30;
                 unidad45 = objMap.unidad45;
-                condretado = objMap.condretado;
+                //condretado = objMap.condretado;
+                condretado = 13;
                 entregado = objMap.entregado;
                 ventaLitro = objMap.ventaLitro;
                 traspasoId = objMap.traspasoId;
@@ -232,6 +249,7 @@
                     arrayPagos.push(objPagos);
                     objPagosOportunidad = { pago: arrayPagos };
                     var objValue = JSON.stringify(objPagosOportunidad);
+                    log.debug("objValue 245", objValue);
 
                     for(var j = 0; j < cantidad; j++){
                         var recOportunidad = record.create({
@@ -483,6 +501,7 @@
                 }
             }
             
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 1;
 
             context.write({
                 key: recOportunidadIdSaved,
@@ -490,10 +509,25 @@
             });
                
         } catch (error) {
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 3;
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_registro_servicios_cili",
+                id: idRegistro,
+                values: valoresProceso
+            });
+            log.debug("registro error Cilindros map", registroCilindros);
             log.error({
                 title: 'error map',
                 details: JSON.stringify(error)
             });
+        } finally {
+            
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_registro_servicios_cili",
+                id: idRegistro,
+                values: valoresProceso
+            });
+            log.debug("registro Cilindros map", registroCilindros);
         }
     }
 
@@ -520,7 +554,24 @@
             log.audit({
                 title: 'context summarize',
                 details: JSON.stringify(context)
-            });            
+            });
+
+            var idRegistro = runtime.getCurrentScript().getParameter({
+                name: 'custscript_drt_ptg_id_registro_serv_cil'
+            }) || '';
+            log.debug("idRegistro", idRegistro);
+
+            var valoresProceso = {};
+
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 2;
+
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_registro_servicios_cili",
+                id: idRegistro,
+                values: valoresProceso
+            });
+            log.debug("registroCilindros", registroCilindros);
+
 			
         } catch (error) {
             log.error({
@@ -533,7 +584,7 @@
     return {
         getInputData: getInputData,
         map: map,
-        reduce: reduce,
-        summarize: summarize
+        //reduce: reduce,
+        //summarize: summarize
     }
 });
