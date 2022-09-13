@@ -693,7 +693,7 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
     }
 
     function customSearch(request, arrayResult, responseData) {
-
+        const cusVars = drt_mapid_cm.getVariables();
         var filter = [];
         log.audit('request', request);
         try {

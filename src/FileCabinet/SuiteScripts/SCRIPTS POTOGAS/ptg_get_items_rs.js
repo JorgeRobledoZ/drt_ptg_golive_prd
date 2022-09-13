@@ -18,8 +18,7 @@ define(["N/search", "SuiteScripts/drt_custom_module/drt_mapid_cm"], function (se
             var itemSearchObj = search.create({
                 type: "item",
                 filters: [
-                    ["subsidiary", "anyof", customVars.subsidiariaGas, customVars.subsidiariaCorpoGas, 
-                    customVars.subsidiariaSanLuisGas, customVars.subsidiariaDistPotosi, customVars.subsidiariaEliminacion],
+                    ["subsidiary", "anyof", customVars.subsidiariaDistPotosi],
                     // ["subsidiary", "anyof", "20", "14", "16", "13"],
                     "AND",
                     ["type", "anyof", "InvtPart"],
@@ -30,6 +29,7 @@ define(["N/search", "SuiteScripts/drt_custom_module/drt_mapid_cm"], function (se
                     "AND",
                     ["isinactive", "is", "F"],
                     "AND",
+                    // ["custitem_ptg_tipodearticulo_", "anyof", "1", "2", "5", "7"],
                     ["custitem_ptg_tipodearticulo_", "anyof", customVars.tipoArticuloCil, customVars.tipoArticuloEst, customVars.tipoArticuloEnvCil, customVars.tipoArticuloEnvEst],
                     "AND", 
                     ["custitem_ptg_mostrar_call_center","is","T"]
@@ -126,9 +126,10 @@ define(["N/search", "SuiteScripts/drt_custom_module/drt_mapid_cm"], function (se
             var itemSearchObj = search.create({
                 type: "item",
                 filters: [
+                    ["subsidiary", "anyof", customVars.subsidiariaDistPotosi],
                     // ["subsidiary", "anyof", "20", "14", "16", "13"], // Este código no sabemos por qué tiene subsidiarias que NO son de potogas
-                    ["subsidiary", "anyof", customVars.subsidiariaGas, customVars.subsidiariaCorpoGas, 
-                    customVars.subsidiariaSanLuisGas, customVars.subsidiariaDistPotosi, customVars.subsidiariaEliminacion],
+                    // ["subsidiary", "anyof", customVars.subsidiariaGas, customVars.subsidiariaCorpoGas, 
+                    // customVars.subsidiariaSanLuisGas, customVars.subsidiariaDistPotosi, customVars.subsidiariaEliminacion],
                     "AND",
                     ["type", "anyof", "InvtPart"],
                     //"AND", 
