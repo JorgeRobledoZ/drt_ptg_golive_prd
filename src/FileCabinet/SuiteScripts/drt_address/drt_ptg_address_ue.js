@@ -20,7 +20,7 @@ define([
                 ) &&
                 scriptContext.newRecord.type == record.Type.CUSTOMER
             ) {
-                drt_address_cm.addresEntity(scriptContext.newRecord.id);
+                drt_ptg_address_cm.addresEntity(scriptContext.newRecord.id);
             }
         }
 
