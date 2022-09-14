@@ -1,13 +1,20 @@
 /**
  * @NApiVersion 2.1
  * @NScriptType plugintypeimpl
+ * @NModuleScope public
  */
 define(
     [
-        'N/runtime'
+        'N/record',
+        'N/runtime',
+        'N/search',
+        'N/transaction',
     ],
     (
-        runtime
+        record,
+        runtime,
+        search,
+        transaction
     ) => {
         const getVariables = () => {
             let respuesta = {};
@@ -17,10 +24,7 @@ define(
                         customFormOppPotogas   : 265, // Oportunidad-Potogas
                         customFormOppCarb      : 264, // Oportunidad-Carburación
                         productgasLpId         : 4216,// Gas LP
-                        articuloDescuentoId    : 4217,// Artículo de descuento
-                        publicoGeneralId       : 27041,// Público general
-                        roleAgenteHEB          : 1195,// Agente HEB
-                        roleSupervisor         : 1202,// Supervisor
+                        publicoGeneralId       : 27041,
                         currency               : 1,// Pesos
                         tipoServicioEst        : 2,// Estacionario
                         tipoServicioCar        : 3,// Carburación
@@ -51,12 +55,6 @@ define(
                         tipoClienteDD          : 6,
                         tipoClienteDG          : 7,
                         tipoClienteFYE         : 8,
-                        //Tipo de servicios a nivel dirección
-                        tipoServDirCil         : 1,
-                        tipoServDirEst         : 2,
-                        tipoServDirMontacarga  : 3,
-                        tipoServDirCarb        : 4,
-                        // Tipo de servicios a nivel cliente
                         tipoServicioCil        : 1,
                         tipoServicioEst        : 2,
                         tipoServicioCarb       : 3,
@@ -84,7 +82,7 @@ define(
                         statusViajePreliqui    : 1,
                         statusViajeLiquidacion : 2,
                         statusViajeEjecutado   : 3,
-                        statusViajeFacturacion : 4,  
+                        statusViajeFacturacion : 4,
                         tipoContactoTelefono   : 1,
                         tipoContactoAviso      : 2,
                         tipoContactoEjecutiva  : 3,
@@ -111,10 +109,7 @@ define(
                         customFormOppPotogas   : 305, // Oportunidad-Potogas
                         customFormOppCarb      : 307, // Oportunidad-Carburación
                         productgasLpId         : 4088,// Gas LP
-                        articuloDescuentoId    : 4528,// Artículo de descuento
-                        publicoGeneralId       : 14508,// Público general
-                        roleAgenteHEB          : 1213,// Agente HEB
-                        roleSupervisor         : 1167,// Supervisor
+                        publicoGeneralId       : 14508,
                         currency               : 1,// Pesos
                         tipoServicioEst        : 2,// Estacionario
                         tipoServicioCar        : 3,// Carburación
@@ -145,12 +140,6 @@ define(
                         tipoClienteDD          : 6,
                         tipoClienteDG          : 7,
                         tipoClienteFYE         : 8,
-                        //Tipo de servicios a nivel dirección
-                        tipoServDirCil         : 1,
-                        tipoServDirEst         : 2,
-                        tipoServDirMontacarga  : 3,
-                        tipoServDirCarb        : 4,
-                        // Tipo de servicios a nivel cliente
                         tipoServicioCil        : 1,
                         tipoServicioEst        : 2,
                         tipoServicioCarb       : 3,
@@ -178,7 +167,7 @@ define(
                         statusViajePreliqui    : 1,
                         statusViajeLiquidacion : 2,
                         statusViajeEjecutado   : 3,
-                        statusViajeFacturacion : 4,  
+                        statusViajeFacturacion : 4,
                         tipoContactoTelefono   : 1,
                         tipoContactoAviso      : 2,
                         tipoContactoEjecutiva  : 3,
@@ -208,12 +197,12 @@ define(
             } catch (error) {
                 log.error(`error getVariables`, error);
             } finally {
-                log.debug(`respuesta getVariables ${runtime.envType}`);
+                log.debug(`respuesta getVariables ${runtime.envType}`, respuesta);
                 return respuesta;
             }
         }
 
-        const drt_liquidacion = () => {
+          const drt_liquidacion = () => {
             let respuesta = {};
             try {
                 const mapObj = {
@@ -356,7 +345,9 @@ define(
                         urlRegistroCliente: "https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1070&planta=",
                     }
                 }
-                respuesta = mapObj[runtime.envType];
+                respuesta = {
+                    ...drt_modulo_general()
+                };
             } catch (error) {
                 log.error(`error drt_liquidacion`, error);
             } finally {
@@ -391,7 +382,7 @@ define(
                         cilindro20: 4211,
                         cilindro30: 4212,
                         cilindro45: 4213,
-                        articuloEstacionario: 2, 
+                        articuloEstacionario: 2,
                         unidad10: 12,
                         unidad20: 13,
                         unidad30: 14,
@@ -491,10 +482,37 @@ define(
                         servicioCilindro: 1,
                         idArticuloServicio: 4217,
                         envaseCilindro: 5,
-
                         planta: 1505,
                         unidadLitros: 11,
                         envaseCilindro: 5,
+                        descuentoPorcentaje: 1,
+                        descuentoPeso: 2,
+                        estatusViejeEnCurso: 3,
+                        efectivoId : 1,
+                        valeId : 3,
+                        cortesiaId : 4,
+                        tarjetaCreditoId : 5,
+                        tarjetaDebitoId : 6,
+                        multipleId : 7,
+                        creditoClienteId : 9,
+                        recirculacionId : 21,
+                        chequeBanamexId : 29,
+
+                        prepagoBanorteId: 2,
+                        prepagoTransferenciaId: 8,
+                        prepagoBancomerId: 13,
+                        prepagoHSBCId: 14,
+                        prepagoBanamexId: 15,
+                        prepagoSantanderId: 16,
+                        prepagoScotianI: 17,
+                        terminoContado: 4,
+                        condretado: 13,
+                        formularioRecepcion: 270,
+                        formularioOportunidad: 265,
+                        formularioOrdenTraslado: 266,
+                        urlCilindros: 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=497&whence=&vehiculo=',
+                        urlEstacionarios: 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=495&whence=&vehiculo=',
+
                     },
                     [runtime.EnvType.SANDBOX]: {
                         formularioCilindro: 172,
@@ -618,10 +636,36 @@ define(
                         servicioCilindro: 1,
                         idArticuloServicio: 4528,
                         envaseCilindro: 5,
-
                         planta: 1142,
                         unidadLitros: 23,
                         envaseCilindro: 5,
+                        descuentoPorcentaje: 1,
+                        descuentoPeso: 2,
+                        estatusViejeEnCurso: 3,
+                        efectivoId : 1,
+                        valeId : 3,
+                        cortesiaId : 4,
+                        tarjetaCreditoId : 5,
+                        tarjetaDebitoId : 6,
+                        multipleId : 7,
+                        creditoClienteId : 9,
+                        recirculacionId : 21,
+                        chequeBanamexId : 29,
+
+                        prepagoBanorteId: 2,
+                        prepagoTransferenciaId: 8,
+                        prepagoBancomerId: 13,
+                        prepagoHSBCId: 14,
+                        prepagoBanamexId: 15,
+                        prepagoSantanderId: 16,
+                        prepagoScotianI: 17,
+                        terminoContado: 4,
+                        condretado: 13,
+                        formularioRecepcion: 258,
+                        formularioOportunidad: 305,
+                        formularioOrdenTraslado: 313,
+                        urlCilindros: 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=497&whence=&vehiculo=',
+                        urlEstacionarios: 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=495&whence=&vehiculo=',
                     }
                 }
                 respuesta = mapObj[runtime.envType];
@@ -666,7 +710,7 @@ define(
                 }
                 respuesta = mapObj[runtime.envType];
             } catch (error_compras) {
-                log.error(`error drt_compras`, error_compras)     
+                log.error(`error drt_compras`, error_compras)
             } finally {
                 log.debug(`respuesta drt_compras ${runtime.envType}`, respuesta);
                 return respuesta;
@@ -686,9 +730,58 @@ define(
                 }
                 respuesta = mapObj[runtime.envType];
             } catch (error_compras) {
-                log.error(`error drt_compras`, error_compras)     
+                log.error(`error drt_compras`, error_compras)
             } finally {
                 log.debug(`respuesta drt_compras ${runtime.envType}`, respuesta);
+                return respuesta;
+            }
+        }
+
+        const searchRecord = (searchType, searchFilters, searchColumns) => {
+            try {
+                log.audit("searchType", searchType);
+                log.audit("searchFilters", searchFilters);
+                log.audit("searchColumns", searchColumns);
+                const respuesta = {
+                    success: false,
+                    data: {},
+                    error: {}
+                };
+
+                const searchObj = search.create({
+                    type: searchType,
+                    filters: searchFilters,
+                    columns: searchColumns
+                });
+                const searchCount = searchObj.runPaged().count;
+                log.audit("searchCount", searchCount);
+                if(searchCount > 0){
+                    const searchObjResult = searchObj.run().getRange({
+                        start: 0,
+                        end: searchCount,
+                    });
+                    log.audit("searchObjResult", searchObjResult);
+                    for(let i = 0; i < searchCount; i++){
+                        respuesta.data[searchObjResult[i].id] = {
+                            id: searchObjResult[i].id,
+                        };
+                        log.audit("respuesta.data", respuesta.data[searchObjResult[i].id]);
+                        for (let column in searchColumns){
+                            respuesta.data[searchObjResult[i].id][searchColumns[column].name] = searchObjResult[i].getValue(searchColumns[column]) || 0
+                            log.audit("respuesta.data", respuesta.data[searchObjResult[i].id][searchColumns[column].name]);
+                        }
+                    }
+                }
+                log.audit("respuesta", respuesta);
+
+                respuesta.success = Object.keys(respuesta.data).length > 0;
+                log.audit("respuesta.success", respuesta.success);
+
+            } catch (error) {
+                log.error("error searchRecord", error);
+                respuesta.error = error;
+            } finally {
+                log.audit("respuesta", respuesta);
                 return respuesta;
             }
         }
@@ -698,7 +791,8 @@ define(
             getVariables,
             drt_modulo_general,
             drt_compras,
-            ptgSuitletsCallCenterMonitor
+            ptgSuitletsCallCenterMonitor,
+            searchRecord
         };
 
     });
