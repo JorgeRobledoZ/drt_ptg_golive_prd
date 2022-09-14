@@ -2608,6 +2608,10 @@
                     <div class="col-auto p-0">
                         <div class="tab" data-tab="historico-consumos">Histórico de consumos</div>
                     </div>
+
+                    <div class="col-auto p-0">
+                        <div class="tab" data-tab="grafica-consumos">Gráfica de consumos</div>
+                    </div>
                 </div>
                 <div id="tab-pedidos" class="p-2 tabs-content">
                     <div class="row align-items-center header-edit d-none">
@@ -3048,6 +3052,10 @@
                         </div>
                     </div>
                 </div>
+                <div id="tab-grafica-consumos" class="p-2 d-none tabs-content">
+                    <canvas id="myChart"></canvas>
+                    <div class="myChart"></div>
+                </div>
             </div>
             <div class="content-rma-list d-none">
                 <table class="table-gen table-gen-blue">
@@ -3403,6 +3411,9 @@
 
     <!-- FancyTable -->
     <script src="https://cdn.jsdelivr.net/npm/jquery.fancytable/dist/fancyTable.min.js"></script>
+
+    <!-- charts js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Funciones generales -->
     <script type="text/javascript">
@@ -3934,7 +3945,7 @@
                             auxFormat += '<li>'+element.attr("title")+'</li>';
                         }
                         
-                        if(element.hasClass('phone') && (element.val().trim().length < 7 || !telNumRegex.test(element.val().trim()))) {
+                        if(element.hasClass('phone') && (element.val().trim().length < 10 || !telNumRegex.test(element.val().trim()))) {
                             element.addClass('invalid');
                             element.closest(".content-input").addClass('invalid');
                             hasError = true;

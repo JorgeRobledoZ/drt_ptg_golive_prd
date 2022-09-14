@@ -491,6 +491,7 @@ function setDir(direccion, requiereFactura = false) {
     direccion.zip             ? str+= ', C.P. '+direccion.zip : '';
     direccion.stateName       ? str+= ', '+direccion.stateName : '';
     direccion.city            ? str+= ', '+direccion.city : '';
+    direccion.tipoServicioAbbr ? str+= ' - '+direccion.tipoServicioAbbr : '';
     console.log(requiereFactura);
     if(requiereFactura) {
         direccion.defaultBilling  ? str+= ', Facturación' : '';
