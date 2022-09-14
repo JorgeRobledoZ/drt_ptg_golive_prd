@@ -32,6 +32,14 @@ define(
                         statusPedidoAsignado   : 2,// Asignado
                         entityStatusConcretado : 13,// Concretado
                         tipoSgcWeb             : 1,// Web
+                        tipoDirSoloEntrega     : 1,// Sólo entrega
+                        tipoDirSoloFacturacion : 2,// Sólo facturación
+                        tipoDirEntFact         : 3,// Entrega y facturación
+                        // Estas variables hacen referencia a la lista PTG - Tipo Servicio
+                        ptgTipoServicioCil     : 1,// Cilindro
+                        ptgTipoServicioEst     : 2,// Estacionario
+                        ptgTipoServicioMon     : 3,// Montacargas
+                        ptgTipoServicioCar     : 4,// Carburación
                         urlSgcWeb              : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php",
                         urlSgcWebLogin         : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login",
                         urlSgcWebProcesar      : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
@@ -117,6 +125,14 @@ define(
                         statusPedidoAsignado   : 2,// Asignado
                         entityStatusConcretado : 13,// Concretado
                         tipoSgcWeb             : 1,// Web
+                        tipoDirSoloEntrega     : 1,// Sólo entrega
+                        tipoDirSoloFacturacion : 2,// Sólo facturación
+                        tipoDirEntFact         : 3,// Entrega y facturación
+                        // Estas variables hacen referencia a la lista PTG - Tipo Servicio
+                        ptgTipoServicioCil     : 1,// Cilindro
+                        ptgTipoServicioEst     : 2,// Estacionario
+                        ptgTipoServicioMon     : 3,// Montacargas
+                        ptgTipoServicioCar     : 4,// Carburación
                         urlSgcWeb              : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php",
                         urlSgcWebLogin         : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login",
                         urlSgcWebProcesar      : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
@@ -197,7 +213,7 @@ define(
             } catch (error) {
                 log.error(`error getVariables`, error);
             } finally {
-                log.debug(`respuesta getVariables ${runtime.envType}`, respuesta);
+                log.debug(`respuesta getVariables ${runtime.envType}`);
                 return respuesta;
             }
         }

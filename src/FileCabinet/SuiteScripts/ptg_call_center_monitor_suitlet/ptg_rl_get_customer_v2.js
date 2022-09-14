@@ -280,6 +280,11 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     name: "custrecord_ptg_zona_precio_especial",
                     join: "Address",
                     label: "PTG - ZONA DE PRECIO ESPECIAL"
+                }),
+                search.createColumn({
+                    name: "custrecord_ptg_tipo_direccion",
+                    join: "Address",
+                    label: "PTG - TIPO DE DIRECCION"
                 })
             ]
         });
@@ -301,15 +306,35 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     name: "custrecord_ptg_tipo_servicio",
                     join: "Address"
                 })
+                let tipoDireccionId = result.getValue({
+                    name: "custrecord_ptg_tipo_direccion",
+                    join: "Address"
+                })
+                log.debug('tipoDireccionId', tipoDireccionId);
+                
                 let tipoServicio = '';
-                if (idTipoServicio == cusVars.tipoServDirCil) {
-                    tipoServicio = 'Cilindro'
-                } else if (idTipoServicio == cusVars.tipoServDirEst) {
-                    tipoServicio = 'Estacionario'
-                } else if (idTipoServicio == cusVars.tipoServDirMontacarga) {
-                    tipoServicio = 'Montacarga'
-                } else if (idTipoServicio == cusVars.tipoServDirCarb) {
-                    tipoServicio = 'Otros'
+                let tipoServicioAbbr = '';
+                if (idTipoServicio == cusVars.ptgTipoServicioCil) {
+                    tipoServicio = 'Cilindro';
+                    tipoServicioAbbr = 'CIL';
+                } else if (idTipoServicio == cusVars.ptgTipoServicioEst) {
+                    tipoServicio = 'Estacionario';
+                    tipoServicioAbbr = 'EST';
+                } else if (idTipoServicio == cusVars.ptgTipoServicioMon) {
+                    tipoServicio = 'Montacarga';
+                    tipoServicioAbbr = 'MC';
+                } else if (idTipoServicio == cusVars.ptgTipoServicioCar) {
+                    tipoServicio = 'Otros';
+                    tipoServicioAbbr = 'CAR';
+                }
+
+                let tipoDireccion = '';
+                if (tipoDireccionId == cusVars.tipoDirSoloEntrega) {
+                    tipoDireccion = 'Sólo entrega';
+                } else if (tipoDireccionId == cusVars.tipoDirSoloFacturacion) {
+                    tipoDireccion = 'Sólo facturación';
+                } else if (tipoDireccionId == cusVars.tipoDirEntFact) {
+                    tipoDireccion = 'Entrega y facturación';
                 }
 
                 let idColandRoute = result.getValue({
@@ -493,11 +518,14 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                         name: "custrecord_ptg_ruta_asignada_4",
                         join: "Address"
                     }),
+                    tipoServicioAbbr: tipoServicioAbbr,
                     typeService: tipoServicio,
                     typeServiceId: result.getValue({
                         name: "custrecord_ptg_tipo_servicio",
                         join: "Address"
                     }),
+                    tipoDireccionId: tipoDireccionId,
+                    tipoDireccion: tipoDireccion,
                     commentsAddr: result.getValue({
                         name: "custrecord_ptg_obesarvaciones_direccion_",
                         join: "Address"
