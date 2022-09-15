@@ -55,20 +55,20 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             form.title = "Servicios Procesados";
           }
           
-          if (status == estatusEtapa && tipoServicio == servicioCilindros) {
+          /*if (status == estatusEtapa && tipoServicio == servicioCilindros) {
               form.addButton({
                   id: "custpage_drt_to_preliq_est",
                   label: "Preliquidación Cilindros",
                   functionName: "pasarPreliquidacion()",
               });
           }
-          if (status == estatusEtapa && tipoServicio == servicioEstacionarios) {
+          if (status == estatusEtapa && tipoServicio == servicioEstacionarios) {*/
             form.addButton({
                 id: "custpage_drt_to_preliq_est",
                 label: "Preliquidación Estacionarios",
                 functionName: "pasarPreliquidacion()",
             });
-        }
+        //}
 
           form.clientScriptModulePath = "./drt_ptg_reg_serv_est_cs.js";       
 
