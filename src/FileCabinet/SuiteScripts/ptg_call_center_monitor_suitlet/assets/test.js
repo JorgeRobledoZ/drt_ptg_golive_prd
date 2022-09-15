@@ -19,7 +19,7 @@ $(function() {
                 if(response.data.length > 0) {
                     response.data = removeDuplicates(response.data, 'idAux');
                     response.data.forEach(element => {
-                        element.text = element.nombre + " - " + getDireccionFormat(element, "cliente") + " - " + element.telefono;
+                        element.text = element.nombre + " - " + getDireccionFormat(element, "cliente") + " - " + element.telefono.concat(element.tipoServicioNom ? " - "+element.tipoServicioNom : "");
                     });
                 }
                 return {                     
@@ -491,6 +491,7 @@ function setDir(direccion, requiereFactura = false) {
     direccion.zip             ? str+= ', C.P. '+direccion.zip : '';
     direccion.stateName       ? str+= ', '+direccion.stateName : '';
     direccion.city            ? str+= ', '+direccion.city : '';
+    direccion.tipoServicioAbbr ? str+= ' - '+direccion.tipoServicioAbbr : '';
     console.log(requiereFactura);
     if(requiereFactura) {
         direccion.defaultBilling  ? str+= ', Facturación' : '';

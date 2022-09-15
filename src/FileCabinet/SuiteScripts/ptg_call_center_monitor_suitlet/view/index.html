@@ -1677,7 +1677,24 @@
                     <h5 class="modal-title" id="titleTelefonosAdicionalesModal">Agregar teléfono adicional</h5>
                 </div>
                 <div class="modal-body">
-                    <input id="telefonoAdicionalForm" title="Teléfono adicional" placeholder="5559636669" type="number" class="form-ptg form-ptg-primary validate required format phone">
+                    <div class="row pb-2">
+                        <div class="col-12">
+                            <div class="content-input content-input-primary">
+                                <label>Tipo de teléfono*</label>
+                                <select id="tipoTelefonoAdicionalForm" title="Tipo de teléfono" class="form-ptg form-ptg-primary validate required">
+                                    <option value="Casa">Casa</option>
+                                    <option value="Oficina">Oficina</option>
+                                    <option value="Celular">Celular</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <div class="content-input content-input-primary">
+                                <label>Teléfono adicional*</label>
+                                <input id="telefonoAdicionalForm" title="Teléfono adicional" placeholder="5559636669" type="number" class="form-ptg form-ptg-primary validate required format phone">
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
@@ -2591,6 +2608,10 @@
                     <div class="col-auto p-0">
                         <div class="tab" data-tab="historico-consumos">Histórico de consumos</div>
                     </div>
+
+                    <div class="col-auto p-0">
+                        <div class="tab" data-tab="grafica-consumos">Gráfica de consumos</div>
+                    </div>
                 </div>
                 <div id="tab-pedidos" class="p-2 tabs-content">
                     <div class="row align-items-center header-edit d-none">
@@ -3031,6 +3052,10 @@
                         </div>
                     </div>
                 </div>
+                <div id="tab-grafica-consumos" class="p-2 d-none tabs-content">
+                    <canvas id="myChart"></canvas>
+                    <div class="myChart"></div>
+                </div>
             </div>
             <div class="content-rma-list d-none">
                 <table class="table-gen table-gen-blue">
@@ -3175,8 +3200,8 @@
                                         </div>
                                         <div class="col-6 dato-regimen-moral d-none">
                                             <div class="content-input">
-                                                <label>Nombre razón social*</label>
-                                                <input id="nombreRazonSocialFormCliente" title="Nombre razón social" placeholder="Razón social" type="text" class="form-ptg only-mayus validate required">
+                                                <label>Nombre*</label>
+                                                <input id="nombreRazonSocialFormCliente" title="Nombre" placeholder="Razón social" type="text" class="form-ptg only-mayus validate required">
                                             </div>
                                         </div>
                                         <div class="col-3 dato-regimen-fisico d-none">
@@ -3387,6 +3412,9 @@
     <!-- FancyTable -->
     <script src="https://cdn.jsdelivr.net/npm/jquery.fancytable/dist/fancyTable.min.js"></script>
 
+    <!-- charts js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <!-- Funciones generales -->
     <script type="text/javascript">
         userId = '${ds.userId}';
@@ -3548,19 +3576,24 @@
             $("#formTelefonosAdicionalesModal").modal('show')
         });
 
+        /**
+         * Almacena el teléfono adicional en la tabla de teléfonos, concatenando el valor del tipo de teléfono con el número.
+         * Ejemplo: 33786892 - casa|3223876321 - oficina
+        */ 
         $('body').delegate('#guardarTelefonoAdicional', 'click', function () {
             if(validateForm($("#formTelefonosAdicionalesModal"))) {
                 return;
             }
-            let telAdic = $("#telefonosAdicionales tbody").children('.telAdic'),
-                valTel = $("#telefonoAdicionalForm").val();
+            let telAdic = $("#telefonosAdicionales tbody").children('.telAdic');
+            let valTel  = $("#telefonoAdicionalForm").val();
+            let tipoTel = $("#tipoTelefonoAdicionalForm").val();
 
-            if(telAdic.length == 0) {
+            if( telAdic.length == 0 ) {
                 $("#telefonosAdicionales tbody").children('tr').remove();
             } else {
-                for (let x = 0; x < telAdic.length; x++) {
+                for ( let x = 0; x < telAdic.length; x++ ) {
                     const element = $(telAdic[x]);
-                    if(element.find('td').first().html().trim() == valTel) {
+                    if( element.find('td').first().html().trim() == valTel ) {
                         infoMsg('warning', 'Teléfono adicional ya existe');
                         return;
                     }
@@ -3568,13 +3601,11 @@
             }
 
             $("#telefonosAdicionales tbody").append('<tr class="telAdic">'+
-                                                        '<td class="fw-bold">'+
-                                                            valTel+
-                                                        '</td>'+
-                                                        '<td width="50" class="ion-text-center fw-bold">'+
-                                                            '<i class="fa-solid fa-trash-can" style="cursor: pointer;" onclick="deleteTelAdic(this)"></i>'  +
-                                                        '</td>'+
-                                                    '</tr>');
+                '<td class="fw-bold">'+(valTel+' - '+tipoTel)+'</td>'+
+                '<td width="50" class="ion-text-center fw-bold">'+
+                    '<i class="fa-solid fa-trash-can" style="cursor: pointer;" onclick="deleteTelAdic(this)"></i>'  +
+                '</td>'+
+            '</tr>');
             $("#formTelefonosAdicionalesModal").modal('hide')
         });
 
@@ -3914,7 +3945,7 @@
                             auxFormat += '<li>'+element.attr("title")+'</li>';
                         }
                         
-                        if(element.hasClass('phone') && (element.val().trim().length < 7 || !telNumRegex.test(element.val().trim()))) {
+                        if(element.hasClass('phone') && (element.val().trim().length < 10 || !telNumRegex.test(element.val().trim()))) {
                             element.addClass('invalid');
                             element.closest(".content-input").addClass('invalid');
                             hasError = true;
