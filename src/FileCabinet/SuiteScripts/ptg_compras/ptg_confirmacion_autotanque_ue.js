@@ -30,6 +30,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                 let form_intercompany_invoice = 0;
                 let subcidiary_intercompany_invoice = 0;
                 let ubicacion_intercompany_invoice = 0;
+                let form_sales_order = 0;
 
                 var objMap=drt_mapid_cm.drt_compras();
                 if (Object.keys(objMap).length>0) {
@@ -44,6 +45,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                     form_intercompany_invoice = objMap.form_intercompany_invoice;
                     subcidiary_intercompany_invoice = objMap.subcidiary_intercompany_invoice;
                     ubicacion_intercompany_invoice = objMap.ubicacion_intercompany_invoice;
+                    form_sales_order = objMap.form_sales_order;
                 }
 
                 var precioTarifa = currentRecord.getValue({
@@ -306,66 +308,93 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
 
                     if (arrayPo[po]['cliente_desvio']) {
                         try {
-                            let createInvoice = record.create({
-                                type: record.Type.INVOICE,
+                            let createSalesOrder = record.create({
+                                type: record.Type.SALES_ORDER,
                                 isDynamic: true
                             });
 
-                            createInvoice.setValue({
+                            createSalesOrder.setValue({
                                 fieldId: 'customform',
-                                value: form_desvio_cliente_invoice
+                                value: form_sales_order
                             });
 
-                            createInvoice.setValue({
+                            createSalesOrder.setValue({
                                 fieldId: 'entity',
                                 value: arrayPo[po]['cliente_desvio']
                             });
 
-                            createInvoice.setValue({
+                            createSalesOrder.setValue({
                                 fieldId: 'subsidiary',
                                 value: arrayPo[po]['subsidiaria']
                             });
 
-                            createInvoice.setValue({
+                            createSalesOrder.setValue({
                                 fieldId: 'location',
                                 value: arrayPo[po]['location']
                             });
 
-                            createInvoice.selectNewLine({
+                            createSalesOrder.selectNewLine({
                                 sublistId: "item",
                             });
 
-                            createInvoice.setCurrentSublistValue({
+                            createSalesOrder.setCurrentSublistValue({
                                 sublistId: "item",
                                 fieldId: "item",
                                 value: arrayPo[po]['item']
                             });
 
-                            createInvoice.setCurrentSublistValue({
+                            createSalesOrder.setCurrentSublistValue({
                                 sublistId: "item",
                                 fieldId: "quantity",
                                 value: arrayPo[po]['cantidad']
                             });
 
-                            createInvoice.setCurrentSublistValue({
+                            createSalesOrder.setCurrentSublistValue({
                                 sublistId: "item",
                                 fieldId: "rate",
                                 value: arrayPo[po]['tarifa_kilogramo'] + arrayPo[po]['sobre_precio_cliente']
                             });
 
-                            createInvoice.setCurrentSublistValue({
+                            createSalesOrder.setCurrentSublistValue({
                                 sublistId: "item",
                                 fieldId: "location",
                                 value: arrayPo[po]['location']
                             });
 
-                            let idArticle = createInvoice.commitLine({
+                            let idArticle = createSalesOrder.commitLine({
                                 sublistId: "item",
                             });
 
-                            saveinvoice = createInvoice.save();
+                            saveinvoice = createSalesOrder.save();
 
                             log.audit('saveinvoice', saveinvoice);
+
+                            if(saveinvoice){
+                                let itemFulFill = record.transform({
+                                    fromType: record.Type.SALES_ORDER,
+                                    fromId: saveinvoice,
+                                    toType: record.Type.ITEM_FULFILLMENT,
+                                    isDynamic: true,
+                                });
+
+                                let saveItemFull = itemFulFill.save();
+                                log.audit('saveItemFull', saveItemFull);
+
+                                let invoice = record.transform({
+                                    fromType: record.Type.SALES_ORDER,
+                                    fromId: saveinvoice,
+                                    toType: record.Type.INVOICE,
+                                    isDynamic: true,
+                                });
+
+                                invoice.setValue({
+                                    fieldId: 'customform',
+                                    value: form_desvio_cliente_invoice
+                                });
+
+                                let saveInvoice = invoice.save();
+                                log.audit('saveInvoice', saveInvoice);
+                            }
                         } catch (error_cliente_desvio) {
                             log.audit('error_cliente_desvio', error_cliente_desvio);
                         }
@@ -855,10 +884,10 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
 
                                 log.audit('subisidiarias', subsidiaryLookup2 + "  " + subsidiaryLookup);
 
-                                //Creacion de factura de venta
+                                //Creacion de orden de venta
 
                                 let invoiceInter = record.create({
-                                    type: record.Type.INVOICE,
+                                    type: record.Type.SALES_ORDER,
                                     isDynamic: true
                                 });
 
@@ -867,7 +896,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
 
                                 invoiceInter.setValue({
                                     fieldId: 'customform',
-                                    value: form_intercompany_invoice
+                                    value: form_sales_order
                                 });
 
                                 invoiceInter.setValue({
@@ -935,8 +964,35 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
 
                                 saveinvoice = invoiceInter.save();
                                 log.audit('saveinvoice', saveinvoice)
-                                //creacion de factura de provedor intercompañia
 
+                                if(saveinvoice){
+                                    let itemFulFillInter = record.transform({
+                                        fromType: record.Type.SALES_ORDER,
+                                        fromId: saveinvoice,
+                                        toType: record.Type.ITEM_FULFILLMENT,
+                                        isDynamic: true,
+                                    });
+    
+                                    let saveItemFullInter = itemFulFillInter.save();
+                                    log.audit('saveItemFullInter', saveItemFullInter);
+    
+                                    let invoiceInter = record.transform({
+                                        fromType: record.Type.SALES_ORDER,
+                                        fromId: saveinvoice,
+                                        toType: record.Type.INVOICE,
+                                        isDynamic: true,
+                                    });
+    
+                                    invoiceInter.setValue({
+                                        fieldId: 'customform',
+                                        value: form_desvio_cliente_invoice
+                                    });
+    
+                                    let saveInvoiceInter = invoiceInter.save();
+                                    log.audit('saveInvoice', saveInvoiceInter);
+                                }
+                                //creacion de factura de provedor intercompañia
+                                /*
                                 if (saveinvoice) {
                                     try {
                                         let billInter = record.create({
@@ -963,12 +1019,11 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                                             fieldId: 'tranid',
                                             value: 'FACR24698'
                                         });
-                                        /*
+
                                         billInter.setValue({
                                             fieldId: 'approvalstatus',
                                             value: 2
                                         });
-                                        */
 
                                         billInter.setValue({
                                             fieldId: 'memo',
@@ -1038,6 +1093,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                                         log.audit('error_factura_proveedor_interco', error_factura_proveedor_interco)
                                     }
                                 }
+                            */
                             }
 
                         }
