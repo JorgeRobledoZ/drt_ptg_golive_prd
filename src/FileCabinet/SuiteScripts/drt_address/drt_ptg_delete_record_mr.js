@@ -29,13 +29,29 @@ define([
             }
         }
 
+        const map = (mapContext) => {
+            // log.debug(`map`, mapContext);
+            const objRecord = JSON.parse(mapContext.value);
+            if (
+                !!objRecord.id &&
+                !!objRecord.recordType
+            ) {
+                mapContext.write({
+                    key: drt_ptg_delete_record_cm.keyRecordType(objRecord.recordType,""),
+                    value: objRecord
+                });
+            }
+        }
+
         const reduce = (reduceContext) => {
-            const respuesta = {
-                success: true,
-                data: {}
+            const objWrite = {
+                key: "",
+                value: [],
             };
+            const arrayError = [];
+            const arraySinConfirmar = [];
             try {
-                log.debug(`reduce`, reduceContext);
+                log.debug(`reduce key ${drt_ptg_delete_record_cm.keyRecordType("",reduceContext.key)}`, reduceContext);
                 reduceContext.values.forEach(objRecord => {
                     objRecord = JSON.parse(objRecord);
                     if (
@@ -43,49 +59,59 @@ define([
                         !!objRecord.recordType
                     ) {
                         try {
-
                             const idDelete = record.delete({
                                 id: objRecord.id,
                                 type: objRecord.recordType,
                             });
-                            log.debug("idDelete", `idDelete: ${idDelete} id: ${objRecord.id} recordType: ${objRecord.recordType} = ${parseInt(objRecord.id) == parseInt(objRecord.idDelete)}`);
+                            log.debug("idDelete", `idDelete: ${idDelete} id: ${objRecord.id} recordType: ${objRecord.recordType} = ${parseInt(objRecord.id) == parseInt(idDelete)}`);
                             if (
                                 !!idDelete
                             ) {
-                                reduceContext.write({
-                                    key: objRecord.recordType,
-                                    value: objRecord.id,
-                                });
+                                objWrite.value.push(`idDelete: ${idDelete} id: ${objRecord.id} recordType: ${objRecord.recordType} = ${parseInt(objRecord.id) == parseInt(idDelete)}`);
                             } else {
-                                reduceContext.write({
-                                    key: "sin_id_confirmacion",
-                                    value: `${objRecord.recordType} ${objRecord.id}`,
-                                });
+                                arraySinConfirmar.push(`${objRecord.recordType} ${objRecord.id}`);
                             }
                         } catch (edelete) {
-                            log.error(`edelete`, edelete);
-                            reduceContext.write({
-                                key: "Error",
-                                value: `${objRecord.recordType} ${objRecord.id} : ${edelete.message}`,
-                            });
+                            log.error(`Errpr Eliminacion ${objRecord.recordType} ${objRecord.id} `, edelete);
+                            arrayError.push(`${objRecord.recordType} ${objRecord.id} : ${edelete.message}`)
                         }
                     }
                 });
             } catch (error) {
                 log.error(`error reduce`, error);
+            } finally {
+                objWrite.key=`${drt_ptg_delete_record_cm.keyRecordType("",reduceContext.key)} ${objWrite.value.length}`;
+                reduceContext.write(objWrite);
+                if (
+                    arraySinConfirmar.length > 0
+                ) {
+                    reduceContext.write({
+                        key: `sin_confirmar ${arraySinConfirmar.length}`,
+                        value: arraySinConfirmar,
+                    });
+                }
+                if (
+                    arrayError.length > 0
+                ) {
+                    reduceContext.write({
+                        key: `error ${arrayError.length}`,
+                        value: arrayError,
+                    });
+                }
             }
         }
 
         const summarize = (summaryContext) => {
-            log.debug(`summarize`, summaryContext);
             summaryContext.output.iterator().each(function (key, value) {
-                log.debug(`key ${key}`, value);
+                log.debug(`Resultado ${key}`, value);
                 return true;
             });
+            log.debug(`summarize`, summaryContext);
         }
 
         return {
             getInputData,
+            map,
             reduce,
             summarize
         }
