@@ -193,7 +193,8 @@ define([
             const respuesta = [];
             try {
 
-                log.debug(`arraySearchRecord ${param_type}`, `param_filters ${JSON.stringify(param_filters)} param_columns ${JSON.stringify(param_columns)}`);
+                log.debug(`arraySearchRecord ${param_type}`, param_filters);
+                log.debug(`arraySearchRecord ${param_type}`, param_columns);
                 const objSearch = search.create({
                     type: param_type,
                     filters: param_filters,
@@ -218,7 +219,8 @@ define([
             } catch (error) {
                 log.error(`error arraySearchRecord`, error);
             } finally {
-                log.debug(`respuesta arraySearchRecord ${param_type} ${respuesta.length}`, respuesta);
+                log.debug(`arraySearchRecord ${param_type}`, respuesta.length);
+                log.debug(`arraySearchRecord ${param_type}`, respuesta);
                 return respuesta;
             }
         }
