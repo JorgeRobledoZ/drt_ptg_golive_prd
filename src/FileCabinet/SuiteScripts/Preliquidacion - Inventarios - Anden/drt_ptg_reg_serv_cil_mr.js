@@ -65,7 +65,7 @@
         } finally {
             
             var registroCilindros = record.submitFields({
-                type: "customrecord_ptg_registro_servicios_cili",
+                type: "customrecord_ptg_preliquicilndros_",
                 id: idRegistro,
                 values: valoresProceso
             });
@@ -501,7 +501,7 @@
                 }
             }
             
-            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 1;
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 2;
 
             context.write({
                 key: recOportunidadIdSaved,
