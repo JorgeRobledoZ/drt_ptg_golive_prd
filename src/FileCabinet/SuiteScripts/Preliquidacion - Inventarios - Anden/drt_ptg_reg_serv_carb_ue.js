@@ -25,19 +25,19 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         if (type_event == "view") {
           var status = newRecord.getValue("custrecord_ptg_etapa_reg_serv_carb");
           log.debug("status", status);
-          var estatusEtapa = 0;
-          var objMap=drt_mapid_cm.drt_liquidacion();
-          if (Object.keys(objMap).length>0) {
-            estatusEtapa = objMap.estatusEtapa;
-          }
+          //var estatusEtapa = 0;
+          // var objMap=drt_mapid_cm.drt_liquidacion();
+          // if (Object.keys(objMap).length>0) {
+          //   estatusEtapa = objMap.estatusEtapa;
+          // }
           
-          if (status == estatusEtapa) {
+          // if (status == estatusEtapa) {
               form.addButton({
                   id: "custpage_drt_to_preliq_carb",
                   label: "Preliquidación Carburacion",
                   functionName: "pasarPreliquidacion()",
               });
-          }      
+         // }      
 
         } else if(type_event == "create" || type_event == "edit"){
           form.addButton({
