@@ -19,7 +19,12 @@ $(function() {
                 if(response.data.length > 0) {
                     response.data = removeDuplicates(response.data, 'idAux');
                     response.data.forEach(element => {
-                        element.text = element.nombre + " - " + getDireccionFormat(element, "cliente") + " - " + element.telefono.concat(element.tipoServicioNom ? " - "+element.tipoServicioNom : "");
+                        let tipoServicio = element.tipoServicioNom ? " - "+element.tipoServicioNom : "";
+                        let telefono     = element.telefono;
+                        let text         = element.nombre + " - " + getDireccionFormat(element, "cliente");
+                        if ( telefono ) { text += " - "+telefono; }
+                        if ( tipoServicio ) { text += tipoServicio; }
+                        element.text = text;
                     });
                 }
                 return {                     

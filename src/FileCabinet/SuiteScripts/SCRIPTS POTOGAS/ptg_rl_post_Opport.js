@@ -15,6 +15,26 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/log', 'SuiteScripts/SC
         apiErrorPost: []
     }
 
+    // Configura el json del método de pago
+    const setMetodoPago = (tipoPago, monto) => {
+        const arrPagos = [
+            {
+                "metodo_txt":tipoPago == 1 ? 'Efectivo' : 'Crédito',
+                "tipo_pago":tipoPago,
+                "tipo_cuenta":null,
+                "tipo_tarjeta":null,
+                "monto":monto,
+                "folio":"",
+            }
+        ];
+
+        const objPago = {
+            "pago":arrPagos
+        };
+
+        return JSON.stringify(objPago);
+    }
+
 
 
     // funcion que crea oportunidades  
@@ -461,6 +481,11 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/log', 'SuiteScripts/SC
                       });
                 }
                 */
+                let preTotal = opportunityRecord.getValue({fieldId:'total'});
+                log.debug('preTotal', preTotal);
+                if ( preTotal ) {
+                    opportunityRecord.setText({fieldId:'custbody_ptg_opcion_pago_obj', text: setMetodoPago(1, preTotal)});
+                }
 
                 let idOpportSave = opportunityRecord.save();
                 log.audit('idOpportSave', idOpportSave);
