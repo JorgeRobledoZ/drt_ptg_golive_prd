@@ -14,7 +14,7 @@
  */
 define([
   "SuiteScripts/drt_custom_module/drt_mapid_cm",
-  /*'SuiteScripts/drt_custom_module/drt_ptg_library',*/ 
+  //'SuiteScripts/drt_custom_module/drt_ptg_library',
   "N/record",
   "N/search",
   "N/error",
@@ -22,7 +22,7 @@ define([
   "N/ui/dialog",
 ], function (
   drt_mapid_cm,
-  /*library,*/ 
+  //library,
   record,
   search,
   error,
