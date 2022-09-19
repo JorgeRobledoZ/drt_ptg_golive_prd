@@ -329,6 +329,7 @@
                     type: search.Type.INVENTORY_ITEM,
                     id: cilindro,
                 });
+                log.audit("idRegistroMovimientos", idRegistroMovimientos);
                 log.debug("lookupItem", itemObjDM);
                 var litrosCapacidad = itemObjDM.getValue("custitem_ptg_capacidadcilindro_");
                 log.debug("litrosCapacidad", litrosCapacidad);
@@ -339,7 +340,25 @@
                 var ptgLTS = ventaGasInt * litrosCapacidadInt;
                 log.debug("ptgLTS", ptgLTS);
 
-                var objUpdateRegistroMovimiento = {
+                var recObj = record.copy({
+                    type: "customrecord_ptg_regitrodemovs_",
+                    id: idRegistroMovimientos,
+                    isDynamic: true,
+                });
+                recObj.setValue("name", idRegistroMovimientos);
+                recObj.setValue("custrecord_drt_ptg_reg_transaccion", null);
+                recObj.setValue("custrecord_ptg_origen", false);
+                recObj.setValue("custrecord_ptg_lts_", ptgLTS);
+                recObj.setValue("custrecord_ptg_rutavehiculo_", recId);
+
+                var recordId = recObj.save();
+
+                
+                   
+
+
+
+              /*  var objUpdateRegistroMovimiento = {
                     custrecord_ptg_lts_: ptgLTS,
                     custrecord_ptg_rutavehiculo_: recId,
                 };
@@ -347,8 +366,8 @@
                     id: idRegistroMovimientos,
                     type: "customrecord_ptg_regitrodemovs_",
                     values: objUpdateRegistroMovimiento,
-                });
-                log.emergency("idRegMov", idRegMov);
+                });*/
+                log.emergency("recordId", recordId);
             }
             log.audit('Remaining Usage end for detalle de movimientos', runtime.getCurrentScript().getRemainingUsage());
 
