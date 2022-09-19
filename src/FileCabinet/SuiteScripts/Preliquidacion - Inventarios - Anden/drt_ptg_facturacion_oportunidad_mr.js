@@ -22,6 +22,7 @@
                 name: 'custscript_drt_oportunidad_a_factura'
             }) || '';
             log.audit("id_search 1", id_search);
+            var valoresProceso = {};
              
              var arrayColumns = [
                  search.createColumn({ name: "custrecord_ptg_id_oportunidad_fact", label: "PTG - Id Oportunidad a Facturar" }),
@@ -31,20 +32,32 @@
             var arrayFilters = [
                 ["custrecord_ptg_preliq_cilindros","anyof",id_search],"AND", 
                 ["isinactive","is","F"]
-             ];
+            ];
             
-                respuesta = search.create({
-                    type: 'customrecord_ptg_oportunidad_facturar',
-                    columns: arrayColumns,
-                    filters: arrayFilters
-                });
+            respuesta = search.create({
+                type: 'customrecord_ptg_oportunidad_facturar',
+                columns: arrayColumns,
+                filters: arrayFilters
+            });
+
+            valoresProceso.custrecord_ptg_plc_etapa = 1;
+
 
         } catch (error) {
+            valoresProceso.custrecord_ptg_plc_etapa = 3;
             log.audit({
                 title: 'error getInputData',
                 details: JSON.stringify(error)
             });
         } finally {
+
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_preliquicilndros_",
+                id: idRegistro,
+                values: valoresProceso
+            });
+            log.debug("registroCilindros", registroCilindros);
+
             log.audit({
                 title: 'respuesta getInputData Finally',
                 details: JSON.stringify(respuesta)
@@ -69,6 +82,8 @@
 
             var idOportunidad = objValue2.value;
             log.audit("idOportunidadM", idOportunidad);
+
+            var valoresProceso = {};
 
             var objUpdate = {
                 custrecord_ptg_terminado_cilindros: false,
@@ -509,15 +524,23 @@
                 key: recObjID,
                 value: recObjID
             });
+
+            objUpdate.custrecord_ptg_plc_etapa = 1;
                
         } catch (error) {
+            objUpdate.custrecord_ptg_plc_etapa = 3;
             log.error({
                 title: 'error map',
                 details: JSON.stringify(error)
             });
             objUpdate.custrecord_ptg_error_cilindro = error.message || '';
         } finally {
-        submitField("customrecord_ptg_preliquicilndros_", objValue3, objUpdate);
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_preliquicilndros_",
+                id: objValue3,
+                values: objUpdate
+            });
+            log.debug("registroCilindros", registroCilindros);
     }
     }
 
@@ -765,6 +788,7 @@
         }
 
             objUpdate.custrecord_ptg_terminado_cilindros = true;
+            objUpdate.custrecord_ptg_plc_etapa = 2;
             
 			
         } catch (error) {
@@ -773,8 +797,14 @@
                 details: JSON.stringify(error)
             });
             objUpdate.custrecord_ptg_error_cilindro = error.message || '';
+            objUpdate.custrecord_ptg_plc_etapa = 3;
         } finally {
-            submitField("customrecord_ptg_preliquicilndros_", id_search, objUpdate);
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_preliquicilndros_",
+                id: id_search,
+                values: objUpdate
+            });
+            log.debug("registroCilindros", registroCilindros);
         }
     }
 
