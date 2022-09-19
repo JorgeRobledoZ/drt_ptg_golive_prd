@@ -1195,6 +1195,14 @@
                         </div>
                     </div>
                     <div class="row pb-2">
+                        <div class="col-12">
+                            <div class="content-input content-input-primary">
+                                <label>Tipo de dirección*</label>
+                                <select id="tipoDireccion" title="Tipo de dirección" class="form-ptg form-ptg-primary validate required">
+                                    <option value="">Seleccione una opción</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-6">
                             <div class="content-input content-input-primary">
                                 <label>Estado*</label>
@@ -3504,8 +3512,12 @@
         isAdmin = (rolesAdmins.indexOf(userRole.trim().toLowerCase()) > -1);
         origenPedidoDefault = "4";
         loadColonias = true;
+        // Roles de usuario
         idAgenteHEB = cusVars.roleAgenteHEB;
         idSupervisor = cusVars.roleSupervisor;
+        tipoDirSoloEntrega = cusVars.tipoDirSoloEntrega;
+        tipoDirSoloFacturacion = cusVars.tipoDirSoloFacturacion;
+        tipoDirEntFact = cusVars.tipoDirEntFact;
         idCilindro = 1;
         idEstacionario = 2;
         idMontacarga = 3;
@@ -3716,6 +3728,11 @@
             // $('body').delegate('.dropdown-toggle', 'hidden.bs.dropdown', function () {
             //     $(this).closest("td").css("z-index", "1");
             // });
+
+            // Alimenta el select de tipo de dirección
+            $('select#tipoDireccion').append('<option value="'+tipoDirSoloEntrega+'">Sólo entrega</option>');
+            $('select#tipoDireccion').append('<option value="'+tipoDirSoloFacturacion+'">Sólo facturación</option>');
+            $('select#tipoDireccion').append('<option value="'+tipoDirEntFact+'">Entrega y facturación</option>');
 
             let today = moment().endOf('day');
             $('#fechaPrometidaPedido').val(today.format('YYYY-MM-DD').toString());

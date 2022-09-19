@@ -4,16 +4,17 @@ $("#agregarDirecciones, #agregarDireccion").click( function() {
     let id = $(this).attr('id');
     $('.dias-semana').prop('checked', true);
 
-    if ( id == 'agregarDirecciones' ) {
+    if ( id == 'agregarDirecciones' ) {// Nueva dirección de cliente nuevo
         $("#tipoAccionDireccion").val('lista');
         $("input[name=tipoAccionFormCliente][value=1]").prop("checked", true).trigger("change");
         $("#tipoServicioFormCliente").val(idCilindro);
         //$($(".dato-facturacion").addClass("d-none"));
         $("#tipoServicioFormCliente").trigger("change");
-    } else if ( id == 'agregarDireccion' ) {
+    } else if ( id == 'agregarDireccion' ) {// Nueva dirección de cliente existente
         $("#estadoDireccion").val("").trigger("change");
         $("#frecuenciaFormCliente").trigger("change")
         $("input[name=tipoAccionFormCliente][value=1]").prop("checked", true).trigger("change");
+        // En esta función, se colocará la lógica de mostrar campos obligatorios de la facturación
         if(customerGlobal.requiereFactura) {
             $($(".dato-facturacion").removeClass("d-none"));
         } else {
@@ -26,6 +27,19 @@ $("#agregarDirecciones, #agregarDireccion").click( function() {
         }
         $("#tipoAccionDireccion").val('guardar');
     }
+
+    // Valida si es válido agregar una dirección en caso de que no esté listo el servicio de colonias
+    if(loadColonias) {
+        infoMsg('warning', 'Aun están cargando los datos para direcciones, favor de esperar un momento');
+    } else {
+        if($("#estadoDireccion option").length == 2) {
+            $("#estadoDireccion").prop("disabled", true);
+            $("#estadoDireccion").val($($("#estadoDireccion option")[1]).val()).trigger("change");
+        } else {
+            $("#estadoDireccion").prop("disabled", false);
+        }    
+        $("#formDireccionesModal").modal("show");
+    }   
 });
 
 // Si el cliente requiere factura, se mostrarán esos campos en el form de cliente

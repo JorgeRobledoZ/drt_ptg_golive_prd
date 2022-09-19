@@ -41,6 +41,8 @@ define(
                         ptgTipoServicioEst     : 2,// Estacionario
                         ptgTipoServicioMon     : 3,// Montacargas
                         ptgTipoServicioCar     : 4,// Carburación
+                        roleSupervisor         : 1202,// Rol supervisor
+                        roleAgenteHEB          : 1195,// Rol agente HEB
                         urlSgcWeb              : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php",
                         urlSgcWebLogin         : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login",
                         urlSgcWebProcesar      : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
@@ -135,6 +137,8 @@ define(
                         ptgTipoServicioEst     : 2,// Estacionario
                         ptgTipoServicioMon     : 3,// Montacargas
                         ptgTipoServicioCar     : 4,// Carburación
+                        roleSupervisor         : 1167,// Rol supervisor
+                        roleAgenteHEB          : 1213,// Rol agente HEB
                         urlSgcWeb              : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php",
                         urlSgcWebLogin         : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login",
                         urlSgcWebProcesar      : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",

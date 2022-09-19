@@ -137,11 +137,9 @@ $('span#role').text(userRole);
 
 // Si el rol es distinto a administrador HEB, se eliminan los campos
 if ( userRoleId != idAgenteHEB ) {
-    console.log(userRole);
     $('.campos-contrato').addClass('d-none');
     // $('.campos-contrato').remove();
 } else {
-    console.log(userRole);
     $('.campos-contrato').removeClass('d-none');
 }
 

@@ -1,21 +1,21 @@
 // lugares.js
 // Abre el modal de direcciones
-$("#agregarDirecciones, #agregarDireccion").click(function() {
-    //loadMsg();
-    if(loadColonias) {
-        infoMsg('warning', 'Aun están cargando los datos para direcciones, favor de esperar un momento');
-    } else {
-        if($("#estadoDireccion option").length == 2) {
-            $("#estadoDireccion").prop("disabled", true);
-            $("#estadoDireccion").val($($("#estadoDireccion option")[1]).val()).trigger("change");
-        } else {
-            $("#estadoDireccion").prop("disabled", false);
-        }    
-        $("#formDireccionesModal").modal("show");
-    }    
-    //swal.close();            
-    //getStates();
-});
+// $("#agregarDirecciones, #agregarDireccion").click(function() {
+//     //loadMsg();
+//     if(loadColonias) {
+//         infoMsg('warning', 'Aun están cargando los datos para direcciones, favor de esperar un momento');
+//     } else {
+//         if($("#estadoDireccion option").length == 2) {
+//             $("#estadoDireccion").prop("disabled", true);
+//             $("#estadoDireccion").val($($("#estadoDireccion option")[1]).val()).trigger("change");
+//         } else {
+//             $("#estadoDireccion").prop("disabled", false);
+//         }    
+//         $("#formDireccionesModal").modal("show");
+//     }    
+//     //swal.close();            
+//     //getStates();
+// });
 
 // Prellena los datos de una dirección en el modal
 $("#editarDireccion").click(function() {
