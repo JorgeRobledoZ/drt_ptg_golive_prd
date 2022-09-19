@@ -45,14 +45,25 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
       var numeroExterior = newRecord.getValue("custrecord_ptg_registro_cliente_num_exte");
       var numeroInterior = newRecord.getValue("custrecord_ptg_registro_cliente_num_inte");
       var codigoPostal = newRecord.getValue("custrecord_ptg_registro_cliente_cod_post");
+      log.audit("coloniaRuta", coloniaRuta);
       log.audit("codigoPostal", codigoPostal);
       var telefonoPrincipal = newRecord.getValue("custrecord_ptg_registro_cliente_telefono");
       
+      var coloniaRutaObj = record.load({
+        type: "customrecord_ptg_coloniasrutas_",
+        id: coloniaRuta
+      });
+      log.audit("coloniaRutaObj", coloniaRutaObj);
+
+      var nombreColonia = coloniaRutaObj.getValue("custrecord_ptg_nombrecolonia_");
+      var municipio = coloniaRutaObj.getValue("custrecord_ptg_rutamunicipio_");
+      var estado = coloniaRutaObj.getValue("custrecord_ptg_estado_");
 
       var locationObj = record.load({
         type: search.Type.LOCATION,
         id: planta
       });
+      log.audit("locationObj", locationObj);
 
       var subsidiaria = locationObj.getValue("subsidiary");
       var parent = locationObj.getValue("parent");
@@ -131,7 +142,23 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
       addressSubrecord.setValue({
         fieldId: "custrecord_ptg_telefono_principal",
         value: telefonoPrincipal
-      });    
+      });
+      addressSubrecord.setValue({
+        fieldId: "custrecord_ptg_nombre_colonia",
+        value: nombreColonia
+      });
+      addressSubrecord.setValue({
+        fieldId: "city",
+        value: estado
+      });
+      addressSubrecord.setValue({
+        fieldId: "custrecord_ptg_estado",
+        value: estado
+      });
+      /*addressSubrecord.setValue({
+        fieldId: "custrecord_ptg_nombre_colonia",
+        value: nombreColonia
+      });*/
       
       recCliente.commitLine({
         sublistId: "addressbook"
@@ -140,6 +167,25 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
       var recClienteSaved = recCliente.save();
 
       log.debug("Registro de cliente creado ", recClienteSaved);
+
+      var customerLoad = record.load({
+        type: record.Type.CUSTOMER,
+        id: recClienteSaved,
+        isDynamic: true
+      });
+
+      var dataId = customerLoad.getValue("entityid");
+
+      if(dataId.length < 10) {
+        var auxCero = "";
+        for (var x = dataId.length; x < 10; x++) {
+          auxCero += "0";
+        }
+
+        customerLoad.setValue("entityid", auxCero+dataId);
+
+        customerLoad.save();
+      }
 
       customerObj.custrecord_ptg_registro_cliente_creado = recClienteSaved;
 
