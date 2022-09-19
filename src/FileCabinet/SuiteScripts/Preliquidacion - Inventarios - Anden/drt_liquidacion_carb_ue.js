@@ -188,12 +188,24 @@
                         label: "Liquidación Estaciones de Carburación",
                         functionName: "redirectTo()",
                     });
+
+                    form.addButton({
+                        id: "custpage_drt_eliminar",
+                        label: "Eliminar Preliquidación",
+                        functionName: "redirectToEliminar()",
+                    });
                 }
                 if (status == estatusLiquidacion && (montoDesgloseEfec != "" || montoDesgloseEfec > 0)) {
                     form.addButton({
                         id: "custpage_drt_to_facturacion",
                         label: "Facturar Estaciones de Carburación",
                         functionName: "facturarOportunidad()",
+                    });
+
+                    form.addButton({
+                        id: "custpage_drt_eliminar",
+                        label: "Eliminar Liquidación",
+                        functionName: "redirectToEliminar()",
                     });
                 }
                 
@@ -334,7 +346,7 @@
                         end: 2,
                     });
                     tipoPago = tipoPagoEfectivoServGasObjResult[0].getValue({name: "custrecord_ptg_tipo_pago", summary: "GROUP", label: "PTG - Tipo de Pago"});
-                    sumaEfectivo = parseFloat(tipoPagoEfectivoServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
+                    sumaEfectivo = Number(tipoPagoEfectivoServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
 
 
@@ -358,7 +370,7 @@
                         end: 2,
                     });
                     tipoPago = tipoPagoCreditoServGasObjResult[0].getValue({name: "custrecord_ptg_tipo_pago", summary: "GROUP", label: "PTG - Tipo de Pago"});
-                    sumaCredito = parseFloat(tipoPagoCreditoServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
+                    sumaCredito = Number(tipoPagoCreditoServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
 
 
@@ -380,10 +392,10 @@
                         start: 0,
                         end: 2,
                     });
-                    sumaOtros = parseFloat(tipoPagoOtrosServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
+                    sumaOtros = Number(tipoPagoOtrosServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
 
-                suma = sumaEfectivo + sumaCredito + sumaOtros;
+                suma = parseFloat(sumaEfectivo) + parseFloat(sumaCredito) + parseFloat(sumaOtros);
 
 
                 //LIQUIDACION: TOTALES CABECERA
@@ -488,7 +500,7 @@
                     sumaOtrosTS = parseFloat(tipoPagoOtrosServObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
 
-                sumaTS = sumaEfectivoTS + sumaCreditoTS + sumaOtrosTS;
+                sumaTS = parseFloat(sumaEfectivoTS) + parseFloat(sumaCreditoTS) + parseFloat(sumaOtrosTS);
                     
 
 

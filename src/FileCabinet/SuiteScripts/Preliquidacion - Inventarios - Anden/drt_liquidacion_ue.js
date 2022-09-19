@@ -43,6 +43,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             var status = recObj.getValue("custrecord_ptg_liquidacion_status");
             var conteoExceso = parseInt(recObj.getValue("custrecord_ptg_conteo_exceso"));
             var conteoRestriccion = parseInt(recObj.getValue("custrecord_ptg_conteo_restriccion"));
+            log.audit("conteoRestriccion", conteoRestriccion);
             var prepagosSinAplicar = parseInt(recObj.getValue("custrecord_ptg_prepago_sin_aplicar_cil"));
             var montoDesgloseEfec = recObj.getValue("custrecord_ptg_monto_totalizador");
 
@@ -200,7 +201,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             
             if (type_event == "view") {
                 log.debug("status", status);
-                if(conteoRestriccion == 0 || conteoRestriccion == ""){
+                if(conteoRestriccion == 0 || conteoRestriccion == "" || conteoRestriccion == null){
                 if (status == estatusPreliquidacion && prepagosSinAplicar == 0) {
                     form.title = "Preliquidación";
                 } else if (status == estatusPreliquidacion && prepagosSinAplicar > 0) {
@@ -227,11 +228,21 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                         label: "Liquidación",
                         functionName: "redirectTo()",
                     });
+                    form.addButton({
+                        id: "custpage_drt_eliminar",
+                        label: "Eliminar Preliquidación",
+                        functionName: "redirectToEliminar()",
+                    });
                 } else if (status == estatusLiquidacion && (montoDesgloseEfec != "" || montoDesgloseEfec > 0)) {
                     form.addButton({
                         id: "custpage_drt_to_nuevo_viaje",
                         label: "Nuevo Viaje y Facturar",
                         functionName: "redirectToNuevoViajeYFacturacion()",
+                    });
+                    form.addButton({
+                        id: "custpage_drt_eliminar",
+                        label: "Eliminar Preliquidación",
+                        functionName: "redirectToEliminar()",
                     });
                 } else if (status == estatusFacturacion) {
                     form.addButton({
