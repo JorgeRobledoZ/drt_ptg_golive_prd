@@ -765,6 +765,62 @@
 
 };
 
+function redirectToNuevoViaje() {
+  try {
+    log.audit("redirectToNuevoViaje cs");
+
+    var urlCustomRecord = '';
+    var urlCustomRecordFormulario = '';
+    var formularioCilindro = 0;
+
+    var objMap=drt_mapid_cm.drt_liquidacion();
+    if (Object.keys(objMap).length>0) {
+      formularioEstacionario = objMap.formularioEstacionario;
+      urlCustomRecord = objMap.urlCustomRecord;
+      urlCustomRecordFormulario = objMap.urlCustomRecordFormulario;
+    }
+
+      
+      recObj = currentRecord.get();
+      console.log("recObj", recObj);
+      log.debug("recObj", recObj);
+
+      var recordObj = record.load({
+        type: recObj.type,
+        id: recObj.id,
+      });
+      var numeViaje = recordObj.getValue("custrecord_ptg_nodeviaje_preliq_est_");
+      log.audit("numeViaje", numeViaje);
+
+      var vehiculo = recordObj.getValue("custrecord_ptg_vehiculo_preliqest_");
+      log.debug("vehiculo nf", vehiculo);
+
+      
+/*
+      var viajesObj = record.load({
+        type: "customrecord_ptg_tabladeviaje_enc2_",
+        id: numeViaje,
+      });
+      
+      var vehiculo = viajesObj.getValue("custrecord_ptg_vehiculo_tabladeviajes_");
+      log.debug("vehiculo nf", vehiculo);*/
+
+      var objUrl = {
+        vehiculo: vehiculo,
+      }
+      log.debug("objUrl", objUrl);
+
+      var urlRedirect = urlCustomRecord+vehiculo+urlCustomRecordFormulario+formularioEstacionario;
+
+      window.open(urlRedirect, '_blank');
+
+
+  } catch (e) {
+      log.error("Error", "[ redirectToNuevoViaje ] " + e);
+  }
+
+};
+
 
   function resultadoFactura(){
     try {
@@ -860,5 +916,6 @@
         redirectToNuevoViajeYFacturacion: redirectToNuevoViajeYFacturacion,
         borrarDesglose: borrarDesglose,
         redirectToAprobar: redirectToAprobar,
+        redirectToNuevoViaje: redirectToNuevoViaje,
     };
 });
