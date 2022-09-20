@@ -50,6 +50,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
         var transaccionesCreadas = newRecord.getValue("custrecord_drt_ptg_transferencia_tv");
         var fechaEnCurso = newRecord.getValue("custrecord_ptg_fecha_viaje_en_curso");
         var lineCount = newRecord.getLineCount({sublistId: "recmachcustrecord_ptg_numviaje_dot_",});
+        var estacionCarburacion = newRecord.getValue("custrecord_ptg_est_carb_viaje_");
         var lineCountEstacionario = newRecord.getLineCount({sublistId: "recmachcustrecord_ptg_viajellenadopipa_",});
         var transacciones = transaccionesCreadas[0];
         var formulario = newRecord.getValue("customform");
@@ -90,14 +91,27 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
           gasLPUnidades = objMap.gasLPUnidades;
         }
 
+        var parent = 0;
+        var subsidiary = 0;
+        var subsidiaryText = "";
+
         var locationObj = record.load({
           type: search.Type.LOCATION,
           id: ruta,
         });
-        var parent = locationObj.getValue("parent");
-        var parentText = locationObj.getText("parent");
-        var subsidiary = locationObj.getValue("subsidiary");
-        var subsidiaryText = locationObj.getText("subsidiary");
+        parent = locationObj.getValue("parent");
+        subsidiary = locationObj.getValue("subsidiary");
+        subsidiaryText = locationObj.getText("subsidiary");
+
+        if(estacionCarburacion){
+          var locationCarburacionObj = record.load({
+            type: search.Type.LOCATION,
+            id: estacionCarburacion,
+          });
+          parent = estacionCarburacion;
+          subsidiary = locationCarburacionObj.getValue("subsidiary");
+          subsidiaryText = locationCarburacionObj.getText("subsidiary");
+        }
         
         var d = new Date();
         var conf = config.load({
@@ -203,7 +217,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
           }
 
           var recOrdenTraslado = record.create({
-            type: "transferorder",
+            type: record.Type.TRANSFER_ORDER,
             isDynamic: true,
           });
 
@@ -273,6 +287,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
           }
 
           if (idItemFulfillment) {
+            log.audit("Entra ITEM RECEIPT");
             var newRecordItemReceipt = record.transform({
               fromType: record.Type.TRANSFER_ORDER,
               fromId: idOrdenTraslado,
