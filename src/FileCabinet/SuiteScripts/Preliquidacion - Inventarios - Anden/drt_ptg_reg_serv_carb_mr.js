@@ -23,6 +23,8 @@
                 name: 'custscript_drt_ptg_id_registro_serv_carb'
             }) || '';
             log.debug("idRegistro", idRegistro);
+
+            var registroCarburacionObj = {};
              
             var arrayColumns = [
                 search.createColumn({name: "custrecord_ptg_cliente_reg_serv_car_lin", label: "PTG - Cliente"}),
@@ -37,7 +39,9 @@
                 search.createColumn({name: "custrecord_ptg_num_vdes_reg_serv_car_lin", label: "PTG - Número de Viaje Destino"}),
                 search.createColumn({name: "custrecord_ptg_referenci_reg_serv_car_li", label: "PTG - Referencia"}),
                 search.createColumn({name: "custrecord_ptg_kilometraje_serv_car_lin", label: "PTG - Kilometraje"}),
-                search.createColumn({name: "custrecord_ptg_bomba_serv_car_lin", label: "PTG - Bomba Despachadora"})
+                search.createColumn({name: "custrecord_ptg_bomba_serv_car_lin", label: "PTG - Bomba Despachadora"}),
+                search.createColumn({name: "custrecord_ptg_precio_reg_serv_carb", join: "CUSTRECORD_PTG_ID_REG_SERV_CAR_LIN", label: "PTG - Precio"}),
+                search.createColumn({name: "custrecord_ptg_fecha_hora_reg_serv_carb", join: "CUSTRECORD_PTG_ID_REG_SERV_CAR_LIN", label: "PTG - Fecha Registro Servicio"})
             ];
 
             var arrayFilters = [
@@ -53,13 +57,21 @@
                 filters: arrayFilters
             });
 
+            registroCarburacionObj.custrecord_ptg_etapa_reg_serv_carb = 1;
 
         } catch (error) {
+            registroCarburacionObj.custrecord_ptg_etapa_reg_serv_carb = 3;
             log.audit({
                 title: 'error getInputData',
                 details: JSON.stringify(error)
             });
         } finally {
+            var servicioCarburacion = record.submitFields({
+                id: idRegistro,
+                type: "customrecord_ptg_registro_servicios_carb",
+                values: registroCarburacionObj,
+            });
+            log.audit("servicioCarburacion getInputData", servicioCarburacion);
             log.audit({
                 title: 'respuesta getInputData Finally',
                 details: JSON.stringify(respuesta)
@@ -74,6 +86,13 @@
                 title: 'context map',
                 details: JSON.stringify(context)
             });
+
+            var idRegistro = runtime.getCurrentScript().getParameter({
+                name: 'custscript_drt_ptg_id_registro_serv_carb'
+            }) || '';
+            log.debug("idRegistro", idRegistro);
+
+            var registroCarburacionObj = {};
 
             var objValue = JSON.parse(context.value);
             var idRegistroCarburacionLinea = objValue.id;
@@ -95,9 +114,13 @@
             var referencia = objValue.values["custrecord_ptg_referenci_reg_serv_car_li"];
             var kilometraje = objValue.values["custrecord_ptg_kilometraje_serv_car_lin"];
             var bomba = objValue.values["custrecord_ptg_bomba_serv_car_lin"].value;
+            var precioEstacion = objValue.values["custrecord_ptg_precio_reg_serv_carb.CUSTRECORD_PTG_ID_REG_SERV_CAR_LIN"];
+            var fechaHora = objValue.values["custrecord_ptg_fecha_hora_reg_serv_carb.CUSTRECORD_PTG_ID_REG_SERV_CAR_LIN"];
             log.debug("formaPago", formaPago);
             log.debug("formaPagoTXT", formaPagoTXT);
             log.debug("referencia", referencia);
+            log.debug("precioEstacion", precioEstacion);
+            log.debug("fechaHora", fechaHora);
             var condretado = 0;
             var pagoSGCContado = 0;
             var equipo = "";
@@ -121,6 +144,8 @@
                 formularioOrdenTraslado = objMap.formularioOrdenTraslado;
                 rfcGenerico = objMap.rfcGenerico;
                 rfcPublicoGeneral = objMap.rfcPublicoGeneral;
+                tipoArticuloCilindro = objMap.tipoArticuloCilindro;
+                idArticuloDescuento = objMap.idArticuloDescuento;
             }
             
             
@@ -134,6 +159,18 @@
             });
             var subsidiariaCarburacion = ubicacionObj.getValue("subsidiary");
             var parentCarburacion = ubicacionObj.getValue("parent");
+
+            var itemCilObj = record.load({
+                type: search.Type.INVENTORY_ITEM,
+                id: articulo,
+            });
+            var tipoArticulo = itemCilObj.getValue("custitem_ptg_tipodearticulo_");
+            if(tipoArticulo == tipoArticuloCilindro){
+                var capacidadArticulo = itemCilObj.getValue("custitem_ptg_capacidadcilindro_");
+                litrosVendidos = (cantidad * capacidadArticulo) / 0.54;
+            } else {
+                litrosVendidos = cantidad;
+            }
             
             var clienteObj = record.load({
                 type: search.Type.CUSTOMER,
@@ -145,6 +182,15 @@
             if((rfc != rfcGenerico) || (rfc != rfcPublicoGeneral)){
                 log.audit("Solicita factura");
                 solicitaFactura = true;
+            }
+            var descuentoPeso = parseFloat(clienteObj.getValue("custentity_ptg_descuento_asignar"));
+            var clienteDescuento = false;
+            var descuentoSinIVA = 0;
+            var descuentoUnitario = 0;
+            if(descuentoPeso > 0){
+                clienteDescuento = true;
+                descuentoSinIVA = descuentoPeso / 1.16;
+                descuentoUnitario = (litrosVendidos * descuentoSinIVA) * -1;
             }
 
 
@@ -183,10 +229,20 @@
                 recOportunidad.selectLine("item", i);
                 recOportunidad.setCurrentSublistValue("item", "item", articulo);
                 recOportunidad.setCurrentSublistValue("item", "quantity", cantidad);
-                recOportunidad.setCurrentSublistValue("item", "rate", precio);
+                recOportunidad.setCurrentSublistValue("item", "rate", precioEstacion);
                 recOportunidad.setCurrentSublistValue("item", "amount", subtotal);
                 recOportunidad.commitLine("item");
               }
+
+              if(clienteDescuento){
+                for (var j = 1; j < 2; j++) {
+                    recOportunidad.selectLine("item", j);
+                    recOportunidad.setCurrentSublistValue("item", "item", idArticuloDescuento);
+                    recOportunidad.setCurrentSublistValue("item", "rate", descuentoUnitario);
+                    recOportunidad.commitLine("item");
+                }
+              }
+
               var recOportunidadIdSaved = recOportunidad.save();
               regServCilUpdate.custrecord_ptg_oportun_reg_serv_car_lin = recOportunidadIdSaved;
               log.debug({
@@ -211,6 +267,21 @@
                 title: "Oportunidad Cargada",
                 details: "Id Saved: " + idObjRecordLoad,
               });
+
+              var objUpdateOp = {
+                custbody_ptg_fecha_hora_servicio_carb: fechaHora,
+              }
+              var opor = record.submitFields({
+                type: record.Type.OPPORTUNITY,
+                id: recOportunidadIdSaved,
+                values: objUpdateOp
+              });
+              log.debug({
+                title: "Campos Actualizados Oportunidad",
+                details: "Id Oportunidad: " + opor,
+              });
+
+
             } else {
 
                 var vehiculoDestinoObj = record.load({
@@ -244,6 +315,19 @@
                     ignoreMandatoryFields: true,
                   }) || "";
                 log.debug("idOrdenTraslado", idOrdenTraslado);
+
+                var objUpdateOT = {
+                    custbody_ptg_fecha_hora_servicio_carb: fechaHora,
+                }
+                var ordenTras = record.submitFields({
+                    type: record.Type.TRANSFER_ORDER,
+                    id: idOrdenTraslado,
+                    values: objUpdateOT
+                });
+                log.debug({
+                    title: "Campos Actualizados Orden Traslado",
+                    details: "Id Orden Traslado: " + ordenTras,
+                });
 
                 if (idOrdenTraslado) {
                     var newRecordItemFulfillment = record.transform({
@@ -326,15 +410,24 @@
             
 
             context.write({
-                key: recOportunidadIdSaved,
-                value: recOportunidadIdSaved
+                key: idRegistro,
+                value: idRegistro
             });
+            registroCarburacionObj.custrecord_ptg_etapa_reg_serv_carb = 1;
                
         } catch (error) {
+            registroCarburacionObj.custrecord_ptg_etapa_reg_serv_carb = 3;
             log.error({
                 title: 'error map',
                 details: JSON.stringify(error)
             });
+        } finally {
+            var servicioCarburacion = record.submitFields({
+                id: idRegistro,
+                type: "customrecord_ptg_registro_servicios_carb",
+                values: registroCarburacionObj,
+            });
+            log.audit("servicioCarburacion map", servicioCarburacion);
         }
     }
 
@@ -344,15 +437,43 @@
                 title: 'context reduce',
                 details: JSON.stringify(context)
             });
-            var idOportunidad = JSON.parse(context.key);
-            log.audit("idOportunidad", idOportunidad);
+            var registroID = JSON.parse(context.key);
+            log.audit("registroID", registroID);
+
+            var registroCarburacionObj = {};
+
+            var registroServiciosObj = search.create({
+                type: "customrecord_ptg_registro_servicios_ca_l",
+                filters: [
+                   ["custrecord_ptg_id_reg_serv_car_lin","anyof",registroID], "AND", 
+                   ["custrecord_ptg_oportun_reg_serv_car_lin","anyof","@NONE@"], "AND", 
+                   ["custrecord_ptg_transa_reg_serv_car_lin","anyof","@NONE@"]
+                ],
+                columns: []
+            });
+            var registroServiciosObjCount = registroServiciosObj.runPaged().count;
+            log.debug("registroServiciosObjCount", registroServiciosObjCount);
+
+            if(registroServiciosObjCount > 0){
+                registroCarburacionObj.custrecord_ptg_etapa_reg_serv_carb = 1;
+            } else {
+                registroCarburacionObj.custrecord_ptg_etapa_reg_serv_carb = 2;
+            }
             
 			
         } catch (error) {
+            registroCarburacionObj.custrecord_ptg_etapa_reg_serv_carb = 3;
             log.error({
                 title: 'error reduce',
                 details: JSON.stringify(error)
             });
+        } finally {
+            var servicioCarburacion = record.submitFields({
+                id: registroID,
+                type: "customrecord_ptg_registro_servicios_carb",
+                values: registroCarburacionObj,
+            });
+            log.audit("servicioCarburacion reduce", servicioCarburacion);
         }
     }
 
