@@ -14,8 +14,9 @@
 *@NModuleScope Public
 */
 
-//define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/encode', 'N/config', 'N/task', 'N/xml', 'N/email', 'N/file','../Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/PacConnectors/mysuite/signedxml-req/util'], SBX
-define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/encode', 'N/config', 'N/task', 'N/xml', 'N/email', 'N/file','../../SuiteBundles/Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/PacConnectors/mysuite/signedxml-req/util'],
+//define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/encode', 'N/config', 'N/task', 'N/xml', 'N/email', 'N/file','../Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/PacConnectors/mysuite/signedxml-req/util'], //SBX
+define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/encode', 'N/config', 'N/task', 'N/xml', 'N/email', 'N/file','../../SuiteBundles/Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/PacConnectors/mysuite/signedxml-req/util'], //SBX
+//define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/encode', 'N/config', 'N/task', 'N/xml', 'N/email', 'N/file','../../SuiteBundles/Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/PacConnectors/mysuite/signedxml-req/util'], //PRD
  function (search, record, format, runtime, https, xml, encode, config, task, xml, email, file, util) {
 
 	 const CONST_ARR_CHART = ['&', '"', '<', '>', "'", '´'];
@@ -168,6 +169,17 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 			 log.audit("idsetfol", idsetfol);
 		 }
 
+		/*var clienteObj = record.load({
+			type: search.Type.CUSTOMER,
+			id: jsonData.entityID
+		});
+		var clienteEspecial = clienteObj.getValue("custentity_ptg_cliente_especial");
+		if(clienteEspecial){
+			log.debug("cliente especial", clienteEspecial);
+			jsonData.rfcrecep = "XAXX010101000";
+			jsonData.entity = "Público en General";
+		}*/
+
 
 		 var xmlDoc = '';
 		 xmlDoc += '<?xml version="1.0" encoding="UTF-8"?>';
@@ -197,9 +209,9 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 		 xmlDoc += '  </fx:Emisor>';
 		 xmlDoc += '  <fx:Receptor>';
 		 xmlDoc += '    <fx:CdgPaisReceptor>MX</fx:CdgPaisReceptor>';
-		 xmlDoc += '    <fx:RFCReceptor>' + jsonData.rfcrecep + '</fx:RFCReceptor>';
+		 xmlDoc += '    <fx:RFCReceptor>' + jsonData.rfcrecepFin + '</fx:RFCReceptor>';
 		 //xmlDoc += '    <fx:NombreReceptor>' + jsonData.entity.replace("2 ", "").replace("1 ", "") + '</fx:NombreReceptor>';
-		 xmlDoc += '    <fx:NombreReceptor>' + jsonData.entity + '</fx:NombreReceptor>';
+		 xmlDoc += '    <fx:NombreReceptor>' + jsonData.entityFin + '</fx:NombreReceptor>';
 		 // xmlDoc += '    <fx:NombreReceptor>PUBLICO EN GENERAL</fx:NombreReceptor>';
 		 xmlDoc += '    <fx:UsoCFDI>' + jsonData.cfdi.split('-')[0].trim() + '</fx:UsoCFDI>'; //P01
 		 xmlDoc += '  </fx:Receptor>';
@@ -426,7 +438,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 				line: j
 			 }) || " ").split(' ')[0];
 
-			 if(nameArray != "Descuentos, bonificaciones y devoluciones"){
+			 if(nameArray != "Descuentos, bonificaciones y devoluciones" && nameArray != "PTG - Descuentos, bonificaciones y devoluciones"){
 
 				objItems = {line: lineaArray, itemid: itemidArray, name: nameArray, quantity: quantityArray, unit: unitArray, taxcodeid: taxcodeidArray, taxcode: taxcodeArray, taxrate: taxrateArray, rate: rateArray,
 					taxamt: taxamtArray, amount: amountArray, discount: discouArray, idinvo: idinvoArray, type: typeArray, ClaveUnidad: ClaveUArray, ClaveProdServ: ClavePArray}
@@ -533,7 +545,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						 subsidiary: rec.getValue('subsidiary'),
 						 trandate: rec.getValue('trandate'),
 						 tranid: rec.getValue('tranid'),
-						 //entity: rec.getText('entity'),
+						 entityID: rec.getValue('entity'),
 						 entity: rec.getText('custbody_razon_social_para_facturar'),
 						 // rfcrecep: 'XAXX010101000', 
 						 rfcrecep: rec.getValue('custbody_mx_customer_rfc'),
@@ -636,6 +648,19 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						 },]*/
 					 };
 					 isentry = false;
+					var clienteObj = record.load({
+						type: search.Type.CUSTOMER,
+						id: jsonData.entityID
+					});
+					var clienteEspecial = clienteObj.getValue("custentity_ptg_cliente_especial");
+					if(clienteEspecial){
+						log.debug("cliente especial", clienteEspecial);
+						jsonData.rfcrecepFin = "XAXX010101000";
+						jsonData.entityFin = "Público en General";
+					} else {
+						jsonData.rfcrecepFin = jsonData.rfcrecep;
+						jsonData.entityFin = jsonData.entity;
+					}
 					 log.audit("jsonData", jsonData);
 					//log.audit("jsonData.items.length", jsonData.items.length);
 
@@ -851,8 +876,8 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 				 type: 'customrecord_mx_pac_connect_info',
 				 //MODIFICAR
 				 //id: runtime.getCurrentScript().getParameter('custscript_drt_glb_requestor')
-				 //id: 4
-				 id: requestorID
+				 id: 4
+				 //id: requestorID
 			 });
 			 var url = mySuiteConfig.getValue('custrecord_mx_pacinfo_url') || '';
 			 log.audit({
@@ -1155,6 +1180,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 							custbody_psg_ei_sending_method: 11, //MÉTODO DE ENVÍO DE DOCUMENTOS ELECTRÓNICOS: MySuite
 							custbody_psg_ei_status: 5, //ESTADO DEL DOCUMENTO ELECTRÓNICO (Error en la generación)
 							custbody_ptg_registro_facturacion: recIdSaved,
+							custbody_ptg_rfc_facturado: jsonData.rfcrecepFin,
 						};
 						log.audit("objSubmitError aqui salia error", objSubmitError);
 
@@ -1344,6 +1370,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 								 'custbody_mx_cfdi_sat_serial': parsedResponse.noCertificadoSat,
 								 'custbody_mx_cfdi_sat_signature': parsedResponse.selloSat,
 								 'custbody_mx_cfdi_signature': parsedResponse.selloCfd,
+								 'custbody_ptg_rfc_facturado': jsonData.rfcrecepFin,
 							 },
 							 options: {
 								 enableSourcing: false,
@@ -1586,6 +1613,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						custbody_edoc_generated_pdf: resppdf.data, //PDF GENERDO
 						custbody_psg_ei_status: 3, //ESTADO DEL DOCUMENTO ELECTRÓNICO (Para generación)
 						custbody_ptg_registro_facturacion: recIdSaved,
+						custbody_ptg_rfc_facturado: jsonData.rfcrecepFin,
 						// custbody_mx_cfdi_usage: value1,
 						// custbody_mx_txn_sat_payment_method: value2,
 						// custbody_mx_txn_sat_payment_term: value3,
