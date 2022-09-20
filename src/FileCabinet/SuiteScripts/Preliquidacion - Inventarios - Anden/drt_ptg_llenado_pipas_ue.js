@@ -59,6 +59,7 @@ function beforeSubmit(context) {
       var porcentaje = porcentajeDespues - porcentajeAntes;
       var numeroViajeLlenadoPipas = customRec.getValue("custrecord_ptg_num_viaje_llenado_pipas_");
       var transaccion = customRec.getValue("custrecord_drt_ptg_transferencia_lp");
+      var estacionCarburacion = customRec.getValue("custrecord_ptg_llp_estacion_carburacion")
       var transacciones = transaccion[0];
       var idTransaccionArray = [];
       var paqueteMySuite = 0;
@@ -86,12 +87,30 @@ function beforeSubmit(context) {
       var ubicacion = equipoObj.getValue("custrecord_ptg_ubicacionruta_");
       var capacidadPF = parseFloat(capacidad);
 
+      var parent = 0;
+      var subsidiary = 0;
+
       var ubicacionObj = record.load({
         type: record.Type.LOCATION,
         id: ubicacion,
       });
-      var parent = ubicacionObj.getValue("parent");
-      var subsidiary = ubicacionObj.getValue("subsidiary");
+      parent = ubicacionObj.getValue("parent");
+      subsidiary = ubicacionObj.getValue("subsidiary");
+
+      if(estacionCarburacion){
+        var ubicacionCarburacionObj = record.load({
+          type: record.Type.LOCATION,
+          id: estacionCarburacion,
+        });
+        var pipaAlmacen = ubicacionCarburacionObj.getValue("custrecord_ptg_ubic_pipa_almacen");
+        
+        var pipaAlmacenObj = record.load({
+          type: "customrecord_ptg_equipos",
+          id: pipaAlmacen,
+        });
+        parent = pipaAlmacenObj.getValue("custrecord_ptg_ubicacionruta_");
+        subsidiary = pipaAlmacenObj.getValue("custrecord_ptg_subsidiaria_1");
+      }
 
       var tablaViajesObj = record.load({
         type: "customrecord_ptg_tabladeviaje_enc2_",
