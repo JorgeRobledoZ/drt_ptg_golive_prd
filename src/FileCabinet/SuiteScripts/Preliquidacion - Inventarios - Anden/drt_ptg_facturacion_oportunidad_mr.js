@@ -53,7 +53,7 @@
 
             var registroCilindros = record.submitFields({
                 type: "customrecord_ptg_preliquicilndros_",
-                id: idRegistro,
+                id: id_search,
                 values: valoresProceso
             });
             log.debug("registroCilindros", registroCilindros);
