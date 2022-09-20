@@ -37,7 +37,7 @@ define([
                 !!objRecord.recordType
             ) {
                 mapContext.write({
-                    key: drt_ptg_delete_record_cm.keyRecordType(objRecord.recordType,""),
+                    key: drt_ptg_delete_record_cm.keyRecordType(objRecord.recordType, ""),
                     value: objRecord
                 });
             }
@@ -80,7 +80,7 @@ define([
             } catch (error) {
                 log.error(`error reduce`, error);
             } finally {
-                objWrite.key=`${drt_ptg_delete_record_cm.keyRecordType("",reduceContext.key)} ${objWrite.value.length}`;
+                objWrite.key = `${drt_ptg_delete_record_cm.keyRecordType("",reduceContext.key)} ${objWrite.value.length}`;
                 reduceContext.write(objWrite);
                 if (
                     arraySinConfirmar.length > 0

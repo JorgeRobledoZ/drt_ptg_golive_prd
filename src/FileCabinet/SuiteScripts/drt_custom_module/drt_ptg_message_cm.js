@@ -18,8 +18,7 @@ define([
                 if (
                     scriptContext.type == scriptContext.UserEventType.VIEW
                 ) {
-                    const columsCustomRecord = [
-                        {
+                    const columsCustomRecord = [{
                             name: "name",
                         },
                         {
@@ -60,8 +59,7 @@ define([
                                 fieldidText == registro.custrecord_drt_ptg_ms_key_text
                             ) {
                                 messageCreate(
-                                    scriptContext,
-                                    {
+                                    scriptContext, {
                                         title: registro.name,
                                         message: registro.custrecord_drt_ptg_ms_message,
                                         type: message.Type[registro.custrecord_drt_ptg_ms_codigo],

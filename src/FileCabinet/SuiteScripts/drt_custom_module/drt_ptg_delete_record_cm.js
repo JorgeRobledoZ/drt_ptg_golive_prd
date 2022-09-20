@@ -24,8 +24,7 @@ define([
             try {
                 log.debug(`recordRelate`, record_type);
                 const objMap = {
-                    customrecord_ptg_preliquicilndros_: [
-                        {
+                    customrecord_ptg_preliquicilndros_: [{
                             record: "customrecord_ptg_registrodedotacion_cil_",
                             field: "custrecord_ptg_preliqrelacionada_"
                         },
@@ -37,8 +36,7 @@ define([
                             record: "customrecord_ptg_regitrodemovs_",
                             field: "custrecord_ptg_rutavehiculo_",
                             field2: "custrecord_drt_ptg_reg_oportunidad",
-                            opportunity: [
-                                {
+                            opportunity: [{
                                     record: "customrecord_ptg_pagos",
                                     field: "custrecord_ptg_oportunidad_pagos",
                                 },
@@ -66,8 +64,7 @@ define([
                             field: "custrecord_ptg_preliq_cilindros"
                         },
                     ],
-                    customrecord_ptg_preliqestcarburacion_: [
-                        {
+                    customrecord_ptg_preliqestcarburacion_: [{
                             record: "customrecord_ptg_det_tipo_pago_est_car_",
                             field: "custrecord_ptg_detalle_pago_carb_"
                         },
@@ -91,8 +88,7 @@ define([
                             record: "customrecord_ptg_detalle_despachador_",
                             field: "custrecord_ptg_detallecrburacion_", //Checar
                             field2: "custrecord_ptg_oportunidad_carburacion",
-                            opportunity: [
-                                {
+                            opportunity: [{
                                     record: "customrecord_ptg_pagos",
                                     field: "custrecord_ptg_oportunidad_pagos",
                                     filters: ["AND", ["custrecord_ptg_oportunidad_pagos.custbody_ptg_servicio_id", search.Operator.ISEMPTY, '']]
@@ -108,8 +104,7 @@ define([
                             record: "customrecord_ptg_det_gas_tipo_pago_",
                             field: "custrecord_ptg_detgas_tipo_pago_",
                             field2: "custrecord_ptg_id_oportunidad_gas",
-                            opportunity: [
-                                {
+                            opportunity: [{
                                     record: "customrecord_ptg_pagos",
                                     field: "custrecord_ptg_oportunidad_pagos",
                                     filters: ["AND", ["custrecord_ptg_oportunidad_pagos.custbody_ptg_servicio_id", search.Operator.ISEMPTY, '']]
@@ -125,8 +120,7 @@ define([
                             record: "customrecord_ptg_detalleenv_est_carb_",
                             field: "custrecord_ptg_envdetallecarb_",
                             field2: "custrecord_ptg_id_oportunidad_envases",
-                            opportunity: [
-                                {
+                            opportunity: [{
                                     record: "customrecord_ptg_pagos",
                                     field: "custrecord_ptg_oportunidad_pagos",
                                     filters: ["AND", ["custrecord_ptg_oportunidad_pagos.custbody_ptg_servicio_id", search.Operator.ISEMPTY, '']]
@@ -141,10 +135,8 @@ define([
                     ]
                 };
                 respuesta.data = objMap[record_type];
-                respuesta.success =
-                    !!respuesta.data &&
-                    respuesta.data.length > 0
-                ;
+                respuesta.success = !!respuesta.data &&
+                    respuesta.data.length > 0;
             } catch (error) {
                 log.error(`error recordRelate`, error);
             } finally {
@@ -160,7 +152,9 @@ define([
                 if (
                     !!param_id
                 ) {
-                    respuesta = runtime.getCurrentScript().getParameter({name: param_id}) || "";
+                    respuesta = runtime.getCurrentScript().getParameter({
+                        name: param_id
+                    }) || "";
                 }
             } catch (error) {
                 log.error(`error readParameter ${param_id}`, error);
@@ -188,11 +182,9 @@ define([
                     ) {
                         const objOpportuniti = {};
                         record_related.data.forEach(element => {
-                            const columsCustomRecord = [
-                                {
-                                    name: element.field,
-                                }
-                            ];
+                            const columsCustomRecord = [{
+                                name: element.field,
+                            }];
                             if (
                                 !!element.field2
                             ) {
@@ -242,11 +234,9 @@ define([
                                     const dataRecord2 = drt_ptg_address_cm.arraySearchRecord(
                                         eopp.record,
                                         filters2,
-                                        [
-                                            {
-                                                name: eopp.field,
-                                            }
-                                        ]
+                                        [{
+                                            name: eopp.field,
+                                        }]
                                     );
                                     log.debug(`dataRecord2`, dataRecord2);
                                     dataRecord2.forEach(x => {
@@ -285,6 +275,7 @@ define([
                 return respuesta;
             }
         }
+
         const keyRecordType = (param_record_type, param_bloque) => {
             const recordTypeNs = [
                 "customrecord_ptg_pagos_oportunidad",
@@ -342,6 +333,7 @@ define([
             }
             //log.debug(`respuesta keyRecordType`, respuesta);
         }
+
         return {
             keyRecordType,
             getAllRecord,
