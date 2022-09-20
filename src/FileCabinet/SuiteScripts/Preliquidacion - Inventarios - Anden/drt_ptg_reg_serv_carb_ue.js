@@ -60,6 +60,13 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
     try {
         var newRecord = context.newRecord;
         var recId = newRecord.id;
+        var type_interface = runtime.executionContext;
+        var type_event = context.type;
+        var recObj = context.newRecord;
+        var form = context.form;
+        var userRoleId = runtime.getCurrentUser().role;
+        log.debug(["afterSubmit", "type_interface", "type_event", "recType", "recObj.id", "userRoleId",].join(" - "),
+        [type_interface, type_event, recObj.type, recObj.id, userRoleId].join(" - "));
         var estacionCarburacion = newRecord.getValue("custrecord_ptg_estacion_reg_serv_carb")
         var etapa = newRecord.getValue("custrecord_ptg_etapa_reg_serv_carb");
         var estatusEtapaProcesado = 0;
@@ -69,20 +76,20 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         }
         log.audit("recId", recId);
         log.audit("etapa", etapa);
-        if (etapa != estatusEtapaProcesado) {
+        if (type_interface == "USERINTERFACE") {
           log.debug("pasa");
-        var mrTask = task.create({
-          taskType: task.TaskType.MAP_REDUCE,
-          scriptId: 'customscript_drt_ptg_reg_serv_carb_mr',
-          params: {
-            custscript_drt_ptg_id_estacion_serv_carb: estacionCarburacion,
-            custscript_drt_ptg_id_registro_serv_carb: recId,
-          }
-        });
-        var mrTaskId = mrTask.submit();
-        var taskStatus = task.checkStatus(mrTaskId);
-        log.audit({title: 'taskStatus', details: JSON.stringify(taskStatus)});
-      }
+          var mrTask = task.create({
+            taskType: task.TaskType.MAP_REDUCE,
+            scriptId: 'customscript_drt_ptg_reg_serv_carb_mr',
+            params: {
+              custscript_drt_ptg_id_estacion_serv_carb: estacionCarburacion,
+              custscript_drt_ptg_id_registro_serv_carb: recId,
+            }
+          });
+          var mrTaskId = mrTask.submit();
+          var taskStatus = task.checkStatus(mrTaskId);
+          log.audit({title: 'taskStatus', details: JSON.stringify(taskStatus)});
+        }
     } catch (e) {
       log.error({
         title: "afterSubmit error "+e.name,
