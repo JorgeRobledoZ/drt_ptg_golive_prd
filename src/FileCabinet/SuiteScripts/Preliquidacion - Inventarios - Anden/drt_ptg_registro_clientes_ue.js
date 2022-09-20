@@ -15,7 +15,7 @@
 define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/task", "N/format", "N/config", "N/runtime"], function (drt_mapid_cm, record, search, task, format, config, runtime) {
   function afterSubmit(context) {
     try {
-      if (context.type == "edit") {
+      if (context.type == "create") {
       log.audit("Create");
       var newRecord = context.newRecord;
       var recId = newRecord.id;
