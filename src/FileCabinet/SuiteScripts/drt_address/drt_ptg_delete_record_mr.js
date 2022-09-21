@@ -59,17 +59,24 @@ define([
                         !!objRecord.recordType
                     ) {
                         try {
-                            const idDelete = record.delete({
-                                id: objRecord.id,
-                                type: objRecord.recordType,
-                            });
-                            log.debug("idDelete", `idDelete: ${idDelete} id: ${objRecord.id} recordType: ${objRecord.recordType} = ${parseInt(objRecord.id) == parseInt(idDelete)}`);
+                            const isTest = true;
                             if (
-                                !!idDelete
+                                isTest
                             ) {
-                                objWrite.value.push(`idDelete: ${idDelete} id: ${objRecord.id} recordType: ${objRecord.recordType} = ${parseInt(objRecord.id) == parseInt(idDelete)}`);
+                                objWrite.value.push(`Test id: ${objRecord.id} recordType: ${objRecord.recordType}`);
                             } else {
-                                arraySinConfirmar.push(`${objRecord.recordType} ${objRecord.id}`);
+                                const idDelete = record.delete({
+                                    id: objRecord.id,
+                                    type: objRecord.recordType,
+                                });
+                                log.debug("idDelete", `idDelete: ${idDelete} id: ${objRecord.id} recordType: ${objRecord.recordType} = ${parseInt(objRecord.id) == parseInt(idDelete)}`);
+                                if (
+                                    !!idDelete
+                                ) {
+                                    objWrite.value.push(`idDelete: ${idDelete} id: ${objRecord.id} recordType: ${objRecord.recordType} = ${parseInt(objRecord.id) == parseInt(idDelete)}`);
+                                } else {
+                                    arraySinConfirmar.push(`${objRecord.recordType} ${objRecord.id}`);
+                                }
                             }
                         } catch (edelete) {
                             log.error(`Errpr Eliminacion ${objRecord.recordType} ${objRecord.id} `, edelete);
