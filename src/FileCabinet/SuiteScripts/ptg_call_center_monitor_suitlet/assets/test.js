@@ -197,6 +197,9 @@ function setCustomerInfo(customer, idAddress = null) {
     // Campos del formulario quejas y fugas
     $('#emailFugaQueja').val(customer.email);
 
+    // Muestra la opción de elegir un tipo de dirección con facturación
+    if( customer.requiereFactura ){ $('.opt-tipo-dir-fact').removeClass('d-none'); }
+
     if ( customer.statusCostumer == 'Activo') { $('#badgeActivo').removeClass('d-none'); }
     else if ( customer.statusCostumer == 'Inactivo') { $('#badgeInactivo').removeClass('d-none');  }
     
@@ -1017,6 +1020,9 @@ function clearCustomerInfo () {
     
     // Se remueven los badge de información adicional del cliente
     $('.badgesClientes').addClass('d-none');
+
+    // Se remueven las opciones de poder agregar una dirección de facturación
+    $('.opt-tipo-dir-fact').addClass('d-none');
 
     // Se oculta el select de casos pendientes
     $('select#casoPedido').parent().parent().addClass('d-none');

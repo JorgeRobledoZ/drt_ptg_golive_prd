@@ -481,10 +481,14 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/log', 'SuiteScripts/SC
                       });
                 }
                 */
-                let preTotal = opportunityRecord.getValue({fieldId:'total'});
-                log.debug('preTotal', preTotal);
-                if ( preTotal ) {
-                    opportunityRecord.setText({fieldId:'custbody_ptg_opcion_pago_obj', text: setMetodoPago(1, preTotal)});
+
+                // Si no se envió específicamente el dato de custbody_ptg_opcion_pago_obj, se calcula uno en automático
+                if (!opportunityUpdate.bodyFields['custbody_ptg_opcion_pago_obj']) {
+                    let preTotal = opportunityRecord.getValue({fieldId:'total'});
+                    log.debug('preTotal', preTotal);
+                    if ( preTotal ) {
+                        // opportunityRecord.setText({fieldId:'custbody_ptg_opcion_pago_obj', text: setMetodoPago(1, preTotal)});
+                    }
                 }
 
                 let idOpportSave = opportunityRecord.save();

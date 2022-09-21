@@ -26,11 +26,14 @@ $("#editarDireccion").click(function() {
         $("#tipoAccionDireccion").val('guardar');
         let periodo = '';
         if ( direccion ) {
-            if(customerGlobal.requiereFactura) {
-                $($(".dato-facturacion").removeClass("d-none"));
-            } else {
-                $($(".dato-facturacion").addClass("d-none"));
-            }
+            // Setea el tipo de dirección
+            $('#tipoDireccion').val(direccion.tipoDireccionId ?? "").trigger('change');
+            
+            // if(customerGlobal.requiereFactura) {
+            //     $($(".dato-facturacion").removeClass("d-none"));
+            // } else {
+            //     $($(".dato-facturacion").addClass("d-none"));
+            // }
             // Se ocultan los campos de frecuencia y posteriormente se decide si se muestran o no
             $('.frecuencia-cada, .frecuencia-semana').addClass('d-none');
             if ( direccion.defaultBilling ) {// Dirección de facturación
@@ -192,11 +195,13 @@ $("#copiarDireccion").click(function() {
         $("#tipoAccionDireccion").val('guardar');
         let periodo = '';
         if ( direccion ) {
-            if(customerGlobal.requiereFactura) {
-                $($(".dato-facturacion").removeClass("d-none"));
-            } else {
-                $($(".dato-facturacion").addClass("d-none"));
-            }
+            // Setea el tipo de dirección
+            $('#tipoDireccion').val(direccion.tipoDireccionId ?? "").trigger('change');
+            // if(customerGlobal.requiereFactura) {
+            //     $($(".dato-facturacion").removeClass("d-none"));
+            // } else {
+            //     $($(".dato-facturacion").addClass("d-none"));
+            // }
             // Se ocultan los campos de frecuencia y posteriormente se decide si se muestran o no
             $('.frecuencia-cada, .frecuencia-semana').addClass('d-none');
             if ( direccion.defaultBilling ) {// Dirección de facturación
