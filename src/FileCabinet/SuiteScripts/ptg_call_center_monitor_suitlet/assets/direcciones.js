@@ -4,6 +4,28 @@ $('body').delegate('#guardarDireccion', 'click', function () {
     validateAddressFields("guardar");
 });
 
+// Valida el select de tipo de dirección
+$("#tipoDireccion").on('change', function(e) {
+    let val = $(this).val();
+    
+    if ( val == tipoDirSoloEntrega || val == tipoDirEntFact ) {// Sólo entrega / entrega y facturación
+        $('.direccion-entrega').removeClass('d-none');
+        $("input[name=tipoAccionFormCliente]").trigger("change");
+        // $('#tipoServicioFormCliente').val("").trigger('change');
+    } else if ( val == tipoDirSoloFacturacion ) {// Sólo facturación
+        $('.direccion-entrega').addClass('d-none');
+        $('.tipo-aviso-programado').addClass('d-none');
+        // $("input[name=tipoAccionFormCliente]").trigger("change");
+        $('#tipoServicioFormCliente').val("").trigger('change');
+
+    } else {// Se ocultan todos los campos de entre calles para abajo
+        $('.direccion-entrega').addClass('d-none');
+        $('.tipo-aviso-programado').addClass('d-none');
+        // $("input[name=tipoAccionFormCliente]").trigger("change");
+        $('#tipoServicioFormCliente').val("").trigger('change');
+    }
+});
+
 // Valida la frecuencia de un pedido tipo aviso o programado
 $("#frecuenciaFormCliente").on('change', function(e) {
     let val = $(this).val();
@@ -191,6 +213,7 @@ function validateAddressFields(type) {
         if ( idAddress ) {// Se actualiza la dirección
             let updateAddress = {}
 
+            address.obj['tipoDireccion']  ? updateAddress['custrecord_ptg_tipo_direccion'] = address.obj['tipoDireccion'] : '';
             address.obj['domFacturacion'] ? updateAddress['defaultbilling'] = address.obj['domFacturacion'] : '';
             address.obj['stateName'] ? updateAddress['custrecord_ptg_estado'] = address.obj['stateName'] : '';
             address.obj['ruta'] ? updateAddress['custrecord_ptg_colonia_ruta'] = address.obj['ruta'] : '';
@@ -581,6 +604,7 @@ function getAddressOnList() {
     }
 
     let addressObj = {
+        tipoDireccion   :  $("#tipoDireccion").val(),
         timeUnix        : Date.now(),
         principal       : $('table.table-address tbody').find(".address").length == 0 ? true : false,
         stateName       : $("#estadoDireccion option:selected").data('item').name.trim(),

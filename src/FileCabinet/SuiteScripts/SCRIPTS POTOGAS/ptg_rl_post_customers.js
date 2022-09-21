@@ -791,6 +791,10 @@
                                 fieldId: 'addressbookaddress'
                             });
                             addressSubrecord.setValue({
+                                fieldId: "custrecord_ptg_tipo_direccion",
+                                value: adress.tipoDireccion
+                            });
+                            addressSubrecord.setValue({
                                 fieldId: "city",
                                 value: adress.city
                             });

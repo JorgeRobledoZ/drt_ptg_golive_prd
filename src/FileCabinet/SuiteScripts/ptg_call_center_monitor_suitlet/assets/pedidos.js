@@ -315,7 +315,7 @@ $('#guardarMetodoPagoForm').on('click', function () {
         tipo_pago    : metodoId,
         tipo_cuenta  : tipoCuenta,
         tipo_tarjeta : tipoTarjeta,
-        monto        : total,
+        monto        : Number(total).toFixed(6),
         folio        : folioAut,
     };
 
@@ -941,7 +941,7 @@ $('body').delegate('.delete-producto-cil, .delete-producto-est, .delete-producto
 $('body').delegate('.edit-metodo-pago','click', function() {
     let metodo = $(this).closest("tr").data("metodo");
     $("#metodoPagoPedido").val(metodo.tipo_pago).trigger("change");
-    $("#montoPagoPedido").val(metodo.monto);
+    $("#montoPagoPedido").val(Number(metodo.monto).toFixed(2));
     $("#tipoCuenta").val(metodo.tipo_cuenta);
     $("#tipoTarjeta").val(metodo.tipo_tarjeta);
     $("#folioAutorizacionPedido").val(metodo.folio);

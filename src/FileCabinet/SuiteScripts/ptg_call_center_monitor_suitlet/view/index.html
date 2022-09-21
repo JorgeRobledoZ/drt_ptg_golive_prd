@@ -1237,13 +1237,13 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-3 text-center dato-facturacion d-none">
+                        <!-- <div class="col-3 text-center dato-facturacion d-none">
                             <div class="content-input content-input-primary">
                                 <label>Facturación</label>
                                 <br>
                                 <input id="domFacturacionDireccion" type="checkbox" class="form-check-input form-ptg" style="width: auto;">
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="row pb-2">
                         <div class="col-6">
@@ -1265,7 +1265,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row pb-2">
+                    <div class="row pb-2 direccion-entrega">
                         <div class="col-4">
                             <div class="content-input content-input-primary">
                                 <label>Entre calles 1</label>
@@ -1286,7 +1286,7 @@
                         </div>
                         
                     </div>
-                    <div class="row pb-2">
+                    <div class="row pb-2 direccion-entrega">
                         <div class="col-12">
                             <div class="content-input content-input-primary">
                                 <label>Tipo de servicio*</label>
@@ -1419,12 +1419,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row pb-2">
+                    <div class="row pb-2 direccion-entrega">
                         <div class="col-12">
                             <label class="title-ptg color-primary fw-bold border-bp w-100" style="font-size: 20px;">Contacto</label>
                         </div>
                     </div>
-                    <div class="row pb-2">
+                    <div class="row pb-2 direccion-entrega">
                         <div class="col-6">
                             <div class="content-input content-input-primary">
                                 <label>Teléfono principal*</label>
@@ -1500,12 +1500,12 @@
                             </div>
                         </div>                                   
                     </div>
-                    <div class="row pb-2">
+                    <div class="row pb-2 direccion-entrega">
                         <div class="col-12">
                             <label class="title-ptg color-primary fw-bold border-bp w-100" style="font-size: 20px;">Programación</label>
                         </div>
                     </div>
-                    <div class="row pb-2">
+                    <div class="row pb-2 direccion-entrega">
                         <div class="col-auto align-self-center">
                             <label class="title-ptg color-primary" style="font-size: 16px;">Tipo de acción*:</label>
                         </div>
@@ -1604,7 +1604,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row pb-2">
+                    <div class="row pb-2 direccion-entrega">
                         <div class="col-6 tipo-aviso-programado d-none">
                             <div class="border-radius-primary p-2">
                                 <label class="title-ptg color-primary" style="font-size: 20px">Día de la semana*</label>
@@ -3730,9 +3730,9 @@
             // });
 
             // Alimenta el select de tipo de dirección
-            $('select#tipoDireccion').append('<option value="'+tipoDirSoloEntrega+'">Sólo entrega</option>');
-            $('select#tipoDireccion').append('<option value="'+tipoDirSoloFacturacion+'">Sólo facturación</option>');
-            $('select#tipoDireccion').append('<option value="'+tipoDirEntFact+'">Entrega y facturación</option>');
+            $('select#tipoDireccion').append('<option class="" value="'+tipoDirSoloEntrega+'">Sólo entrega</option>');
+            $('select#tipoDireccion').append('<option class="opt-tipo-dir-fact" value="'+tipoDirSoloFacturacion+'">Sólo facturación</option>');
+            $('select#tipoDireccion').append('<option class="opt-tipo-dir-fact" value="'+tipoDirEntFact+'">Entrega y facturación</option>');
 
             let today = moment().endOf('day');
             $('#fechaPrometidaPedido').val(today.format('YYYY-MM-DD').toString());
