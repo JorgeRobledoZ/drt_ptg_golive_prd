@@ -15,8 +15,7 @@ define([
             try {
                 log.debug(`addresEntity`, param_entity);
                 const idSublist = "address";
-                const columns = [
-                    {
+                const columns = [{
                         name: "addressinternalid",
                         join: idSublist,
                     },
@@ -77,8 +76,7 @@ define([
                     ["internalid", search.Operator.IS, param_entity],
                     columns
                 );
-                const columsCustomRecord = [
-                    {
+                const columsCustomRecord = [{
                         name: "custrecord_ptg_cliente_dir",
                     },
                     {
@@ -123,8 +121,7 @@ define([
                                 objRepeat[keyRepeat] = 0;
                                 updateRecord(
                                     "customrecord_ptg_direcciones",
-                                    addCR.id,
-                                    {
+                                    addCR.id, {
                                         isinactive: false,
                                         ...objValue,
                                     }
@@ -136,8 +133,7 @@ define([
                             ) {
                                 updateRecord(
                                     "customrecord_ptg_direcciones",
-                                    addCR.id,
-                                    {
+                                    addCR.id, {
                                         isinactive: true,
                                         ...objValue,
                                     }
@@ -176,8 +172,7 @@ define([
                     if (objSobrante[sobrante] == arrayAddressEntity.length) {
                         updateRecord(
                             "customrecord_ptg_direcciones",
-                            sobrante,
-                            {
+                            sobrante, {
                                 isinactive: true,
                             }
                         );
@@ -280,6 +275,8 @@ define([
         }
 
         return {
+            updateRecord,
+            createRecord,
             arraySearchRecord,
             addresEntity
         };
