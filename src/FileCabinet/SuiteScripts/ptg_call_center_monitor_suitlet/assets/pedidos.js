@@ -713,8 +713,7 @@ async function savePedido() {
             totalMetodosPago = $('.productosMetodoPago').children('tfoot').find('td.total').data('total');
         }
 
-        // Parche para validar que el total del pedido sea igual al del método de pago
-        if ( Number(totalPedido).toFixed(2) != Number(totalMetodosPago).toFixed(2) ) {
+        if ( totalPedido != totalMetodosPago ) {
             infoMsg('warning', 'El total a pagar debe ser igual al total de productos enlistados');
             return;
         }
@@ -958,6 +957,7 @@ $('body').delegate('.edit-metodo-pago','click', function() {
 
 // Elimina un método de pago de la tabla
 $('body').delegate('.delete-metodo-pago','click', function() {
+    let tr = $(this).closest("tr");
     let metodo  = $(this).parent().parent().data('metodo');
     let table = $(this).data('table-ref');
     let id    = ( metodo && metodo.tipo_pago ? metodo.tipo_pago : 0 );
@@ -984,7 +984,7 @@ $('body').delegate('.delete-metodo-pago','click', function() {
         dangerMode: true,
     }).then((accept) => {
         if ( accept ) {
-            $(table).children('tbody').children('tr[data-metodo-id="'+id+'"]').remove();
+            tr.remove();
             validarTablaMetodosPago( $(table) );
         }
     }).catch(swal.noop);
