@@ -320,9 +320,12 @@ $('#guardarMetodoPagoForm').on('click', function () {
     };
 
     if($("#formMetodoPagosModal").data("tipo") == "add") {
+        console.log("entre al if");
         agregarMetodoPago(metodoObj);
     } else {
+        console.log("entre al else");
         let tr = $("#formMetodoPagosModal").data("tr");
+        console.log(tr, tr.data());
         tr.data("metodoId", metodoId);
         tr.data("metodo", metodoObj);
         $(tr.find("td")[0]).html(metodoObj.metodo_txt);
@@ -988,14 +991,22 @@ $('body').delegate('.delete-metodo-pago','click', function() {
 
 // Agrega un método de pago a la tabla de métodos
 function agregarMetodoPago(metodoObj) {
-    let searchTr = $('table.productosMetodoPago > tbody > tr[data-metodo-id="'+metodoObj.tipo_pago+'"]');
-
+    let searchTr = [];
+    for (let x = 0; x <  $('table.productosMetodoPago > tbody > tr').length; x++) {
+        const element =  $('table.productosMetodoPago > tbody > tr')[x];
+        if(metodoObj.tipo_pago == $(element).data("metodoId")) {
+            searchTr.push($(element));
+        }        
+    }
+    
+    //let searchTr = $('table.productosMetodoPago > tbody > tr[data-metodo-id="'+metodoObj.tipo_pago+'"]');
+    //console.log(searchTr, searchTr.data());
     if ( searchTr.length && ( !metodosPagoPrepago.includes(metodoObj.tipo_pago) && metodoObj.tipo_pago != metodoTransferencia ) ) {// Se verifica si el artículo fue previamente registrado y si no es un prepago se edita el row
 
-        searchTr.data('metodo', metodoObj);
-        searchTr.children('td').siblings("td:nth-child(2)").text(metodoObj.folio ? metodoObj.folio : 'No aplica');
-        searchTr.children('td').siblings("td:nth-child(3)").data('total', metodoObj.monto);
-        searchTr.children('td').siblings("td:nth-child(3)").text('$'+getCorrectFormat(metodoObj.monto)+' MXN');
+        searchTr[0].data('metodo', metodoObj);
+        searchTr[0].children('td').siblings("td:nth-child(2)").text(metodoObj.folio ? metodoObj.folio : 'No aplica');
+        searchTr[0].children('td').siblings("td:nth-child(3)").data('total', metodoObj.monto);
+        searchTr[0].children('td').siblings("td:nth-child(3)").text('$'+getCorrectFormat(metodoObj.monto)+' MXN');
         console.log(metodoObj);
         
     } else {// Se llena la información del item
