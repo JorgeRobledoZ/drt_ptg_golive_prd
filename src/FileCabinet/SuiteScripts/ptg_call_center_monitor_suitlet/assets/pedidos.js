@@ -713,7 +713,8 @@ async function savePedido() {
             totalMetodosPago = $('.productosMetodoPago').children('tfoot').find('td.total').data('total');
         }
 
-        if ( totalPedido != totalMetodosPago ) {
+        // Parche para validar que el total del pedido sea igual al del método de pago
+        if ( Number(totalPedido).toFixed(2) != Number(totalMetodosPago).toFixed(2) ) {
             infoMsg('warning', 'El total a pagar debe ser igual al total de productos enlistados');
             return;
         }

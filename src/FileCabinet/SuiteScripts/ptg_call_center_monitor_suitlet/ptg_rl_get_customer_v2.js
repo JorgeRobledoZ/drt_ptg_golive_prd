@@ -352,6 +352,7 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
 
                 log.audit('dataRoute', dataRoute)
 
+                //Modificar esta lógica para la zona de precio
                 let dataZone = search.lookupFields({
                     type: "customrecord_ptg_zonasdeprecio_",
                     id: dataRoute['custrecord_ptg_zona_de_precio_'][0].value,
