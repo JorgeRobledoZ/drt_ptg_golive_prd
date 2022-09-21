@@ -5,6 +5,10 @@ $("#agregarDirecciones, #agregarDireccion").click( function() {
     $('.dias-semana').prop('checked', true);
 
     if ( id == 'agregarDirecciones' ) {// Nueva dirección de cliente nuevo
+        // Se remueven las opciones de poder agregar una dirección de facturación
+        let requiereFactura = $("input[name=requiereFactura]:checked").val();
+        if ( requiereFactura == 'si' ) { console.log('deben aparecer todos los tipos de domicilio'); $('.opt-tipo-dir-fact').removeClass('d-none');  } 
+        else { console.log('se quitan algunos tipos de domicilio'); $('.opt-tipo-dir-fact').addClass('d-none'); }
         $("#tipoAccionDireccion").val('lista');
         $("input[name=tipoAccionFormCliente][value=1]").prop("checked", true).trigger("change");
         $("#tipoServicioFormCliente").val(idCilindro);
@@ -366,10 +370,13 @@ $('body').delegate('.edit-address', 'click', function () {
     if(loadColonias) {
         infoMsg('warning', 'Aun están cargando los datos para direcciones, favor de esperar un momento');
     } else {
-        let direccion = $(this).closest('.address').data('address');
+        // let direccion = $(this).closest('.address').data('address');
+        let direccion = $(this).parent().parent().data('address');
         $("#tipoAccionDireccion").val('guardar');
-        console.log(direccion);
+        console.log('Esta es la dirección en editar:', direccion);
         if ( direccion ) {
+            $('#tipoDireccion').val(direccion.tipoDireccion ?? "").trigger('change');
+
             let requiereFactura  = ($("input[name=requiereFactura]:checked").val() == "si" ? true : false);
             if(requiereFactura) {
                 $($(".dato-facturacion").removeClass("d-none"));
