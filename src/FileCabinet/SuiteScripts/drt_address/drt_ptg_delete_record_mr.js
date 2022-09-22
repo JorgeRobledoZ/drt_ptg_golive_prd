@@ -110,6 +110,7 @@ define([
 
         const summarize = (summaryContext) => {
             const objUpdate = {
+                custrecord_drt_ptg_dr_id_estado: "Finalizado",
                 custrecord_drt_ptg_dr_resultado: "",
                 custrecord_drt_ptg_dr_error: "",
                 custrecord_drt_ptg_dr_finalizado: true,
