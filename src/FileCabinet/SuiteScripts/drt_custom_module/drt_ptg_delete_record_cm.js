@@ -178,9 +178,11 @@ define([
                 data: []
             };
             try {
+                const record_delete_id = readParameter("custscript_drt_ptg_dr_mr_delete");
                 const record_id = readParameter("custscript_drt_ptg_dr_mr_id");
                 const record_type = readParameter("custscript_drt_ptg_dr_mr_type");
                 if (
+                    !!record_delete_id &&
                     !!record_type &&
                     !!record_id
                 ) {
@@ -453,7 +455,7 @@ define([
                         newIdTask = createTask(
                             task.TaskType.MAP_REDUCE,
                             "customscript_drt_ptg_delete_record_mr",
-                            "customdeploy_drt_ptg_delete_record_mr", {
+                            "", {
                                 custscript_drt_ptg_dr_mr_id: scriptContext.request.parameters.custpage_record_id,
                                 custscript_drt_ptg_dr_mr_type: scriptContext.request.parameters.custpage_record_type,
                                 custscript_drt_ptg_dr_mr_delete: recordDelete.data,
@@ -475,6 +477,20 @@ define([
                         redirect.toRecord({
                             type: "customrecord_drt_ptg_delete_record",
                             id: recordDelete.data,
+                            parameters: {}
+                        });
+                    } else {
+                        drt_ptg_address_cm.updateRecord(
+                            "customrecord_drt_ptg_delete_record",
+                            recordDelete.data, {
+                                custrecord_drt_ptg_dr_id_estado: "Sin iniciar",
+                                custrecord_drt_ptg_dr_finalizado: true,
+                                custrecord_drt_ptg_dr_error: "Existen muchos procesos en ejecucion.",
+                            }
+                        );
+                        redirect.toRecord({
+                            type: scriptContext.request.parameters.custpage_record_type,
+                            id: scriptContext.request.parameters.custpage_record_id,
                             parameters: {}
                         });
                     }
@@ -520,13 +536,13 @@ define([
             try {
                 log.debug(`createTask `, `param_taskType:${param_taskType} param_scriptId:${param_scriptId} param_deploymentId:${param_deploymentId} param_params:${JSON.stringify(param_params)}`);
                 if (
-                    !!param_scriptId &&
-                    !!param_deploymentId
+                    // !!param_deploymentId &&
+                    !!param_scriptId
                 ) {
                     respuesta.data = task.create({
                         taskType: param_taskType,
                         scriptId: param_scriptId,
-                        deploymentId: param_deploymentId,
+                        // deploymentId: param_deploymentId,
                         params: param_params,
                     }).submit();
                 }
@@ -539,8 +555,27 @@ define([
             }
         }
 
+        const updateRecordDelete = (param_obj) => {
+            try {
+                log.debug(`updateRecordDelete `, param_obj);
+                const record_delete_id = readParameter("custscript_drt_ptg_dr_mr_delete");
+                if (
+                    !!record_delete_id
+                ) {
+                    drt_ptg_address_cm.updateRecord(
+                        "customrecord_drt_ptg_delete_record",
+                        record_delete_id,
+                        param_obj
+                    );
+                }
+            } catch (e) {
+                log.error(`error updateRecordDelete`, e);
+            }
+        }
+
 
         return {
+            updateRecordDelete,
             urlScript,
             readParams,
             printForm,

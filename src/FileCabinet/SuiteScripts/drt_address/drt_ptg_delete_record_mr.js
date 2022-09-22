@@ -59,7 +59,7 @@ define([
                         !!objRecord.recordType
                     ) {
                         try {
-                            const isTest = true;
+                            const isTest = false;
                             if (
                                 isTest
                             ) {
@@ -109,10 +109,34 @@ define([
         }
 
         const summarize = (summaryContext) => {
+            const objUpdate = {
+                custrecord_drt_ptg_dr_resultado: "",
+                custrecord_drt_ptg_dr_error: "",
+                custrecord_drt_ptg_dr_finalizado: true,
+            };
             summaryContext.output.iterator().each(function (key, value) {
-                log.debug(`Resultado ${key}`, value);
+                // log.debug(`Resultado ${key}`, value);
+                if (
+                    key.includes("sin_confirmar") ||
+                    key.includes("error")
+                ) {
+                    objUpdate.custrecord_drt_ptg_dr_error = `${objUpdate.custrecord_drt_ptg_dr_error}
+                    -
+                    ${key}
+                    ${value}
+                    -
+                    `;
+                } else {
+                    objUpdate.custrecord_drt_ptg_dr_resultado = `${objUpdate.custrecord_drt_ptg_dr_resultado}
+                    -
+                    ${key}
+                    ${value}
+                    -
+                    `;
+                }
                 return true;
             });
+            drt_ptg_delete_record_cm.updateRecordDelete(objUpdate);
             log.debug(`summarize`, summaryContext);
         }
 
