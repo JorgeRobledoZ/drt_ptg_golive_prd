@@ -368,6 +368,9 @@ define([
                     const idRecord = scriptContext.newRecord.getValue({
                         fieldId: 'id'
                     });
+                    const isinactive = scriptContext.newRecord.getValue({
+                        fieldId: 'isinactive'
+                    });
                     const suiteletURL = urlScript(
                         "customscript_drt_ptg_delete_record_sl",
                         "customdeploy_drt_ptg_delete_record_sl", {
@@ -377,6 +380,7 @@ define([
                     log.debug(`idRecord`, idRecord);
                     log.debug(`suiteletURL`, suiteletURL);
                     if (
+                        !isinactive &&
                         idRecord
                     ) {
                         scriptContext.form.addButton({
