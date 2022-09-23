@@ -52,7 +52,12 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
         var lineCount = newRecord.getLineCount({sublistId: "recmachcustrecord_ptg_numviaje_dot_",});
         var estacionCarburacion = newRecord.getValue("custrecord_ptg_est_carb_viaje_");
         var lineCountEstacionario = newRecord.getLineCount({sublistId: "recmachcustrecord_ptg_viajellenadopipa_",});
-        var transacciones = transaccionesCreadas[0];
+        var transacciones0 = transaccionesCreadas[0];
+        log.audit("transacciones0", transacciones0);
+        var transacciones1 = transaccionesCreadas[1];
+        log.audit("transacciones1", transacciones1);
+        var transacciones2 = transaccionesCreadas[2];
+        log.audit("transacciones2", transacciones2);
         var formulario = newRecord.getValue("customform");
         var paqueteMySuite = 0;
         var plantillaDocumentoElectronico = 0;
@@ -131,12 +136,12 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
         log.audit("estatus", estatus);
         log.audit("estatusEnCurso", estatusEnCurso);
         log.audit("fechaEnCurso", fechaEnCurso);
-      if (estatus == estatusEnCurso && !fechaEnCurso) {
+      if (estatus == estatusEnCurso /*&& !fechaEnCurso*/) {
 
         log.audit("formulario", formulario);
         log.audit("formularioCilindros", formularioCilindros);
-        log.audit("transacciones", transacciones);
-        if (formulario == formularioCilindros && !transacciones) {
+        log.audit("transacciones2", transacciones2);
+        if (formulario == formularioCilindros && !transacciones2) {
           //BÚSQUEDA GUARDADA: DRT - PTG Dotacion
           log.audit("entra cilindros");
 
@@ -216,6 +221,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
 
           }
 
+          if(!transacciones0){
+
           var recOrdenTraslado = record.create({
             type: record.Type.TRANSFER_ORDER,
             isDynamic: true,
@@ -262,10 +269,12 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
 
           idTransaccionArray.push(idOrdenTraslado);
 
-          if (idOrdenTraslado) {
+        }
+
+          if (idOrdenTraslado || (transacciones0 && !transacciones1)) {
             var newRecordItemFulfillment = record.transform({
               fromType: record.Type.TRANSFER_ORDER,
-              fromId: idOrdenTraslado,
+              fromId: idOrdenTraslado || transacciones0,
               toType: record.Type.ITEM_FULFILLMENT,
               isDynamic: true,
               ignoreMandatoryFields: true,
@@ -283,14 +292,17 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
 
             log.debug("idItemFulfillment", idItemFulfillment);
 
+            if(transacciones0){
+              idTransaccionArray.push(transacciones0);
+            }
             idTransaccionArray.push(idItemFulfillment);
           }
 
-          if (idItemFulfillment) {
+          if (idItemFulfillment || (transacciones0 && !transacciones2)) {
             log.audit("Entra ITEM RECEIPT");
             var newRecordItemReceipt = record.transform({
               fromType: record.Type.TRANSFER_ORDER,
-              fromId: idOrdenTraslado,
+              fromId: idOrdenTraslado || transacciones0,
               toType: record.Type.ITEM_RECEIPT,
               isDynamic: true,
               ignoreMandatoryFields: true,
@@ -316,12 +328,13 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
           var objUpdate = {
             name: numeroEntero,
             custrecord_ptg_viaje_tabladeviajes_: numeroEntero,
-            custrecord_drt_ptg_transferencia_tv: idTransaccionArray,
+            custrecord_ptg_etapa_tabla_viaje_: 2,
+//            custrecord_drt_ptg_transferencia_tv: idTransaccionArray,
             custrecord_ptg_serviciocilindro_: true,
-            custrecord_ptg_fecha_viaje_en_curso: tme,
+            //custrecord_ptg_fecha_viaje_en_curso: tme,
             custrecord_ptg_viajeactivo_: true,
           };
-          record.submitFields({
+          /*record.submitFields({
             id: newRecord.id,
             type: newRecord.type,
             values: objUpdate,
@@ -334,7 +347,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
           log.debug({
             title: "Record created successfully",
             details: "Id: " + recId,
-          });
+          });*/
         }
         log.debug("No entra validacion");
         log.audit("formularioEstacionarios", formularioEstacionarios);
@@ -344,7 +357,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
           log.audit("entra formulario estacionarios");
           
             objUpdate.custrecord_ptg_servicioestacionario_ = true,
-            objUpdate.custrecord_ptg_fecha_viaje_en_curso = tme,
+           // objUpdate.custrecord_ptg_fecha_viaje_en_curso = tme,
             objUpdate.custrecord_ptg_viajeactivo_ = true,
 
           record.submitFields({
@@ -381,9 +394,30 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
 
       } 
     } catch (e) {
+      objUpdate.custrecord_ptg_etapa_tabla_viaje_ = 3;
       log.error({
         title: e.name,
         details: e.message,
+      });
+    } finally {
+
+      if(!transacciones2){
+        objUpdate.custrecord_drt_ptg_transferencia_tv = idTransaccionArray;
+      }
+      
+      record.submitFields({
+        id: newRecord.id,
+        type: newRecord.type,
+        values: objUpdate,
+        options: {
+          enableSourcing: false,
+          ignoreMandatoryFields: true,
+        },
+      });
+
+      log.debug({
+        title: "Record created successfully",
+        details: "Id: " + recId,
       });
     }
   }
