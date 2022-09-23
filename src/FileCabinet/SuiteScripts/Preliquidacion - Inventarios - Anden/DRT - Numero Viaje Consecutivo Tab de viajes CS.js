@@ -9,7 +9,7 @@
  * File: DRT - Numero Viaje Consecutivo Tab de viajes CS.js
  ******************************************************************/
 /**
- *@NApiVersion 2.1
+ *@NApiVersion 2.x
  *@NScriptType ClientScript
  */
 define([
@@ -20,6 +20,7 @@ define([
   "N/error",
   "N/runtime",
   "N/ui/dialog",
+  "N/currentRecord"
 ], function (
   drt_mapid_cm,
   //library,
@@ -27,7 +28,8 @@ define([
   search,
   error,
   runtime,
-  dialog
+  dialog,
+  currentRecord
 ) {
   function pageInit(context) {
     try {
@@ -41,6 +43,29 @@ define([
       var parametroFormulario = urlParametro.get("formulario");
       var nombre = "Por Asignar";
       var nnombre = currentRecord.getValue("name");
+      var transferenciaCreada = currentRecord.getValue("custrecord_drt_ptg_transferencia_tv");
+      var transferencia = transferenciaCreada[0];
+
+      if(transferencia){
+        var nombreSublistaDotacion = "recmachcustrecord_ptg_numviaje_dot_";
+        var numeroLineas = currentRecord.getLineCount(nombreSublistaDotacion);
+        for(var j = 0; j < numeroLineas; j++){
+          dotacion = currentRecord.getSublistField({
+            sublistId: nombreSublistaDotacion,
+            fieldId: 'custrecord_ptg_dotacion_cilindros',
+            line: j
+          });
+             
+          articulo = currentRecord.getSublistField({
+            sublistId: nombreSublistaDotacion,
+            fieldId: 'custrecord_ptg_cilindro_dotacion_',
+            line: j
+          });
+
+          dotacion.isDisabled = true;
+          articulo.isDisabled = true;
+        }
+      }
 
       if (parametroFormulario && parametroVehiculo) {
         if (formulario != parametroFormulario) {
@@ -66,51 +91,62 @@ define([
       var nombreSublistaDotacion = "recmachcustrecord_ptg_numviaje_dot_";
       log.audit("vehiculo", vehiculo);
       log.audit("Numero de viaje", numeroViaje);
+      var transferenciaCreada = currentRecord.getValue("custrecord_drt_ptg_transferencia_tv");
+      var transferencia = transferenciaCreada[0];
 
-      if (vehiculo && cabeceraFieldName === "custrecord_ptg_vehiculo_tabladeviajes_") {
+      if(vehiculo && cabeceraFieldName === "custrecord_ptg_vehiculo_tabladeviajes_" && !transferencia){
         var numeroLineas = currentRecord.getLineCount(nombreSublistaDotacion);
         log.debug("numeroLineas", numeroLineas);
-        if (numeroLineas > 0) {
-          for (var j = 0; j < numeroLineas; j++) {
-            currentRecord.removeLine({
+        if(numeroLineas > 0){
+          log.debug("entra mas de cero");
+          for(var j = 0; j < numeroLineas; j++){
+            log.debug("j", j);
+            var xx = currentRecord.removeLine({
               sublistId: nombreSublistaDotacion,
               line: 0,
-              ignoreRecalc: true,
+              ignoreRecalc: true
             });
+            log.audit("xx", xx);
           }
         }
 
         //BÚSQUEDA GUARDADA: PTG - Dotación Predeterminada Cilindros SS
         var dotacionObj = search.create({
           type: "customrecord_ptg_dotacionpredeterminada_",
-          filters: [["custrecord_ptg_equipodotacion", "anyof", vehiculo]],
+          filters: [["custrecord_ptg_equipodotacion","anyof",vehiculo]],
           columns: [
-            search.createColumn({name: "custrecord_ptg_cilindro_dotacion", label: "PTG - Cilindro",}),
-            search.createColumn({name: "custrecord_ptg_cantidad_dotacion_", label: "PTG - Cantidad",}),
-          ],
+            search.createColumn({name: "custrecord_ptg_cilindro_dotacion", label: "PTG - Cilindro"}),
+            search.createColumn({name: "custrecord_ptg_cantidad_dotacion_", label: "PTG - Cantidad"})
+          ]
         });
+        log.debug("dotacionObj", dotacionObj);
         var dotacionObjCount = dotacionObj.runPaged().count;
         var dotacionObjResults = dotacionObj.run().getRange({
           start: 0,
           end: dotacionObjCount,
         });
-        for (var i = 0; i < dotacionObjCount; i++) {
-          (articulo = dotacionObjResults[i].getValue({name: "custrecord_ptg_cilindro_dotacion", label: "PTG - Cilindro",})),
-          (cantidad = dotacionObjResults[i].getValue({name: "custrecord_ptg_cantidad_dotacion_", label: "PTG - Cantidad",}));
+        log.debug("dotacionObjCount", dotacionObjCount);
+        for(var i = 0; i < dotacionObjCount; i++){
+          (articulo = dotacionObjResults[i].getValue({name: "custrecord_ptg_cilindro_dotacion", label: "PTG - Cilindro"})),
+          (cantidad = dotacionObjResults[i].getValue({name: "custrecord_ptg_cantidad_dotacion_", label: "PTG - Cantidad"}));
+          log.audit("articulo", articulo);
+          log.audit("cantidad", cantidad);
 
-          currentRecord.selectNewLine({sublistId: nombreSublistaDotacion,});
-          currentRecord.setCurrentSublistValue({
-            sublistId: nombreSublistaDotacion,
-            fieldId: "custrecord_ptg_cilindro_dotacion_",
-            value: articulo,
+          currentRecord.selectNewLine({
+            sublistId: nombreSublistaDotacion
           });
           currentRecord.setCurrentSublistValue({
             sublistId: nombreSublistaDotacion,
-            fieldId: "custrecord_ptg_dotacion_cilindros",
-            value: cantidad,
+            fieldId: 'custrecord_ptg_cilindro_dotacion_',
+            value: articulo
+          });
+          currentRecord.setCurrentSublistValue({
+            sublistId: nombreSublistaDotacion,
+            fieldId: 'custrecord_ptg_dotacion_cilindros',
+            value: cantidad
           });
           currentRecord.commitLine({
-            sublistId: nombreSublistaDotacion,
+            sublistId: nombreSublistaDotacion
           });
         }
       }
