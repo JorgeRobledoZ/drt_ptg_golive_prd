@@ -46,20 +46,20 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             form.title = "Servicios Procesados";
           }
           
-          if (status == estatusEtapa && tipoServicio == servicioCilindros) {
+        //  if (status == estatusEtapa && tipoServicio == servicioCilindros) {
               form.addButton({
                   id: "custpage_drt_to_preliq_cil",
                   label: "Preliquidación Cilindros",
                   functionName: "pasarPreliquidacion()",
               });
-          }
+         /* }
           if (status == estatusEtapa && tipoServicio == servicioEstacionarios) {
             form.addButton({
                 id: "custpage_drt_to_preliq_cil",
                 label: "Preliquidación Estacionarios",
                 functionName: "pasarPreliquidacion()",
             });
-        }
+        }*/
 
           form.clientScriptModulePath = "./drt_ptg_reg_serv_cil_cs.js";       
 
@@ -105,6 +105,15 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           var mrTaskId = mrTask.submit();
           var taskStatus = task.checkStatus(mrTaskId);
           log.audit({title: 'taskStatus', details: JSON.stringify(taskStatus)});
+
+          var regCil = record.submitFields({
+            type: recObj.type,
+            id: recObj.id,
+            values: {
+              custrecord_ptg_etapa_reg_serv_cil: null
+            }
+          });
+          log.audit("Registro Actualizado", regCil);
         }
 
     } catch (e) {
