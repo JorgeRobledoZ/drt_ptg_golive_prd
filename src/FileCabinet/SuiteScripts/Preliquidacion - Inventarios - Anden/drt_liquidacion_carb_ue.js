@@ -188,12 +188,6 @@
                         label: "Liquidación Estaciones de Carburación",
                         functionName: "redirectTo()",
                     });
-
-                    form.addButton({
-                        id: "custpage_drt_eliminar",
-                        label: "Eliminar Preliquidación",
-                        functionName: "redirectToEliminar()",
-                    });
                 }
                 if (status == estatusLiquidacion && (montoDesgloseEfec != "" || montoDesgloseEfec > 0)) {
                     form.addButton({
