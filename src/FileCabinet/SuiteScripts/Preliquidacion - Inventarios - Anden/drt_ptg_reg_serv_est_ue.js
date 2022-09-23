@@ -224,7 +224,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         }
 
         
-        else if (etapa == estatusEtapaCarga) {
+        else if (etapa == estatusEtapaCarga && type_interface === "USERINTERFACE") {
           log.debug("pasa");
         var mrTask = task.create({
           taskType: task.TaskType.MAP_REDUCE,
