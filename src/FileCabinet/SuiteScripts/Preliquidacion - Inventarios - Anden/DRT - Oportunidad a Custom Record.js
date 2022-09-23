@@ -109,6 +109,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var customRec = context.newRecord;
         var recId = customRec.id;
         var formulario = customRec.getValue("customform");
+        var clienteOportunidad = customRec.getValue("entity");
         var servicio = customRec.getValue("custbody_ptg_tipo_servicio");
         var probabilidad = customRec.getValue("probability");
         var itemCount = customRec.getLineCount({sublistId : 'item'});
@@ -219,6 +220,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         recPagos.setValue("custrecord_registro_desde_oportunidad_p", true);
         recPagos.setValue("custrecord_ptg_estacion_carburacion", estacionCarburacion);
         recPagos.setValue("custrecord_ptg_total_litros_esta", cantidadTotalstacionario)
+        recPagos.setValue("custrecord_ptg_pagos_cliente", clienteOportunidad);
 
         var recIdSavedEstacionariosPagos = recPagos.save();
 
@@ -354,6 +356,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var cliente = customRec.getValue("entity");
         var clienteTxt = customRec.getText("entity");
         var estacionCarburacion = customRec.getValue("custbody_ptg_estacion_carburacion");
+        var origenServicio = customRec.getValue("custbody_ptg_origen_servicio");
+        var direccionCustom = customRec.getValue("custbody_ptg_id_direccion_envio");
         var articuloArray = [];
         var capacidadArray = [];
         var cantidadArray = [];
@@ -584,58 +588,59 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             } 
             else {
 
-              if(articuloArray[j] != idArticuloDescuento){
-                var rec = record.create({
-                  type: "customrecord_ptg_regitrodemovs_",
-                  isDynamic: true,
-                });
-                rec.setValue("name", nombre);
-                rec.setValue("custrecord_ptg_codigomov_", codigoMovimiento);
-                rec.setValue("custrecord_ptg_movmas_", 0);
-                rec.setValue("custrecord_ptg_movmenos_", 0);
-                rec.setValue("custrecord_ptg_cilindro", articuloArray[j]);
-    
-                if (lookupItemType == articuloCilindro) {
-                  rec.setValue("custrecord_ptg_ventagas_", cantidadArray[j]);
-                  rec.setValue("custrecord_ptg_envasesvendidos_", 0);
+              if(!origenServicio){
+                if(articuloArray[j] != idArticuloDescuento){
+                  var rec = record.create({
+                    type: "customrecord_ptg_regitrodemovs_",
+                    isDynamic: true,
+                  });
+                  rec.setValue("name", nombre);
+                  rec.setValue("custrecord_ptg_codigomov_", codigoMovimiento);
+                  rec.setValue("custrecord_ptg_movmas_", 0);
+                  rec.setValue("custrecord_ptg_movmenos_", 0);
+                  rec.setValue("custrecord_ptg_cilindro", articuloArray[j]);
+      
+                  if (lookupItemType == articuloCilindro) {
+                    rec.setValue("custrecord_ptg_ventagas_", cantidadArray[j]);
+                    rec.setValue("custrecord_ptg_envasesvendidos_", 0);
+                  }
+                  if (lookupItemType == articuloEnvase) {
+                    rec.setValue("custrecord_ptg_ventagas_", 0);
+                    rec.setValue("custrecord_ptg_envasesvendidos_", cantidadArray[j]);
+                  }
+                  if (!lookupItemType) {
+                    rec.setValue("custrecord_ptg_ventagas_", 0);
+                    rec.setValue("custrecord_ptg_envasesvendidos_", 0);
+                  }
+      
+                  rec.setValue("custrecord_ptg_lts_", litrosTotalesArray[j]);
+                  rec.setValue("custrecord_ptg_tasa", tasaArray[j]);
+                  rec.setValue("custrecord_ptg_num_viaje_oportunidad", numeroViaje);
+                  rec.setValue("custrecord_ptg_origen", true);
+                  rec.setValue("custrecord_ptg_zonadeprecio_registromovs", zonaPrecio);
+                  rec.setValue("custrecord_drt_ptg_reg_oportunidad", recId);
+                  var recIdSaved = rec.save();
+      
+                  var rec2 = record.load({
+                    type: customRec.type,
+                    id: customRec.id,
+                    isDynamic: true
+                  });
+                  rec2.setValue('custbody_drt_ptg_registro_creado_mov', true);
+                  rec2.setValue("custbody_ptg_serviciocilindro_", true);
+      
+                  rec2.selectLine('item', j);
+                  rec2.setCurrentSublistValue('item', 'custcol_drt_ptg_registro_mov_creado', recIdSaved);
+                  rec2.commitLine('item');
+      
+                  rec2.save();
+      
+                  log.debug({
+                    title: "Record updated successfully",
+                    details: "Id Saved: " + recIdSaved,
+                  });
                 }
-                if (lookupItemType == articuloEnvase) {
-                  rec.setValue("custrecord_ptg_ventagas_", 0);
-                  rec.setValue("custrecord_ptg_envasesvendidos_", cantidadArray[j]);
-                }
-                if (!lookupItemType) {
-                  rec.setValue("custrecord_ptg_ventagas_", 0);
-                  rec.setValue("custrecord_ptg_envasesvendidos_", 0);
-                }
-    
-                rec.setValue("custrecord_ptg_lts_", litrosTotalesArray[j]);
-                rec.setValue("custrecord_ptg_tasa", tasaArray[j]);
-                rec.setValue("custrecord_ptg_num_viaje_oportunidad", numeroViaje);
-                rec.setValue("custrecord_ptg_origen", true);
-                rec.setValue("custrecord_ptg_zonadeprecio_registromovs", zonaPrecio);
-                rec.setValue("custrecord_drt_ptg_reg_oportunidad", recId);
-                var recIdSaved = rec.save();
-    
-                var rec2 = record.load({
-                  type: customRec.type,
-                  id: customRec.id,
-                  isDynamic: true
-                });
-                rec2.setValue('custbody_drt_ptg_registro_creado_mov', true);
-                rec2.setValue("custbody_ptg_serviciocilindro_", true);
-    
-                rec2.selectLine('item', j);
-                rec2.setCurrentSublistValue('item', 'custcol_drt_ptg_registro_mov_creado', recIdSaved);
-                rec2.commitLine('item');
-    
-                rec2.save();
-    
-                log.debug({
-                  title: "Record updated successfully",
-                  details: "Id Saved: " + recIdSaved,
-                });
               }
-
             
           }
           }
@@ -655,6 +660,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           } else {
             recPagos.setValue("custrecord_ptg_total_litros_esta", cantidadTotalCilindros);
           }
+          recPagos.setValue("custrecord_ptg_pagos_cliente", cliente);
+          recPagos.setValue("custrecord_ptg_pagos_direccion", direccionCustom);
 
           var recIdSavedEstacionariosPagos = recPagos.save();
 
@@ -771,6 +778,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           recPagos.setValue("custrecord_ptg_total_servicio", total);
           recPagos.setValue("custrecord_registro_desde_oportunidad_p", true);
           recPagos.setValue("custrecord_ptg_estacion_carburacion", estacionCarburacion);
+          recPagos.setValue("custrecord_ptg_pagos_cliente", cliente);
+          recPagos.setValue("custrecord_ptg_pagos_direccion", direccionCustom);
   
           var recIdSavedEstacionariosPagos = recPagos.save();
   
