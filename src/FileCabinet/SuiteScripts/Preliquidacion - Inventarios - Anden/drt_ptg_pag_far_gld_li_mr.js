@@ -50,8 +50,11 @@
                 filters: arrayFilters
             });
 
+            estatus.custrecord_ptg_etapa_pagos_farm_gld = 1;
+
 
         } catch (error) {
+            estatus.custrecord_ptg_etapa_pagos_farm_gld = 3;
             log.audit({
                 title: 'error getInputData',
                 details: JSON.stringify(error)
@@ -65,6 +68,7 @@
                 id: idRegistro,
                 values: estatus
             });
+            log.audit("Pagos Farmacias Actualizado getInputData", registroCabecera);
 
             log.audit({
                 title: 'respuesta getInputData Finally',
@@ -307,6 +311,7 @@
 
             log.debug("Registro actualizado", actualizar);
             
+            estatus.custrecord_ptg_etapa_pagos_farm_gld = 1;
 
             context.write({
                 key: actualizar,
@@ -314,6 +319,7 @@
             });
                
         } catch (error) {
+            estatus.custrecord_ptg_etapa_pagos_farm_gld = 3;
             estatus.custrecord_ptg_procesando_pagos_farm_gld = false;
             estatus.custrecord_ptg_terminado_pagos_farm_gld = false;
             log.error({
@@ -328,7 +334,7 @@
                 id: idRegistroCab,
                 values: estatus
             });
-            log.debug("Registro actualizado", registroCabecera);
+            log.debug("Pagos Farmacias Actualizado Map", registroCabecera);
 
             log.audit({
                 title: 'respuesta getInputData Finally',
@@ -360,6 +366,7 @@
         } finally {
             estatus.custrecord_ptg_procesando_pagos_farm_gld = false;
             estatus.custrecord_ptg_terminado_pagos_farm_gld = true;
+            estatus.custrecord_ptg_etapa_pagos_farm_gld = 2;
             var registroCabecera = record.submitFields({
                 type: "customrecord_ptg_pagos_farmacias_gdl",
                 id: idRegistroCab,
