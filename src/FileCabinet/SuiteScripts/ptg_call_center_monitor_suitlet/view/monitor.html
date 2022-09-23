@@ -1298,7 +1298,7 @@
                                     <option value="address">Dirección</option>
                                     <option value="phone">Teléfono</option>
                                     <option value="name">Nombre</option>                                    
-                                    <option value="email">Correo electrónico</option>                                    
+                                    <!-- <option value="email">Correo electrónico</option> -->
                                 </select>
                             </div>
                         </div>
@@ -2508,11 +2508,19 @@
         });
 
         function llenaCampos() {
-            //$("#filterFechaPrometidaIni").val(dateFormatFromDate(removeDays(new Date(), "15"), "2"));    
+            //$("#filterFechaPrometidaIni").val(dateFormatFromDate(removeDays(new Date(), "15"), "2"));
+            // Fechas para pedidos
             $("#filterFechaPrometidaIni").val(dateFormatFromDate(new Date(), "2"));            
             $("#filterFechaPrometidaFin").val(dateFormatFromDate(new Date(), "2"));
             $("#filterFechaPrometidaIni").prop("max", $("#filterFechaPrometidaFin").val());
             $("#filterFechaPrometidaFin").prop("min", $("#filterFechaPrometidaIni").val());
+
+            // Fechas para quejas y fugas
+            // $("#filterFechaSolicitudIni").val(dateFormatFromDate(new Date(), "2"));            
+            // $("#filterFechaSolicitudFin").val(dateFormatFromDate(new Date(), "2"));
+            // $("#filterFechaSolicitudIni").prop("max", $("#filterFechaSolicitudFin").val());
+            // $("#filterFechaSolicitudFin").prop("min", $("#filterFechaSolicitudIni").val());
+
             origins.forEach((element, i) => {
                 $("#origenPedido").append('<option value="' + element + '">' + element + '</option>');
             });
