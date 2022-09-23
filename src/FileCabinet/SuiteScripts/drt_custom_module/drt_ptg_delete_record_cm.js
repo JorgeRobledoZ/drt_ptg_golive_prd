@@ -4,6 +4,10 @@
  */
 define([
         'SuiteScripts/drt_custom_module/drt_ptg_address_cm',
+        'N/ui/serverWidget',
+        'N/task',
+        'N/url',
+        'N/redirect',
         'N/runtime',
         'N/record',
         'N/search',
@@ -11,6 +15,10 @@ define([
     ],
     (
         drt_ptg_address_cm,
+        serverWidget,
+        task,
+        url,
+        redirect,
         runtime,
         record,
         search,
@@ -170,9 +178,11 @@ define([
                 data: []
             };
             try {
+                const record_delete_id = readParameter("custscript_drt_ptg_dr_mr_delete");
                 const record_id = readParameter("custscript_drt_ptg_dr_mr_id");
                 const record_type = readParameter("custscript_drt_ptg_dr_mr_type");
                 if (
+                    !!record_delete_id &&
                     !!record_type &&
                     !!record_id
                 ) {
@@ -334,7 +344,246 @@ define([
             //log.debug(`respuesta keyRecordType`, respuesta);
         }
 
+        const recordButton = (scriptContext) => {
+            try {
+                log.debug(`recordButton ${scriptContext.type}`, `Type: ${scriptContext.newRecord.type} ID: ${scriptContext.newRecord.id}`);
+                let printButton = "";
+                if (
+                    scriptContext.type == scriptContext.UserEventType.VIEW
+                ) {
+                    if (
+                        scriptContext.newRecord.type == "customrecord_ptg_preliquicilndros_"
+                    ) {
+                        printButton = "Preliquidacion Cilndros";
+                    } else if (
+                        scriptContext.newRecord.type == "customrecord_ptg_preliqestcarburacion_"
+                    ) {
+                        printButton = "Preliquidacion Carburacion";
+                    }
+                }
+
+                if (
+                    printButton
+                ) {
+                    const idRecord = scriptContext.newRecord.getValue({
+                        fieldId: 'id'
+                    });
+                    const isinactive = scriptContext.newRecord.getValue({
+                        fieldId: 'isinactive'
+                    });
+                    const suiteletURL = urlScript(
+                        "customscript_drt_ptg_delete_record_sl",
+                        "customdeploy_drt_ptg_delete_record_sl", {
+                            custscript_drt_ptg_delete_record_sl_id: idRecord,
+                            custscript_drt_ptg_delete_record_sl_type: scriptContext.newRecord.type,
+                        });
+                    log.debug(`idRecord`, idRecord);
+                    log.debug(`suiteletURL`, suiteletURL);
+                    if (
+                        !isinactive &&
+                        idRecord
+                    ) {
+                        scriptContext.form.addButton({
+                            id: 'custpage_suiteletbutton',
+                            label: `Borrar ${printButton} ${idRecord}`,
+                            functionName: `window.open("${suiteletURL}", "_self")`
+                        });
+                    }
+                }
+            } catch (error) {
+                log.error(`error recordButton`, error);
+            }
+        }
+
+        const printForm = (scriptContext) => {
+            try {
+                let form = serverWidget.createForm({
+                    title: 'Eliminacion'
+                });
+
+
+                if (
+                    !!scriptContext.request.parameters.custscript_drt_ptg_delete_record_sl_id &&
+                    !!scriptContext.request.parameters.custscript_drt_ptg_delete_record_sl_type
+                ) {
+                    form.addSubmitButton({
+                        label: 'Confirmar'
+                    });
+
+                    form.addField({
+                        id: `custpage_record_type`,
+                        type: serverWidget.FieldType.TEXT,
+                        label: `Registro`,
+                    }).updateDisplayType({
+                        displayType: serverWidget.FieldDisplayType.INLINE
+                    }).defaultValue = scriptContext.request.parameters.custscript_drt_ptg_delete_record_sl_type;
+
+                    form.addField({
+                        id: `custpage_record_id`,
+                        type: serverWidget.FieldType.TEXT,
+                        label: `Identificador`,
+                    }).updateDisplayType({
+                        displayType: serverWidget.FieldDisplayType.INLINE
+                    }).defaultValue = scriptContext.request.parameters.custscript_drt_ptg_delete_record_sl_id;
+
+                }
+
+                scriptContext.response.writePage(form);
+            } catch (e) {
+                log.error(`error printForm`, e);
+            }
+        }
+
+        const readParams = (scriptContext) => {
+            try {
+                log.debug(`scriptContext.request.parameters`, scriptContext.request.parameters);
+                if (
+                    !!scriptContext.request.parameters.custpage_record_id &&
+                    !!scriptContext.request.parameters.custpage_record_type
+                ) {
+
+                    const recordDelete = drt_ptg_address_cm.createRecord(
+                        record.create({
+                            type: "customrecord_drt_ptg_delete_record",
+                            isDynamic: true
+                        }), {
+                            name: `${scriptContext.request.parameters.custpage_record_id} ${scriptContext.request.parameters.custpage_record_type}`,
+                            custrecord_drt_ptg_dr_id: parseInt(scriptContext.request.parameters.custpage_record_id),
+                            custrecord_drt_ptg_dr_type: scriptContext.request.parameters.custpage_record_type,
+                        }
+                    );
+                    let newIdTask = {};
+                    if (
+                        recordDelete.success
+                    ) {
+                        newIdTask = createTask(
+                            task.TaskType.MAP_REDUCE,
+                            "customscript_drt_ptg_delete_record_mr",
+                            "", {
+                                custscript_drt_ptg_dr_mr_id: scriptContext.request.parameters.custpage_record_id,
+                                custscript_drt_ptg_dr_mr_type: scriptContext.request.parameters.custpage_record_type,
+                                custscript_drt_ptg_dr_mr_delete: recordDelete.data,
+                            }
+                        );
+                    }
+                    if (
+                        !!newIdTask.success
+                    ) {
+                        drt_ptg_address_cm.updateRecord(
+                            "customrecord_drt_ptg_delete_record",
+                            recordDelete.data, {
+                                custrecord_drt_ptg_dr_taskid: newIdTask.data,
+                                custrecord_drt_ptg_dr_id_estado: "Inicio",
+                                // custrecord_drt_ptg_dr_resultado:"",
+                                // custrecord_drt_ptg_dr_error:"",
+                            }
+                        );
+                        redirect.toRecord({
+                            type: "customrecord_drt_ptg_delete_record",
+                            id: recordDelete.data,
+                            parameters: {}
+                        });
+                    } else {
+                        drt_ptg_address_cm.updateRecord(
+                            "customrecord_drt_ptg_delete_record",
+                            recordDelete.data, {
+                                custrecord_drt_ptg_dr_id_estado: "Sin iniciar",
+                                custrecord_drt_ptg_dr_finalizado: true,
+                                custrecord_drt_ptg_dr_error: "Existen muchos procesos en ejecucion.",
+                            }
+                        );
+                        redirect.toRecord({
+                            type: scriptContext.request.parameters.custpage_record_type,
+                            id: scriptContext.request.parameters.custpage_record_id,
+                            parameters: {}
+                        });
+                    }
+                }
+            } catch (e) {
+                log.error(`error readParams`, e);
+            }
+        }
+
+        const urlScript = (param_scriptId, param_deploymentId, params) => {
+            let respuesta = "";
+            try {
+                log.debug(`urlScript`, `param_scriptId: ${param_scriptId} param_deploymentId: ${param_deploymentId}`);
+                if (
+                    !!param_scriptId &&
+                    !!param_deploymentId
+                ) {
+                    const scheme = 'https://';
+                    const host = url.resolveDomain({
+                        hostType: url.HostType.APPLICATION
+                    });
+                    const relativePath = url.resolveScript({
+                        scriptId: param_scriptId,
+                        deploymentId: param_deploymentId,
+                        returnExternalUrl: false,
+                        params: params
+                    });
+                    respuesta = scheme + host + relativePath;
+                }
+            } catch (error) {
+                log.error(`error urlScript ${param_scriptId} ${param_deploymentId}`, error);
+            } finally {
+                log.debug(`respuesta urlScript ${param_scriptId} ${param_deploymentId}`, respuesta);
+                return respuesta;
+            }
+        }
+
+        const createTask = (param_taskType, param_scriptId, param_deploymentId, param_params) => {
+            let respuesta = {
+                success: false,
+                data: ""
+            };
+            try {
+                log.debug(`createTask `, `param_taskType:${param_taskType} param_scriptId:${param_scriptId} param_deploymentId:${param_deploymentId} param_params:${JSON.stringify(param_params)}`);
+                if (
+                    // !!param_deploymentId &&
+                    !!param_scriptId
+                ) {
+                    respuesta.data = task.create({
+                        taskType: param_taskType,
+                        scriptId: param_scriptId,
+                        // deploymentId: param_deploymentId,
+                        params: param_params,
+                    }).submit();
+                }
+                respuesta.success = !!respuesta.data;
+            } catch (e) {
+                log.error(`error createTask`, e);
+            } finally {
+                log.debug(`respuesta createTask`, respuesta);
+                return respuesta;
+            }
+        }
+
+        const updateRecordDelete = (param_obj) => {
+            try {
+                log.debug(`updateRecordDelete `, param_obj);
+                const record_delete_id = readParameter("custscript_drt_ptg_dr_mr_delete");
+                if (
+                    !!record_delete_id
+                ) {
+                    drt_ptg_address_cm.updateRecord(
+                        "customrecord_drt_ptg_delete_record",
+                        record_delete_id,
+                        param_obj
+                    );
+                }
+            } catch (e) {
+                log.error(`error updateRecordDelete`, e);
+            }
+        }
+
+
         return {
+            updateRecordDelete,
+            urlScript,
+            readParams,
+            printForm,
+            recordButton,
             keyRecordType,
             getAllRecord,
             readParameter,
