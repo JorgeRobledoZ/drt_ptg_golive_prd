@@ -307,7 +307,9 @@
             //BÚSQUEDA GUARDADA: DRT - PTG - Detalle Movimientos
             var detalleMovimientoSearch = search.create({
                 type: "customrecord_ptg_regitrodemovs_",
-                filters: [["custrecord_ptg_num_viaje_oportunidad","anyof",numViaje], "AND", ["custrecord_ptg_origen","is","T"]],
+                filters: [["custrecord_ptg_num_viaje_oportunidad","anyof",numViaje], "AND", 
+                ["custrecord_ptg_origen","is","T"],"AND", 
+                ["custrecord_drt_ptg_reg_oportunidad","noneof","@NONE@"]],
                 columns: [
                     search.createColumn({name: "internalid", label: "Internal ID"}),
                     search.createColumn({name: "custrecord_ptg_ventagas_", label: "PTG - Venta Gas"}),
