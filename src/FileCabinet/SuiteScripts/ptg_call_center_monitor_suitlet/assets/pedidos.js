@@ -627,15 +627,18 @@ function onChangeValue(element) {
         $('.precio-unitario-label').html(lblPrice);
         $("#formProductosModalPrecio").html('$'.concat(getCorrectFormat(Number(prices * 1.16))));
         if ( elementId == 'totalFormProductos' || elementId == 'productoFormProductos' ) {// Se calculan los litros a contratar
+            if ( elementId == 'totalFormProductos' ) {
+                total = parseFloat( $('#totalFormProductos').val() );
+                
+                $('#totalFormProductos').data("value", total.toFixed(6));
+            } else {
+                total = parseFloat( $('#totalFormProductos').data("value") );
+            }
 
-            total = parseFloat( $('#totalFormProductos').data("value") );
             total = ( isNaN(total) ? 0 : total );
             subtotal = parseFloat(total / 1.16);
-            // subtotal = Math.ceil( $('#valorFormProductos').val() );
-            // subtotal = ( isNaN(subtotal) ? 0 : subtotal );
             litros = parseFloat(subtotal / prices);
             $('#litrosFormProductos').val(litros.toFixed(2));
-            
 
         } else if( elementId == 'litrosFormProductos' ) {// Se calcula el total acorde a los litros
 
