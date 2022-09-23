@@ -28,6 +28,30 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         }
     }
 
+    function lineInit(context) {  
+      try {
+        var currentRecord = context.currentRecord;
+        var sublistName = context.sublistId;
+        var idRegistroDeServicios = "recmachcustrecord_ptg_id_reg_serv_cil_lin";
+        var vehiculo = currentRecord.getValue("custrecord_ptg_no_vehiculo_reg_serv_cil");
+        log.audit("vehiculo lineaInit", vehiculo);
+        var numViaje = currentRecord.getValue("custrecord_ptg_num_viaje_reg_serv_cil");
+        log.audit("numViaje lineaInit", numViaje);
+        var direccion = 581;
+        log.audit("direccion lineaInit", direccion);
+        if (sublistName === idRegistroDeServicios) {
+          log.audit("OK linea");
+          currentRecord.setCurrentSublistValue({
+            sublistId: idRegistroDeServicios, 
+            fieldId: "custrecord_ptg_cil_direccion_venta", 
+            value: direccion,
+          });
+        }
+      } catch (error) {
+       log.error("error lineInit", error); 
+      }
+    }
+
     function fieldChanged(context) {
         try {
             debugger;
@@ -83,10 +107,16 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                 });
                 log.audit("viajeActivoObjResult", viajeActivoObjResult);
                 if(viajeActivoObjCount > 0){
+                var direccion = 581;
                 numeroViaje = viajeActivoObjResult[0].getValue({name: "internalid", sort: search.Sort.DESC, label: "Internal ID"});
                 vendedor = viajeActivoObjResult[0].getValue({name: "custrecord_ptg_chofer_tabladeviajes_", label: "PTG - Chofer (Tabla de viajes)"});
                 currentRecord.setValue("custrecord_ptg_num_viaje_reg_serv_cil",numeroViaje);
                 currentRecord.setValue("custrecord_ptg_vendedor_reg_serv_cil",vendedor);
+                currentRecord.setCurrentSublistValue({
+                  sublistId: idRegistroDeServicios, 
+                  fieldId: "custrecord_ptg_cil_direccion_venta", 
+                  value: direccion,
+                });
                 } else {
                 currentRecord.setValue("custrecord_ptg_num_viaje_reg_serv_cil",'');
                 currentRecord.setValue("custrecord_ptg_vendedor_reg_serv_cil",'');
@@ -125,9 +155,11 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             }
 
 
-            if ((sublistName === idRegistroDeServicios && sublistFieldName === 'custrecord_ptg_cliente_reg_serv_cil_lin') ||
+            if ((sublistName === idRegistroDeServicios && sublistFieldName === 'custrecord_ptg_cil_direccion_venta') ||
+            (sublistName === idRegistroDeServicios && sublistFieldName === 'custrecord_ptg_cliente_reg_serv_cil_lin') ||
             (sublistName === idRegistroDeServicios && sublistFieldName === 'custrecord_ptg_cantidad_reg_serv_cil_lin')  ||
             (sublistName === idRegistroDeServicios && sublistFieldName === 'custrecord_ptg_articulo_reg_serv_cil_lin')){
+              var direccionEmbarque = currentRecord.getCurrentSublistValue({sublistId: idRegistroDeServicios, fieldId: 'custrecord_ptg_cil_direccion_venta'});
                 var idCliente = currentRecord.getCurrentSublistValue({sublistId: idRegistroDeServicios, fieldId: 'custrecord_ptg_cliente_reg_serv_cil_lin'});
                 var precioCabecera = parseInt(currentRecord.getCurrentSublistValue({sublistId: idRegistroDeServicios, fieldId: 'custrecord_ptg_cantidad_reg_serv_cil_lin'}));
                 var articuloServCilindros = currentRecord.getCurrentSublistValue({ sublistId: sublistName, fieldId: "custrecord_ptg_articulo_reg_serv_cil_lin",});
@@ -146,7 +178,34 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                   var cantidadDescuento = parseFloat(clienteObj.getValue("custentity_ptg_descuento_asignar"));
                   log.audit("cantidadDescuento", cantidadDescuento);
                   var lineCount = clienteObj.getLineCount({ sublistId:'addressbook' })||0;
-                  for ( var i = 0; i < lineCount; i++){
+
+                  var direccionObj = record.load({
+                    type: "customrecord_ptg_direcciones",
+                    id: direccionEmbarque,
+                  });
+                  log.audit("direccionObj", direccionObj);
+                  var idZonaPrecio = direccionObj.getValue("custrecord_ptg_zona_precios");
+                  log.audit("idZonaPrecio", idZonaPrecio);
+                  var precio = 0;
+
+                  if(idZonaPrecio){
+                    var zonaPrecioObj = record.load({
+                      type: "customrecord_ptg_zonasdeprecio_",
+                      id: idZonaPrecio,
+                    });
+                    log.audit("zonaPrecioObj", zonaPrecioObj);
+                    precio = zonaPrecioObj.getValue("custrecord_ptg_precio_kg");
+                    log.audit("precio", precio);
+                  } else {
+                    idZonaPrecio = null;
+                    precio = 0;
+                  }
+
+                  
+
+
+
+                  /*for ( var i = 0; i < lineCount; i++){
                     idArray[i] = clienteObj.getSublistValue({
                       sublistId: "addressbook",
                       fieldId: "id",
@@ -188,7 +247,9 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                       log.audit("precio", precio);
                     }
             
-                  }
+                  }*/
+
+
 
                   if(precio > 0){
                     if(tipoDescuento == descuentoPorcentaje){
@@ -392,6 +453,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
       }
 
       if (sublistName === idRegistroDeServicios) {
+        var direccionCliente = currentRecord.getCurrentSublistValue({ sublistId: sublistName, fieldId: "custrecord_ptg_cil_direccion_venta",});
         var clienteServCilindros = currentRecord.getCurrentSublistValue({ sublistId: sublistName, fieldId: "custrecord_ptg_cliente_reg_serv_cil_lin",});
         var articuloServCilindros = currentRecord.getCurrentSublistValue({ sublistId: sublistName, fieldId: "custrecord_ptg_articulo_reg_serv_cil_lin",});
         var cantidadServCilindros = currentRecord.getCurrentSublistValue({ sublistId: sublistName, fieldId: "custrecord_ptg_cantidad_reg_serv_cil_lin",});
@@ -403,7 +465,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var totalServCilindros = currentRecord.getCurrentSublistValue({ sublistId: sublistName, fieldId: "custrecord_ptg_total_reg_serv_cil_lin",});
         var totalServCilindrosOld = currentRecord.getCurrentSublistValue({ sublistId: sublistName, fieldId: "custrecord_ptg_tot_ctrl_reg_serv_cil_lin",});
 
-        if (!clienteServCilindros || !articuloServCilindros || !cantidadServCilindros || !precioUnitarioServCilindros || !formaPago){
+        if (!direccionCliente || !clienteServCilindros || !articuloServCilindros || !cantidadServCilindros || !precioUnitarioServCilindros || !formaPago){
         log.debug("formaPago", formaPago);
           var options = {
             title: "Faltan datos",
@@ -607,14 +669,14 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           var tipoServicio = recordObj.getValue("custrecord_ptg_tipo_servici_reg_serv_cil");
           log.audit("tipoServicio CS", tipoServicio);
 
-          if(tipoServicio == servicioCilindro){
+          //if(tipoServicio == servicioCilindro){
             urlPreliquidacion = urlCilindros;
-          } 
+          /*} 
           else if(tipoServicio == servicioEstacionario){
             urlPreliquidacion = urlEstacionarios;
-          }
+          }*/
 
-          record.submitFields({
+          /*record.submitFields({
               type: recObj.type,
               id: recObj.id,
               values: {custrecord_ptg_etapa_reg_serv_cil : etapaProcesado}
@@ -628,7 +690,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
   
           var url = location.href;
           log.debug('url_2', url);
-          location.replace(url);
+          location.replace(url);*/
   
           var urlRedirect = urlPreliquidacion+vehiculo+'&noviaje='+numeViaje;
           log.debug("urlRedirect", urlRedirect);
@@ -675,7 +737,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
     
   }
 
-  function lineInit(context) {
+  /*function lineInit(context) {
     try {
       var currentRecord = context.currentRecord;
       var sublistName = context.sublistId;
@@ -691,7 +753,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
     } catch (error) {
       log.error("Error lineInit", error);
     }
-  }
+  }*/
 
   function saveRecord(context) {
     try {
@@ -726,16 +788,14 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
       } else {
         //SS: PTG - Registro de Movimientos Mas
         var movimientoMasObj = search.create({
-          type: "customrecord_ptg_regitrodemovs_",
+          type: "customrecord_ptg_registrodedotacion_cil_",
           filters: [
-            ["custrecord_ptg_num_viaje_oportunidad","anyof",numViaje], "AND", 
-            ["custrecord_ptg_origen","is","T"], "AND", 
-            ["custrecord_ptg_movmas_","greaterthan","0"], "AND", 
-            ["custrecord_ptg_movmenos_","equalto","0"]
+            ["custrecord_ptg_numviaje_detalledotacion","anyof",numViaje], "AND", 
+            ["custrecord_ptg_registro_dotacion","is","T"]
           ],
           columns: [
-            search.createColumn({name: "custrecord_ptg_movmas_", summary: "SUM", label: "PTG - Mov +"}),
-            search.createColumn({name: "custrecord_ptg_cilindro", summary: "GROUP", label: "PTG - Cilindro"})
+            search.createColumn({name: "custrecord_ptg_dotacion_cilindros", summary: "SUM", label: "PTG - Dotación cilndros"}),
+            search.createColumn({name: "custrecord_ptg_cilindro_dotacion_", summary: "GROUP", label: "PTG - Cilindro dotación"})
           ]
         });
         var movimientoMasObjCount = movimientoMasObj.runPaged().count;
@@ -743,12 +803,12 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           start: 0,
           end: movimientoMasObjCount,
         });
-        var cantidadTotal = 0;
         log.audit("movimientoMasObjResult", movimientoMasObjResult);
         for(var i = 0; i < movimientoMasObjCount; i++){
-          articulosDotacion = parseInt(movimientoMasObjResult[i].getValue({name: "custrecord_ptg_cilindro", summary: "GROUP", label: "PTG - Cilindro"}));
-          dotacionMas = parseInt(movimientoMasObjResult[i].getValue({name: "custrecord_ptg_movmas_", summary: "SUM", label: "PTG - Mov +"}));
-          articulosDotacionTXT = movimientoMasObjResult[i].getText({name: "custrecord_ptg_cilindro", summary: "GROUP", label: "PTG - Cilindro"});
+          articulosDotacion = parseInt(movimientoMasObjResult[i].getValue({name: "custrecord_ptg_cilindro_dotacion_", summary: "GROUP", label: "PTG - Cilindro dotación"}));
+          dotacionMas = parseInt(movimientoMasObjResult[i].getValue({name: "custrecord_ptg_dotacion_cilindros", summary: "SUM", label: "PTG - Dotación cilndros"}));
+          articulosDotacionTXT = movimientoMasObjResult[i].getText({name: "custrecord_ptg_cilindro_dotacion_", summary: "GROUP", label: "PTG - Cilindro dotación"});
+          var cantidadTotal = 0;
           for(var j = 0; j < lineasRegistro; j++){
             articulo = currentRecord.getSublistValue({
               sublistId: idRegistroDeServicios,
@@ -758,17 +818,19 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             log.audit("articulo lineas", articulo);
   
             if(articulo == articulosDotacion){
-              log.audit("entra for if");
+              log.audit("entra for if "+articulo, articulosDotacion + " "+ articulosDotacionTXT);
               cantidad = currentRecord.getSublistValue({
                 sublistId: idRegistroDeServicios,
                 fieldId: "custrecord_ptg_cantidad_reg_serv_cil_lin",
                 line: j,
               });
               log.audit("cantidad", cantidad);
-              cantidadTotal += cantidad;
+              cantidadTotal = cantidad + cantidadTotal;
+              log.audit("cantidadTotal", cantidadTotal);
             }
   
             if(cantidadTotal > dotacionMas){
+              log.audit("ingresa: "+cantidadTotal, "existente: "+dotacionMas)
               var options = {
                 title: "Restricción",
                 message: "Cantidad supera la dotacion para el articulo de "+articulosDotacionTXT,
@@ -778,8 +840,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             }
           }
   
-        }
-        return true
+        }        
+        return true;
       }
     } catch (error) {
       log.audit("error saveRecord", error);
@@ -794,5 +856,6 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         //lineInit: lineInit,
         pasarPreliquidacion: pasarPreliquidacion,
         saveRecord: saveRecord,
+        lineInit: lineInit,
     };
 });
