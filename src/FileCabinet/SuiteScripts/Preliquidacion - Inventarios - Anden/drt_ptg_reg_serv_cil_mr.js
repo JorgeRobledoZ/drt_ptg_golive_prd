@@ -26,6 +26,7 @@
             log.debug("idRegistro", idRegistro);
              
             var arrayColumns = [
+                search.createColumn({name: "custrecord_ptg_cil_direccion_venta", label: "PTG - Elija Dirección para Asignar Cliente"}),
                 search.createColumn({name: "custrecord_ptg_cliente_reg_serv_cil_lin", label: "PTG - Cliente"}),
                 search.createColumn({name: "custrecord_ptg_articulo_reg_serv_cil_lin", label: "PTG - Artículo"}),
                 search.createColumn({name: "custrecord_ptg_cantidad_reg_serv_cil_lin", label: "PTG - Cantidad"}),
@@ -47,12 +48,15 @@
                 ["custrecord_ptg_transa_reg_serv_cil_lin","anyof","@NONE@"]
              ],
 
-            //BÚSQUEDA GUARDADA: PTG - Registro de Servicios Cilindros SS
+            //BÚSQUEDA GUARDADA: PTG - Registro de Servicios Cilindros L SS
             respuesta = search.create({
                 type: 'customrecord_ptg_registro_servicios_ci_l',
                 columns: arrayColumns,
                 filters: arrayFilters
             });
+
+            var searchResultCount = respuesta.runPaged().count;
+            log.debug("searchResultCount",searchResultCount);
 
             valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 1;
 
@@ -109,6 +113,7 @@
             var unidad20 = 0;
             var unidad30 = 0;
             var unidad45 = 0;
+            var direccionID = objValue.values["custrecord_ptg_cil_direccion_venta"].value;
             var cliente = objValue.values["custrecord_ptg_cliente_reg_serv_cil_lin"].value;
             var articulo = objValue.values["custrecord_ptg_articulo_reg_serv_cil_lin"].value;
             var cantidad = objValue.values["custrecord_ptg_cantidad_reg_serv_cil_lin"];
@@ -162,6 +167,12 @@
                 rfcPublicoGeneral = objMap.rfcPublicoGeneral;
                 idArticuloDescuento = objMap.idArticuloDescuento;
             }
+
+            var direccionObj = record.load({
+                type: "customrecord_ptg_direcciones",
+                id: direccionID,
+            });
+            var idDireccion = direccionObj.getValue("custrecord_ptg_direccion");
 
             var itemCilObj = record.load({
                 type: search.Type.INVENTORY_ITEM,
@@ -266,6 +277,8 @@
                         recOportunidad.setValue("custbody_ptg_codigo_movimiento",ventaLitro);
                         recOportunidad.setValue("custbody_ptg_zonadeprecioop_", zonaPrecio);
                         recOportunidad.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
+                        recOportunidad.setValue("shipaddress", idDireccion);
+                        recOportunidad.setValue("custbody_ptg_id_direccion_envio", direccionID);
                         for (var i = 0; i < 1; i++) {
                             recOportunidad.selectLine("item", i);
                             recOportunidad.setCurrentSublistValue("item", "item", articulo);
@@ -501,7 +514,7 @@
                 }
             }
             
-            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 2;
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 1;
 
             context.write({
                 key: recOportunidadIdSaved,
@@ -570,7 +583,7 @@
                 id: idRegistro,
                 values: valoresProceso
             });
-            log.debug("registroCilindros", registroCilindros);
+            log.debug("registroCilindros summarize", registroCilindros);
 
 			
         } catch (error) {
@@ -584,7 +597,7 @@
     return {
         getInputData: getInputData,
         map: map,
-        //reduce: reduce,
-        //summarize: summarize
+        reduce: reduce,
+        summarize: summarize
     }
 });
