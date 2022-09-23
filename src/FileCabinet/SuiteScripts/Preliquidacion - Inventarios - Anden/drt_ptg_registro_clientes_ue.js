@@ -34,6 +34,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
       var nombreCliente = newRecord.getValue("custrecord_ptg_nombrecliente_");
       var apellidoCliente = newRecord.getValue("custrecord_ptg_apellido_");
       var empresa = newRecord.getValue("custrecord_ptg_empresa_");
+      var empresaNombreCliente = nombreCliente+" "+apellidoCliente;
       var rfc = newRecord.getValue("custrecord_ptg_rfc_");
       var usoCFDI = newRecord.getValue("custrecord_ptg_usocfdi_registro_");
       var metodoDePago = newRecord.getValue("custrecord_ptg_formadepago_");
@@ -84,14 +85,19 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         recCliente.setValue("lastname", apellidoCliente);
       } else {
         recCliente.setValue("isperson", "F");
-      }      
-      recCliente.setValue("companyname", empresa);
+      }
+      if(empresa){
+        recCliente.setValue("companyname", empresa);
+        recCliente.setValue("custentity_razon_social_para_facturar", empresa);
+      } else{
+        recCliente.setValue("companyname", empresaNombreCliente);
+        recCliente.setValue("custentity_razon_social_para_facturar", empresaNombreCliente);
+      }
       recCliente.setValue("custentity_mx_rfc", rfc);
       recCliente.setValue("email", correoElectronico);
       recCliente.setValue("custentity_disa_uso_de_cfdi_", usoCFDI);
       recCliente.setValue("custentity_disa_metodo_de_pago_", metodoDePago);
       recCliente.setValue("custentity_disa_forma_de_pago_", formaDePago);
-      recCliente.setValue("custentity_razon_social_para_facturar", empresa);
 
       recCliente.selectNewLine({
         sublistId: 'addressbook'
