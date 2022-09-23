@@ -821,6 +821,9 @@
                 subsidiariaCorpoGas = objMap.subsidiariaCorpoGas;
                 subsidiariaDistribuidora = objMap.subsidiariaDistribuidora;
                 subsidiariaSanLuis = objMap.subsidiariaSanLuis;
+                cajaGeneralDistribuidora = objMap.cajaGeneralDistribuidora;
+                cajaGeneralCorpogas = objMap.cajaGeneralCorpogas;
+                cajaGeneralSanLuis = objMap.cajaGeneralSanLuis;
             }
 
           //SS: PTG - Mapeo Formas de pago y cuentas SS
@@ -851,11 +854,11 @@
             log.debug("idCuenta", idCuenta);
           } else {
             if(idSubsidiaria == subsidiariaCorpoGas){
-                idCuenta = 3153;
+                idCuenta = cajaGeneralCorpogas;
             } else if(idSubsidiaria == subsidiariaDistribuidora){
-                idCuenta = 2849;
+                idCuenta = cajaGeneralDistribuidora;
             } else if(idSubsidiaria == subsidiariaSanLuis){
-                idCuenta = 3151;
+                idCuenta = cajaGeneralSanLuis;
             }
               log.debug("cuenta no encontrada", idCuenta);
           }
