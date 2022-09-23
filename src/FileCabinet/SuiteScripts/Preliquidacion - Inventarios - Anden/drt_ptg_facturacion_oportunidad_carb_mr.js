@@ -22,6 +22,7 @@
                 name: 'custscript_drt_oportunidad_a_factura_car'
             }) || '';
             log.audit("id_search 1", id_search);
+            var estaCarbObj = {};
 
             var arrayColumns = [
                 search.createColumn({name: "custrecord_ptg_idoportunidad_", join: "custrecord_ptg_rel_op_preliq_", label: "PTG - Oportunidad" }),
@@ -34,21 +35,30 @@
              ];
              log.audit("arrayFilters", arrayFilters);
             
-                respuesta = search.create({
-                    type: 'customrecord_ptg_preliqestcarburacion_',
-                    columns: arrayColumns,
-                    filters: arrayFilters
-                });
+            respuesta = search.create({
+                type: 'customrecord_ptg_preliqestcarburacion_',
+                columns: arrayColumns,
+                filters: arrayFilters
+            });
 
-                var respuestaResultCount = respuesta.runPaged().count;
-                log.debug("respuestaResultCount", respuestaResultCount);
+            var respuestaResultCount = respuesta.runPaged().count;
+            log.debug("respuestaResultCount", respuestaResultCount);
+
+            estaCarbObj.custrecord_ptg_plec_etapa = 1;
 
         } catch (error) {
+            estaCarbObj.custrecord_ptg_plec_etapa = 3;
             log.audit({
                 title: 'error getInputData',
                 details: JSON.stringify(error)
             });
         } finally {
+            var preliqCarb = record.submitFields({
+                type: "customrecord_ptg_preliqestcarburacion_",
+                id: id_search,
+                values: estaCarbObj
+            });
+            log.audit("Preliquidacion actualizada getInput", preliqCarb);
             log.audit({
                 title: 'respuesta getInputData Finally',
                 details: JSON.stringify(respuesta)
@@ -63,6 +73,13 @@
                 title: 'context map',
                 details: JSON.stringify(context)
             });
+
+            var id_search = runtime.getCurrentScript().getParameter({
+                name: 'custscript_drt_oportunidad_a_factura_car'
+            }) || '';
+            log.audit("id_search 1", id_search);
+            var estaCarbObj = {};
+
             var objValue = JSON.parse(context.value);
             log.audit("objValueM", objValue);
 
@@ -681,17 +698,33 @@
                 key: recObjID,
                 value: recObjID
             });
+        
+        estaCarbObj.custrecord_ptg_plec_etapa = 1;
                
         } catch (error) {
+            estaCarbObj.custrecord_ptg_plec_etapa = 3;
             log.error({
                 title: 'error map',
                 details: JSON.stringify(error)
             });
+        } finally {
+            var preliqCarb = record.submitFields({
+                type: "customrecord_ptg_preliqestcarburacion_",
+                id: id_search,
+                values: estaCarbObj
+            });
+            log.audit("Preliquidacion actualizada map", preliqCarb);
         }
     }
 
     function reduce(context) {
         try {
+            var id_search = runtime.getCurrentScript().getParameter({
+                name: 'custscript_drt_oportunidad_a_factura_car'
+            }) || '';
+            log.audit("id_search 1", id_search);
+            var estaCarbObj = {};
+
             log.audit({
                 title: 'context reduce',
                 details: JSON.stringify(context)
@@ -981,17 +1014,40 @@
                 log.debug("Nota de credito Creado con: "+objValueTipoPago, creditMemoID);
             }
 
-            
+            estaCarbObj.custrecord_ptg_plec_etapa = 1;
 			
         } catch (error) {
+            estaCarbObj.custrecord_ptg_plec_etapa = 3;
             log.error({
                 title: 'error reduce',
                 details: JSON.stringify(error)
             });
+        } finally {
+            var preliqCarb = record.submitFields({
+                type: "customrecord_ptg_preliqestcarburacion_",
+                id: id_search,
+                values: estaCarbObj
+            });
+            log.audit("Preliquidacion actualizada reduce", preliqCarb);
         }
     }
 
     function summarize(summary) {
+
+        var id_search = runtime.getCurrentScript().getParameter({
+            name: 'custscript_drt_oportunidad_a_factura_car'
+        }) || '';
+        log.audit("id_search 1", id_search);
+        var estaCarbObj = {};
+
+        estaCarbObj.custrecord_ptg_plec_etapa = 2;
+
+        var preliqCarb = record.submitFields({
+            type: "customrecord_ptg_preliqestcarburacion_",
+            id: id_search,
+            values: estaCarbObj
+        });
+        log.audit("Preliquidacion actualizada sumarize", preliqCarb);
 
     }
 
