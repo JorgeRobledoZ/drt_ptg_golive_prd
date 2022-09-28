@@ -241,19 +241,25 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 				 }
 			 }
 
-			 var liquidacion = "";
-			 var descripcionArticulo = "";
-			 var oportunidadRec = record.load({
-				type: search.Type.OPPORTUNITY,
-				id: jsonData.oportunidadID,
-			});
-			var folioEstacionario = "";
-			var folioSGC = oportunidadRec.getValue("custbody_ptg_folio_sgc_");
-			if(!folioSGC){
-				folioEstacionario = jsonData.oportunidad.substring(1);
-			} else {
-				folioEstacionario = folioSGC;
-			}
+			 if(jsonData.oportunidadID){
+				var liquidacion = "";
+				var descripcionArticulo = "";
+				var oportunidadRec = record.load({
+				   type: search.Type.OPPORTUNITY,
+				   id: jsonData.oportunidadID,
+			   });
+			   var folioEstacionario = "";
+			   var folioSGC = oportunidadRec.getValue("custbody_ptg_folio_sgc_");
+			   if(!folioSGC){
+				   folioEstacionario = jsonData.oportunidad.substring(1);
+			   } else {
+				   folioEstacionario = folioSGC;
+			   }
+			 }
+
+			 
+
+
 			 if(jsonData.preliqCilind){
 				liquidacion = jsonData.preliqCilind;
 				descripcionArticulo = nameItem + " Nota: " + jsonData.oportunidad.substring(1) + " - Liquidación.: " + liquidacion;
@@ -268,8 +274,10 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 				descripcionArticulo = nameItem + " Nota: " + jsonData.oportunidad.substring(1) + " - Liquidación.: " + liquidacion;
 			 } else if(jsonData.preliqViaEsp){
 				liquidacion = jsonData.preliqViaEsp;
-				descripcionArticulo = nameItem + " Nota: " + jsonData.oportunidad.substring(1) + " - Liquidación.: " + liquidacion;
+				descripcionArticulo = nameItem + " Nota: " + jsonData.creadoDesde.substring(1) + " - Liquidación.: " + liquidacion;
 			 }
+			 log.audit("liquidacion", liquidacion);
+			 log.audit("descripcionArticulo", descripcionArticulo);
 
 			 xmlDoc += '    <fx:Concepto>';
 			 //xmlDoc += '      <fx:NoIdentificacion>' + jsonData.permiso + '</fx:NoIdentificacion>';
@@ -568,6 +576,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						 //paymeth: '',
 						 paymeth: rec.getText("custbody_mx_txn_sat_payment_term").split(' ')[0],//PPD
 						 oportunidad: rec.getText("opportunity").split(' ')[1],
+						 creadoDesde: rec.getText("createdfrom").split(' ')[1],
 						 oportunidadID: rec.getValue("opportunity"),
 						 preliqCilind: rec.getText("custbody_ptg_registro_pre_liq"),
 						 preliqEstaci: rec.getText("custbody_ptg_registro_pre_liq_esta"),
@@ -1438,6 +1447,8 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 					log.audit("tipoServicio", tipoServicio);
 					var tiposDePagos = invoiceObj.getValue("custbody_ptg_tipos_de_pago");
 					log.audit("tiposDePagos", tiposDePagos);
+					var liqViejaEspecial = invoiceObj.getValue("custbody_ptg_liq_viaje_especial");
+					log.audit("liqViejaEspecial", liqViejaEspecial);
 
 					var customRecFactura = record.create({
 						type: "customrecord_drt_ptg_registro_factura",
@@ -1474,6 +1485,8 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 					}
 					else if(tipoServicio == 5){
 						objSumbitCR.custrecord_ptg_venta_anden = ventaAnden || '';
+					} else if(tipoServicio == 7){
+						objSumbitCR.custrecord_ptg_registro_fac_viaje_especi = liqViejaEspecial || '';
 					}
 
 					record.submitFields({
