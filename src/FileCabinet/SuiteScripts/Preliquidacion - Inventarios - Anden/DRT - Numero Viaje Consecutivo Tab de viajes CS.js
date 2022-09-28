@@ -101,11 +101,13 @@ define([
           log.debug("entra mas de cero");
           for(var j = 0; j < numeroLineas; j++){
             log.debug("j", j);
+
             var xx = currentRecord.removeLine({
               sublistId: nombreSublistaDotacion,
               line: 0,
               ignoreRecalc: true
             });
+            
             log.audit("xx", xx);
           }
         }
