@@ -155,12 +155,14 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             }
 
 
-            if ((sublistName === idRegistroDeServicios && sublistFieldName === 'custrecord_ptg_cil_direccion_venta') ||
+            if (//(sublistName === idRegistroDeServicios && sublistFieldName === 'custrecord_ptg_cil_direccion_venta') ||
             (sublistName === idRegistroDeServicios && sublistFieldName === 'custrecord_ptg_cliente_reg_serv_cil_lin') ||
+            (sublistName === idRegistroDeServicios && sublistFieldName === 'custrecord_ptg_cil_limited') ||
             (sublistName === idRegistroDeServicios && sublistFieldName === 'custrecord_ptg_cantidad_reg_serv_cil_lin')  ||
             (sublistName === idRegistroDeServicios && sublistFieldName === 'custrecord_ptg_articulo_reg_serv_cil_lin')){
               var direccionEmbarque = currentRecord.getCurrentSublistValue({sublistId: idRegistroDeServicios, fieldId: 'custrecord_ptg_cil_direccion_venta'});
                 var idCliente = currentRecord.getCurrentSublistValue({sublistId: idRegistroDeServicios, fieldId: 'custrecord_ptg_cliente_reg_serv_cil_lin'});
+                var direccionPublicoGeneral = currentRecord.getCurrentSublistValue({sublistId: idRegistroDeServicios, fieldId: 'custrecord_ptg_cil_limited'});
                 var precioCabecera = parseInt(currentRecord.getCurrentSublistValue({sublistId: idRegistroDeServicios, fieldId: 'custrecord_ptg_cantidad_reg_serv_cil_lin'}));
                 var articuloServCilindros = currentRecord.getCurrentSublistValue({ sublistId: sublistName, fieldId: "custrecord_ptg_articulo_reg_serv_cil_lin",});
 
@@ -179,9 +181,21 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                   log.audit("cantidadDescuento", cantidadDescuento);
                   var lineCount = clienteObj.getLineCount({ sublistId:'addressbook' })||0;
 
+                  var direccionCliente = 0;
+                  if(direccionPublicoGeneral){
+                    direccionCliente = direccionPublicoGeneral;
+                    log.audit("entra en la direccionPublicoGeneral", direccionCliente);
+                  } else {
+                    direccionCliente = direccionEmbarque;
+                    log.audit("entra en la direccionEmbarque", direccionCliente);
+                  }
+
+
                   var direccionObj = record.load({
                     type: "customrecord_ptg_direcciones",
-                    id: direccionEmbarque,
+                    //id: direccionEmbarque,
+                    //id: direccionPublicoGeneral,
+                    id: direccionCliente,
                   });
                   log.audit("direccionObj", direccionObj);
                   var idZonaPrecio = direccionObj.getValue("custrecord_ptg_zona_precios");
