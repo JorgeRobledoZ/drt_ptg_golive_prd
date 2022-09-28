@@ -110,13 +110,36 @@
                 (total = parseFloat(registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_total", label: "PTG - Total", })).toFixed(6)),
                 (idRegistroPagos = registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_registro_pagos", label: "PTG - Pagos", })),
                 (idCliente = registroOportunidadResult[incremento_inicio].getValue({ name: "entity", join: "CUSTRECORD_PTG_OPORTUNIDAD", label: "Customer"})),
-                (referencia = registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_referenciapago_", label: "PTG - Referencia pago"}));;
+                (referencia = registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_referenciapago_", label: "PTG - Referencia pago"}));
+
+                var oportunidadObj = record.load({
+                    type: record.Type.OPPORTUNITY,
+                    id: oportunidad,
+                });
+                var idDireccionCliente = oportunidadObj.getValue("shipaddresslist");
+                log.audit("idDireccionCliente", idDireccionCliente);
+
+                //SS: PTG - Direccion cliente SS
+                var direccionesObj = search.create({
+                    type: "customrecord_ptg_direcciones",
+                    filters: [
+                       ["custrecord_ptg_direccion","equalto",idDireccionCliente]
+                    ],
+                    columns: [
+                       search.createColumn({name: "internalid", label: "ID interno"})
+                    ]
+                });
+                var direccionesObjResult = direccionesObj.run().getRange({
+                    start: 0,
+                    end: 2,
+                });
+                (direccionCliente = direccionesObjResult[0].getValue({name: "internalid", label: "ID interno"}));
+                log.audit("direccionCliente", direccionCliente);
 
                 var clienteObj = record.load({
                     type: record.Type.CUSTOMER,
                     id: idCliente,
                 });
-                var direccionCliente = clienteObj.getValue("defaultaddress");
                 var saldoVencido = clienteObj.getValue("overduebalance");
                 var limiteCredito = clienteObj.getValue("creditlimit");
                 var saldo = clienteObj.getValue("balance");
