@@ -28,6 +28,8 @@
             log.audit("fechaI", fechaI);
             var fechaF = req_param.fechaF;
             log.audit("fechaF", fechaF);
+            var incremento_inicio = req_param.incremento_inicio;
+            log.audit("incremento_inicio", incremento_inicio);
             
             log.audit('Remaining Usage start proceso', runtime.getCurrentScript().getRemainingUsage());
 
