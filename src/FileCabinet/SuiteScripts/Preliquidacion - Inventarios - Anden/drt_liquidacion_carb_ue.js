@@ -342,6 +342,7 @@
                     tipoPago = tipoPagoEfectivoServGasObjResult[0].getValue({name: "custrecord_ptg_tipo_pago", summary: "GROUP", label: "PTG - Tipo de Pago"});
                     sumaEfectivo = Number(tipoPagoEfectivoServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
+                log.debug("sumaEfectivo", sumaEfectivo);
 
 
                 //SS: PTG - Pagos Oportunidad Lineas SS
@@ -366,6 +367,7 @@
                     tipoPago = tipoPagoCreditoServGasObjResult[0].getValue({name: "custrecord_ptg_tipo_pago", summary: "GROUP", label: "PTG - Tipo de Pago"});
                     sumaCredito = Number(tipoPagoCreditoServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
+                log.debug("sumaCredito", sumaCredito);
 
 
                 //SS: PTG - Pagos Oportunidad Lineas SS
@@ -388,6 +390,7 @@
                     });
                     sumaOtros = Number(tipoPagoOtrosServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
+                log.debug("sumaOtros", sumaOtros);
 
                 suma = parseFloat(sumaEfectivo) + parseFloat(sumaCredito) + parseFloat(sumaOtros);
 
@@ -1066,6 +1069,7 @@
                     tipoPago = tipoPagoEfectivoServGasObjResult[0].getValue({name: "custrecord_ptg_tipo_pago", summary: "GROUP", label: "PTG - Tipo de Pago"});
                     sumaEfectivo = parseFloat(tipoPagoEfectivoServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
+                log.audit("sumaEfectivo", sumaEfectivo);
 
 
                 //SS: PTG - Pagos Oportunidad Lineas SS
@@ -1090,6 +1094,7 @@
                     tipoPago = tipoPagoCreditoServGasObjResult[0].getValue({name: "custrecord_ptg_tipo_pago", summary: "GROUP", label: "PTG - Tipo de Pago"});
                     sumaCredito = parseFloat(tipoPagoCreditoServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
+                log.audit("sumaCredito", sumaCredito);
 
 
                 //SS: PTG - Pagos Oportunidad Lineas SS
@@ -1112,6 +1117,7 @@
                     });
                     sumaOtros = parseFloat(tipoPagoOtrosServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
+                log.audit("sumaOtros", sumaOtros);
 
                 suma = sumaEfectivo + sumaCredito + sumaOtros;
 
