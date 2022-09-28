@@ -216,7 +216,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
         recordSalesOrder.setValue("customform", formularioOrdenVenta);
         recordSalesOrder.setValue("entity", cliente);
         recordSalesOrder.setValue("location", localizacionAlmacen);
-        recordSalesOrder.setValue("inventorylocation", localizacionAlmacen);
+        //recordSalesOrder.setValue("inventorylocation", localizacionAlmacen);
         recordSalesOrder.setValue("memo", notaLinea);
         recordSalesOrder.setValue("custbody_ptg_tipo_servicio", servicioViajeEspecial);
         recordSalesOrder.setValue("custbody_ptg_opcion_pago", formaPago);
@@ -269,8 +269,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
         for (var j = 0; j < lineCount; j++) {
           recordSalesOrder.selectLine("item", j);
           recordSalesOrder.setCurrentSublistValue("item", "item", gasLP);
-          recordSalesOrder.setCurrentSublistValue("item", "quantitycommitted", litrosVendidos[j]);
-          //recordSalesOrder.setCurrentSublistValue("item", "location", localizacionAlmacen);
+          recordSalesOrder.setCurrentSublistValue("item", "inventorylocation", localizacionAlmacen);
           recordSalesOrder.setCurrentSublistValue("item", "quantity", litrosVendidos[j]);
           recordSalesOrder.setCurrentSublistValue("item", "rate", precioUnitario[j]);
           recordSalesOrder.setCurrentSublistValue("item", "custcol_ptg_cantidad_litros", litrosVendidos[j]);
@@ -307,19 +306,24 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
             fromType: record.Type.SALES_ORDER,
             fromId: idrecordSalesOrder,
             toType: record.Type.ITEM_FULFILLMENT,
-            isDynamic: true,
+            isDynamic: false,
+            defaultValues: {
+              customform: 291,
+              inventorylocation: localizacionAlmacen
+            }
           });
-          log.audit("1");
+
+          var lineCount = newRecordItemFulfillment.getLineCount('item');
+          for (var i = 0; i < lineCount; i++) {
+            newRecordItemFulfillment.setSublistValue('item', 'location', i, localizacionAlmacen);
+          }
           newRecordItemFulfillment.setValue("shipstatus", "C");
-          log.audit("2");
           newRecordItemFulfillment.setValue("custbody_psg_ei_template", plantillaDocumentoElectronico);
-          log.audit("3");
           newRecordItemFulfillment.setValue("custbody_psg_ei_sending_method", metodoDeEnvio);
-          log.audit("4");
   
           var idItemFulfillment = newRecordItemFulfillment.save({
-            enableSourcing: false,
-            ignoreMandatoryFields: true,
+            enableSourcing: true,
+            ignoreMandatoryFields: false,
           }) || "";
 
           log.debug({
