@@ -7,8 +7,8 @@ $("#agregarDirecciones, #agregarDireccion").click( function() {
     if ( id == 'agregarDirecciones' ) {// Nueva dirección de cliente nuevo
         // Se remueven las opciones de poder agregar una dirección de facturación
         let requiereFactura = $("input[name=requiereFactura]:checked").val();
-        if ( requiereFactura == 'si' ) { console.log('deben aparecer todos los tipos de domicilio'); $('.opt-tipo-dir-fact').removeClass('d-none');  } 
-        else { console.log('se quitan algunos tipos de domicilio'); $('.opt-tipo-dir-fact').addClass('d-none'); }
+        if ( requiereFactura == 'si' ) { $('.opt-tipo-dir-fact').removeClass('d-none');  } 
+        else { $('.opt-tipo-dir-fact').addClass('d-none'); }
         $("#tipoAccionDireccion").val('lista');
         $("input[name=tipoAccionFormCliente][value=1]").prop("checked", true).trigger("change");
         $("#tipoServicioFormCliente").val(idCilindro);
@@ -340,6 +340,7 @@ $('body').delegate('.delete-address', 'click', function () {
         if( resp ) {
             let address = button.closest('.address').data('address');
             //button.parent().parent().remove();
+            // Colocar aqui otro if donde compare si el num de direcciones es igual a 0
             if((address.principal || address.domFacturacion) && $('table.table-address tbody').find(".address").length > 1) {
                 button.closest('.address').remove();
                 let element = $($('table.table-address tbody').find(".address")[0]);
@@ -349,7 +350,8 @@ $('body').delegate('.delete-address', 'click', function () {
                     element.find('.check-entrega').parent().html('<i class="fa-solid fa-square-check color-primary check-entrega" style="cursor: pointer;"></i>');
                 }
                 if(address.domFacturacion) {
-                    addressAux.domFacturacion = true;
+                    // Verificar si esta linea de código es obligatoria
+                    // addressAux.domFacturacion = true;
                     element.find('.check-fact').parent().html('<i class="fa-solid fa-square-check color-primary check-fact" style="cursor: pointer;"></i>');
                 }
                 element.data('address', addressAux);              
@@ -624,15 +626,52 @@ $('body').delegate('.copy-address', 'click', function () {
 
 // Guarda la información de un cliente en Netsuite
 function saveCustomer() {
+    let idCliente        = $("input#idInternoFormCliente").val();
     let tipoRegimen      = $("input[name=tipoRegimen]:checked").val();
     let requiereFactura  = ($("input[name=requiereFactura]:checked").val() == "si" ? true : false);
+    let trAddress        = $('table.table-address tbody').children(".address");
+    let numFact          = 0;
+    let numEnt           = 0;
+    let numEntFact       = 0;
+    /**
+     * Si es un cliente nuevo:
+     * Debe existir al menos una dirección de entrega, pero si el cliente requiere factura, 
+     * debe tener tener una dirección de entrega y una de facturación al menos, 
+     * o una única dirección que sea de tipo facturación y entrega al mismo tiempo
+     */
+    if ( !idCliente ) {
+        if ( trAddress.length == 0 ) {
+            infoMsg('warning', 'Favor de colocar al menos una dirección');
+            return;
+        } else {
+            trAddress.each(function(index) {
+                let trAdd = $(this).data('address');
 
-    if ( !$("input#idInternoFormCliente").val() && $('table.table-address tbody').find(".address").length == 0 ) {
-        infoMsg('warning', 'Favor de colocar al menos una dirección')
-        return;
+                if ( trAdd.tipoDireccion == tipoDirEntFact ) { numEntFact ++; }
+                else if ( trAdd.tipoDireccion == tipoDirSoloEntrega ) { numEnt ++; }
+                else if ( trAdd.tipoDireccion == tipoDirSoloFacturacion ) { numFact ++; }
+            });
+
+            if ( requiereFactura ) {// Requiere al menos una de facturación y una de entrega
+                if ( numEntFact > 0 ) {
+                    console.log('Tiene una dirección que funge como entrega y facturación');
+                } else if ( numEntFact == 0 ) {
+                    if ( numEnt == 0 || numFact == 0 ) {
+                        infoMsg('warning', 'Favor de colocar al menos una dirección de entrega y facturación, o en su defecto, una dirección con ambas funciones.');
+                        return;
+                    }
+                }
+            } else if ( numEnt == 0 ) {// Requiere al menos una de entrega
+                infoMsg('warning', 'Favor de colocar al menos una dirección de entrega');
+                return;
+            }
+        }
     }
 
-    let idCliente    = $("input#idInternoFormCliente").val();
+    console.log('procede a crearse');
+
+    return;
+
     let businessType = tipoRegimen != 'domestico' ? $('select#giroNegocioFormCliente').val() : "";
     let businessName = $('#nombreRazonSocialFormCliente').val();
     let cfdi         =  requiereFactura ? $('#usoCfdiFormCliente').val() : "";
