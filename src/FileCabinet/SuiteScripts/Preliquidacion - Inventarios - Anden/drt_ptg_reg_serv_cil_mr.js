@@ -172,7 +172,7 @@
                 type: "customrecord_ptg_direcciones",
                 id: direccionID,
             });
-            var idDireccion = direccionObj.getValue("custrecord_ptg_direccion");
+            var idDireccion = parseInt(direccionObj.getValue("custrecord_ptg_direccion"));
 
             var itemCilObj = record.load({
                 type: search.Type.INVENTORY_ITEM,
@@ -277,7 +277,7 @@
                         recOportunidad.setValue("custbody_ptg_codigo_movimiento",ventaLitro);
                         recOportunidad.setValue("custbody_ptg_zonadeprecioop_", zonaPrecio);
                         recOportunidad.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
-                        recOportunidad.setValue("shipaddress", idDireccion);
+                        recOportunidad.setValue("shipaddresslist", idDireccion);
                         recOportunidad.setValue("custbody_ptg_id_direccion_envio", direccionID);
                         for (var i = 0; i < 1; i++) {
                             recOportunidad.selectLine("item", i);
@@ -340,6 +340,7 @@
                     recOportunidad.setValue("custbody_ptg_zonadeprecioop_", zonaPrecio);
                     recOportunidad.setValue("custbody_ptg_cliente_solicita_factura", solicitaFactura);
                     recOportunidad.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
+                    recOportunidad.setValue("shipaddresslist", idDireccion);
                     for (var i = 0; i < 1; i++) {
                         recOportunidad.selectLine("item", i);
                         recOportunidad.setCurrentSublistValue("item", "item", articulo);
