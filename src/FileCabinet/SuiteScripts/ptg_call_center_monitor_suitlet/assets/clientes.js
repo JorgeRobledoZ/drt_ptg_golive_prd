@@ -225,7 +225,8 @@ $("#editarCliente").click(function () {
         $(".dato-facturacion").removeClass("d-none");
         $('#rfcFormCliente').val(customerGlobal.rfc);
         $('#usoCfdiFormCliente').val(customerGlobal.cdfiId);
-        
+        $('#nombreRegimenFiscalCliente').val(customerGlobal.regimeFiscal);
+        $('#tipoIndustriaFormCliente').val(customerGlobal.tipoIndustria);
     } else {
         $(".dato-facturacion").addClass("d-none");
     }
@@ -241,7 +242,7 @@ $("#editarCliente").click(function () {
     $('#telefonoAlternoFormCliente').val(customerGlobal.telefonoAlt);
     $('#correoAlternativoFormCliente').val(customerGlobal.emailAlt);
     $('#observacionesFormCliente').val(customerGlobal.notasCustomer);
-    $("#nombreFacturacionFormCliente, #rfcFormCliente, #usoCfdiFormCliente, #correoAlternativoFormCliente, #copiarDatosContacto").prop("disabled", true);
+    $("#nombreFacturacionFormCliente, #rfcFormCliente, #usoCfdiFormCliente, #correoAlternativoFormCliente, #copiarDatosContacto, #nombreRegimenFiscalCliente, #tipoIndustriaFormCliente").prop("disabled", true);
 });
 
 $("#historicoCliente").click(function () {
@@ -668,13 +669,11 @@ function saveCustomer() {
         }
     }
 
-    console.log('procede a crearse');
-
-    return;
-
     let businessType = tipoRegimen != 'domestico' ? $('select#giroNegocioFormCliente').val() : "";
     let businessName = $('#nombreRazonSocialFormCliente').val();
     let cfdi         =  requiereFactura ? $('#usoCfdiFormCliente').val() : "";
+    let typeIndustry =  requiereFactura ? $('#tipoIndustriaFormCliente').val() : "";
+    let regimeFiscal =  requiereFactura ? $('#nombreRegimenFiscalCliente').val() : "";
     // let middleName      = tipoRegimen != 'domestico' ? $('select#giroNegocioFormCliente').val() : "";
     let lastName     = $('input#apellidosFormCliente').val().trim();
     let rfc          = requiereFactura ? $('input#rfcFormCliente').val() : "";
@@ -718,6 +717,8 @@ function saveCustomer() {
         lastName : lastName,
         businessName: businessName,
         cfdi: cfdi,
+        typeIndustry: typeIndustry,
+        regimeFiscal: regimeFiscal,
         rfc : rfc,
         razonSocialFact: razonSocialFact,
         regimeType : regimenId != idDomestico ? false : true,
@@ -750,6 +751,8 @@ function saveCustomer() {
             custentity_ptg_giro_negocio : customer['businessType'],
             companyname : customer['businessName'],
             email : customer['email'],
+            // custentity_mx_sat_industry_type : customer['typeIndustry'],
+            // custentity_mx_sat_registered_name : customer['regimeFiscal'],
             // custentity_ptg_plantarelacionada_ : customer['planta'],
             //phone : customer['telefono'],
             //altphone : customer['telefonoAlt'],

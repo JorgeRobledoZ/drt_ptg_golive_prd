@@ -174,7 +174,8 @@ define(['N/search', 'N/query', 'SuiteScripts/drt_custom_module/drt_mapid_cm'],
                         customerAddressbookEntityAddress.custrecord_ptg_interior_number, customerAddressbookEntityAddress.custrecord_ptg_nombre_colonia, 
                         customerAddressbookEntityAddress.custrecord_ptg_codigo_postal, customerAddressbookEntityAddress.custrecord_ptg_entrecalle_, 
                         customerAddressbookEntityAddress.custrecord_ptg_y_entre_, customerAddressbook.internalid, custrecord_ptg_telefono_alterno, 
-                        customerAddressbookEntityAddress.custrecord_ptg_tipo_servicio, customerAddressbookEntityAddress.custrecord_ptg_tipo_direccion
+                        customerAddressbookEntityAddress.custrecord_ptg_tipo_servicio, customerAddressbookEntityAddress.custrecord_ptg_tipo_direccion,
+                        customer.custentity_mx_sat_industry_type, customer.custentity_mx_sat_registered_name
                         FROM customer
                         LEFT JOIN CustomerSubsidiaryRelationship on customer.id = CustomerSubsidiaryRelationship.entity
                         LEFT JOIN customerAddressbook on Customer.id = customerAddressbook.entity
@@ -203,7 +204,8 @@ define(['N/search', 'N/query', 'SuiteScripts/drt_custom_module/drt_mapid_cm'],
                         customerAddressbookEntityAddress.custrecord_ptg_interior_number, customerAddressbookEntityAddress.custrecord_ptg_nombre_colonia, 
                         customerAddressbookEntityAddress.custrecord_ptg_codigo_postal, customerAddressbookEntityAddress.custrecord_ptg_entrecalle_, 
                         customerAddressbookEntityAddress.custrecord_ptg_y_entre_, customerAddressbook.internalid, custrecord_ptg_telefono_alterno, 
-                        customerAddressbookEntityAddress.custrecord_ptg_tipo_servicio, customerAddressbookEntityAddress.custrecord_ptg_tipo_direccion`;
+                        customerAddressbookEntityAddress.custrecord_ptg_tipo_servicio, customerAddressbookEntityAddress.custrecord_ptg_tipo_direccion, 
+                        customer.custentity_mx_sat_industry_type, customer.custentity_mx_sat_registered_name`;
 
                         if(requestBody.filtro.split(" ").length > 1) {
                             sql2 = `SELECT 
@@ -212,7 +214,8 @@ define(['N/search', 'N/query', 'SuiteScripts/drt_custom_module/drt_mapid_cm'],
                             customerAddressbookEntityAddress.custrecord_ptg_interior_number, customerAddressbookEntityAddress.custrecord_ptg_nombre_colonia, 
                             customerAddressbookEntityAddress.custrecord_ptg_codigo_postal, customerAddressbookEntityAddress.custrecord_ptg_entrecalle_, 
                             customerAddressbookEntityAddress.custrecord_ptg_y_entre_, customerAddressbook.internalid, custrecord_ptg_telefono_alterno, 
-                            customerAddressbookEntityAddress.custrecord_ptg_tipo_servicio, customerAddressbookEntityAddress.custrecord_ptg_tipo_direccion
+                            customerAddressbookEntityAddress.custrecord_ptg_tipo_servicio, customerAddressbookEntityAddress.custrecord_ptg_tipo_direccion,
+                            customer.custentity_mx_sat_industry_type, customer.custentity_mx_sat_registered_name
                             FROM customer
                             LEFT JOIN CustomerSubsidiaryRelationship on customer.id = CustomerSubsidiaryRelationship.entity
                             LEFT JOIN customerAddressbook on Customer.id = customerAddressbook.entity
@@ -250,7 +253,8 @@ define(['N/search', 'N/query', 'SuiteScripts/drt_custom_module/drt_mapid_cm'],
                             customerAddressbookEntityAddress.custrecord_ptg_interior_number, customerAddressbookEntityAddress.custrecord_ptg_nombre_colonia, 
                             customerAddressbookEntityAddress.custrecord_ptg_codigo_postal, customerAddressbookEntityAddress.custrecord_ptg_entrecalle_, 
                             customerAddressbookEntityAddress.custrecord_ptg_y_entre_, customerAddressbook.internalid, custrecord_ptg_telefono_alterno, 
-                            customerAddressbookEntityAddress.custrecord_ptg_tipo_servicio, customerAddressbookEntityAddress.custrecord_ptg_tipo_direccion`;
+                            customerAddressbookEntityAddress.custrecord_ptg_tipo_servicio, customerAddressbookEntityAddress.custrecord_ptg_tipo_direccion
+                            customer.custentity_mx_sat_industry_type, customer.custentity_mx_sat_registered_name`;
                                 
                         }
 
@@ -320,6 +324,8 @@ define(['N/search', 'N/query', 'SuiteScripts/drt_custom_module/drt_mapid_cm'],
                                 obj.tipoDireccion = tipoDireccion
                                 obj.tipoDirNom = tipoDirNom;
                                 obj.tipoServicioNom = tipoServicioNom;
+                                obj.tipoIndustria = row.value.getValue(15);
+                                obj.regimeFiscal = row.value.getValue(16);
                             }
                             
                             data.push(obj);

@@ -805,7 +805,9 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     "custentity_disa_uso_de_cfdi_",
                     "custentity_ptg_requiere_factura",
                     "custentity_razon_social_para_facturar",
-                    "custentity_ptg_condicion_credito"
+                    "custentity_ptg_condicion_credito",
+                    "custentity_mx_sat_registered_name",
+                    "custentity_mx_sat_industry_type"
                 ]
             })
             /*
@@ -979,6 +981,14 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                         name: "custentity_mx_rfc"
                     });
 
+                    let regimeFiscal = result.getValue({
+                        name: "custentity_mx_sat_registered_name"
+                    });
+
+                    let tipoIndustria = result.getValue({
+                        name: "custentity_mx_sat_industry_type"
+                    });
+
                     let primerNombre = result.getValue({
                         name: "firstname"
                     });
@@ -1060,6 +1070,8 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                         descuento,
                         terminos,
                         rfc,
+                        regimeFiscal,
+                        tipoIndustria,
                         primerNombre,
                         apellidos,
                         addr,
