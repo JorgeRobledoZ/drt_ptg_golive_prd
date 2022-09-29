@@ -2,7 +2,7 @@
  * @NApiVersion 2.1
  * @NScriptType Suitelet
  */
-define(['N/file', 'N/https', 'N/log', 'N/record', 'N/render', 'N/runtime', 'N/search', 'N/url'],
+define(['N/file', 'N/https', 'N/log', 'N/record', 'N/render', 'N/runtime', 'N/search', 'N/url', 'SuiteScripts/drt_custom_module/drt_mapid_cm'],
     /**
  * @param{file} file
  * @param{https} https
@@ -13,7 +13,7 @@ define(['N/file', 'N/https', 'N/log', 'N/record', 'N/render', 'N/runtime', 'N/se
  * @param{search} search
  * @param{url} url
  */
-    (file, https, log, record, render, runtime, search, url) => {
+    (file, https, log, record, render, runtime, search, url, drt_mapid_cm) => {
         /**
          * Defines the Suitelet script trigger point.
          * @param {Object} scriptContext
@@ -24,12 +24,13 @@ define(['N/file', 'N/https', 'N/log', 'N/record', 'N/render', 'N/runtime', 'N/se
         
         const onRequest = (scriptContext) => {
             //Información general del usuario
-            let remainingUsage = runtime.getCurrentScript()
-            let remainingUser = runtime.getCurrentUser()
-            let remainingSession = runtime.getCurrentSession()
-            log.debug('remainingUsage', remainingUsage)
-            log.debug('remainingUser', remainingUser)
-            log.debug('remainingSession', remainingSession)
+            const genVars        = drt_mapid_cm.getVariables();
+            let remainingUsage   = runtime.getCurrentScript();
+            let remainingUser    = runtime.getCurrentUser();
+            let remainingSession = runtime.getCurrentSession();
+            log.debug('remainingUsage', remainingUsage);
+            log.debug('remainingUser', remainingUser);
+            log.debug('remainingSession', remainingSession);
 
             //Instacia del DS
             let datasource = {};
@@ -146,6 +147,7 @@ define(['N/file', 'N/https', 'N/log', 'N/record', 'N/render', 'N/runtime', 'N/se
                 deploymentId: 'customdeploy_ptg_rl_get_status_callalert'
             });
 
+            datasource.cusVars = JSON.stringify(genVars);
             datasource.getPlantas = getPlantas
             datasource.userId = remainingUser.id
             datasource.userName = remainingUser.name

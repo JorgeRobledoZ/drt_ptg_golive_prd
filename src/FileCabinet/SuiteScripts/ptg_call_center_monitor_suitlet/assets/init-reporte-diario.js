@@ -632,13 +632,13 @@ function getRowTable(pedido) {
                         '<td class="text-center">' + 
                             (pedido.observaciones ? pedido.observaciones : 'Sin nota') + '<br>';
                         pedido.articulos.forEach(element => {
-                        trAux +=  (element.nombre ? element.nombre+ '<br>' : '');
+                            trAux +=  ( element.id != articuloDesc && element.nombre ? element.nombre+ '<br>' : '');
                         });
                         trAux +=   (pedido.item1 ? pedido.item1 : '') + 
                         '</td>'+
                         '<td class="text-center">';
                         pedido.articulos.forEach(element => {
-                            trAux +=  (element.cantidad ? element.cantidad.toString().replace("-", '') + '<br>' : '');
+                            trAux +=  (element.id != articuloDesc && element.cantidad ? element.cantidad.toString().replace("-", '') + '<br>' : '');
                         });
                         trAux +=      '<strong>'+(pedido.alianza ? pedido.alianza : '')+'</strong></td>'+// Aquí falta el litraje/kgs surtidos relacionados al producto
                         '<td class="text-center">' + 
