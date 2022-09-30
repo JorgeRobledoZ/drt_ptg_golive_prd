@@ -178,7 +178,7 @@
             });
             var rfc = clienteObj.getValue("custentity_mx_rfc");
             log.audit("Cliente: "+ cliente, "RFC ", rfc);
-            var nombreClienteAFacturar = clienteObj.getValue("custentity_razon_social_para_facturar");
+            var nombreClienteAFacturar = clienteObj.getValue("custentity_mx_sat_registered_name");
             if((rfc != rfcGenerico) || (rfc != rfcPublicoGeneral)){
                 log.audit("Solicita factura");
                 solicitaFactura = true;

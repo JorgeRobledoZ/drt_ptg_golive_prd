@@ -195,7 +195,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
         var cfdiCliente = entityObj.getValue("custentity_disa_uso_de_cfdi_") || 3;
         log.audit("cfdiCliente solicita", cfdiCliente);
         var clienteTXT = entityObj.getValue("altname");
-        var clienteAFacturar = entityObj.getValue("custentity_razon_social_para_facturar");
+        var clienteAFacturar = entityObj.getValue("custentity_mx_sat_registered_name");
         var nombreClienteAFacturar = "";
         nombreClienteAFacturar = clienteAFacturar;
 

@@ -361,7 +361,7 @@
                 type: search.Type.CUSTOMER,
                 id: cliente
             });
-            var clienteAFacturar = clienteObj.getValue("custentity_razon_social_para_facturar");
+            var clienteAFacturar = clienteObj.getValue("custentity_mx_sat_registered_name");
             nombreClienteAFacturar = clienteAFacturar;
 
             var terminosCliente = clienteObj.getValue("terms");

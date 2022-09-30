@@ -88,10 +88,10 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
       }
       if(empresa){
         recCliente.setValue("companyname", empresa);
-        recCliente.setValue("custentity_razon_social_para_facturar", empresa);
+        recCliente.setValue("custentity_mx_sat_registered_name", empresa);
       } else{
         recCliente.setValue("companyname", empresaNombreCliente);
-        recCliente.setValue("custentity_razon_social_para_facturar", empresaNombreCliente);
+        recCliente.setValue("custentity_mx_sat_registered_name", empresaNombreCliente);
       }
       recCliente.setValue("custentity_mx_rfc", rfc);
       recCliente.setValue("email", correoElectronico);
