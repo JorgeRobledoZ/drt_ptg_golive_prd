@@ -1055,6 +1055,7 @@ function resetProductList(){
 
 function setDefaultItem() {
     if($("#direccionCliente").val() && $("#direccionCliente").val() != 'Sin direcciones' && $('#zonaPrecioCliente').data("precioKg") && $('#zonaPrecioCliente').data("precioLt")) {
+        let timeUnix = Date.now();
         let direccion = $("#direccionCliente option:selected").data("address");
         let prices = 0;
         if ( direccion.typeServiceId == idCilindro ) {
@@ -1072,6 +1073,7 @@ function setDefaultItem() {
         let capacidad = parseInt( ( auxArt && auxArt.capacidad_litros ? auxArt.capacidad_litros : 0 ) );
         if(direccion.typeServiceId == idCilindro) {
             let articulo  = {
+                "timeUnix"  : timeUnix,// Este dato es únicamente para mantener el item con id único
                 "zoneprice" : prices,// Este es el valor de la zona
                 "tipo"      : 1,
                 "capacity"  : capacidad,
@@ -1082,7 +1084,7 @@ function setDefaultItem() {
             let total    = parseFloat( Number(subtotal) * 1.16 );
 
             $(".productosCilindroPedido tbody").append(
-                '<tr data-item-id='+articulo.article+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
+                '<tr data-item-id='+articulo.article+' data-time-unix='+articulo.timeUnix+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
                     '<td class="text-center">'+(auxArt && auxArt.nombre ? auxArt.nombre : 'Sin nombre asignado')+'</td>'+
                     '<td class="text-center">'+articulo['quantity']+'</td>'+
                     '<td class="text-center">'+capacidad+' kg</td>'+
@@ -1099,6 +1101,7 @@ function setDefaultItem() {
             setTotalPedido( $(".productosCilindroPedido") );
         } else if(direccion.typeServiceId == idEstacionario) {
             let articulo = {
+                "timeUnix"  : timeUnix,// Este dato es únicamente para mantener el item con id único
                 "zoneprice" : prices,// Este es el valor de la zona
                 "tipo"      : 2,
                 "capacity"  : item1Capacidad,
@@ -1112,7 +1115,7 @@ function setDefaultItem() {
             $('#sinProductos').addClass('d-none');
             $('.productosEstacionarioPedido').parent().parent().removeClass('d-none');
             $(".productosEstacionarioPedido tbody").append(
-                '<tr data-item-id='+articulo.article+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
+                '<tr data-item-id='+articulo.article+' data-time-unix='+articulo.timeUnix+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
                     '<td>Gas LP</td>'+
                     //'<td class="text-center">1</td>'+
                     '<td class="text-center">'+item1Capacidad+'</td>'+
@@ -1126,6 +1129,7 @@ function setDefaultItem() {
             setTotalPedido( $(".productosEstacionarioPedido") );
         } else if(direccion.typeServiceId == idMontacarga) {
             let articulo = {
+                "timeUnix"  : timeUnix,// Este dato es únicamente para mantener el item con id único
                 "zoneprice" : prices,// Este es el valor de la zona
                 "tipo"      : 2,
                 "capacity"  : item1Capacidad,
@@ -1139,7 +1143,7 @@ function setDefaultItem() {
             $('#sinProductos').addClass('d-none');
             $('.productosEstacionarioPedido').parent().parent().removeClass('d-none');
             $(".productosEstacionarioPedido tbody").append(
-                '<tr data-item-id='+articulo.article+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
+                '<tr data-item-id='+articulo.article+' data-time-unix='+articulo.timeUnix+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
                     '<td>Montacarga Gas LP</td>'+
                     //'<td class="text-center">1</td>'+
                     '<td class="text-center">'+item1Capacidad+'</td>'+
