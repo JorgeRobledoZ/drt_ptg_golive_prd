@@ -27,8 +27,9 @@
       var estatusViajeEnCurso = 0;
       var objMap=drt_mapid_cm.drt_liquidacion();
       if (Object.keys(objMap).length>0) {
-        estatusViajeEnCurso = objMap.estatusViajeEnCurso;
+        estatusViajeEnCurso = objMap.estatusViejeEnCurso;
       }
+      log.audit("vehiculo", vehiculo);
 
       if(vehiculo && fieldName === "custrecord_ptg_salida_pipa_"){
         var equipoObj = record.load({
@@ -171,11 +172,13 @@
           });
           porcentajeDespues = llenadoPipasObjResult[0].getValue({name: "custrecordptg_porcen_despues_llenado", label: "PTG - % Después llenado"});
           pesoDespues = parseFloat(llenadoPipasObjResult[0].getValue({name: "custrecord_ptg_peso_despuesllenado", label: "PTG - Peso después llenado"})||0);
-          transacciones = parseInt(llenadoPipasObjResult[0].getValue({name: "custrecord_drt_ptg_transferencia_lp", label: "PTG - Transferencia Creada"}));
+          transacciones = llenadoPipasObjResult[0].getValue({name: "custrecord_drt_ptg_transferencia_lp", label: "PTG - Transferencia Creada"});
           log.audit("pesoDespues", pesoDespues);
           var porcentajeDespuesPF = parseFloat(porcentajeDespues);
           log.emergency("porcentajeDespuesPF", porcentajeDespuesPF);
-          if(!transacciones){
+          log.emergency("transacciones", transacciones);
+          if(transacciones != ""){
+            log.audit("Entra validacion transacicion");
             if(llenadoSalida == porcentajeDespuesPF){
               log.audit("Porcentajes OK");
               if(bascula){
