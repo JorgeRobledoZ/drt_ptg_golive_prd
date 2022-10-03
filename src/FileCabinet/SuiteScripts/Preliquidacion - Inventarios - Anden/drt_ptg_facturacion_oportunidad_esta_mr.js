@@ -429,6 +429,7 @@
                 facturaObj.setSublistValue('item', 'location', i, ubicacion);
                 facturaObj.setSublistValue("item", "custcol_ptg_cantidad_litros", i, cantidadArray[i]);
                 facturaObj.setSublistValue("item", "custcol_ptg_precio_unitario", i, precioPorLitro);
+                facturaObj.setSublistValue("item", "custcol_mx_txn_line_sat_tax_object", i, 2);
                 log.audit("i", i);
             }
 

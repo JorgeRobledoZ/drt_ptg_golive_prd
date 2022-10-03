@@ -655,6 +655,8 @@
                     }
                 }
                 facturaObj.setSublistValue("item", "location", i, ubicacion);
+                facturaObj.setSublistValue("item", "custcol_mx_txn_line_sat_tax_object", i, 2);
+
             }
 
             var recObjID = facturaObj.save({

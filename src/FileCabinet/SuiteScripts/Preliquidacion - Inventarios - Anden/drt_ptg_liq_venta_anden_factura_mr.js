@@ -379,6 +379,7 @@
                         recordFactura.setCurrentSublistValue("item", "custcol_ptg_cantidad_litros", cantidadArray[j]);
                         recordFactura.setCurrentSublistValue("item", "custcol_ptg_precio_unitario", rateArray[j]);
                         recordFactura.setCurrentSublistValue("item", "location", ubicacionAnden);
+                        recordFactura.setCurrentSublistValue("item", "custcol_mx_txn_line_sat_tax_object", 2);
                         recordFactura.commitLine("item");
                         x += 1;
                     }

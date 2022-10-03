@@ -346,6 +346,14 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
           recordFactura.setValue("custbody_mx_cfdi_usage", cfdiCliente);
           recordFactura.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
 
+          var itemCount = recordFactura.getLineCount('item');
+          log.audit("itemCount", itemCount);
+
+          for (var i = 0; i < itemCount; i++) {
+            recordFactura.setSublistValue("item", "custcol_mx_txn_line_sat_tax_object", i, 2);
+            log.audit("i", i);
+          }
+
           var idRecordFactura = recordFactura.save({
             enableSourcing: false,
             ignoreMandatoryFields: true,
