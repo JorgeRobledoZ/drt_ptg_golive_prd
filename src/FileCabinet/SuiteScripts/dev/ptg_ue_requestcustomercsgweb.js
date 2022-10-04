@@ -45,9 +45,29 @@ define(['N/file', 'N/http', 'N/search', 'N/xml', 'N/record', 'N/query'],
          */
         const afterSubmit = (scriptContext) => {
             try {
-                if( scriptContext.type === scriptContext.UserEventType.CREATE || scriptContext.type === scriptContext.UserEventType.CREATE ) {
+                if( scriptContext.type === scriptContext.UserEventType.CREATE ) {
                     // Se actualiza el campo tipo check
                     var custom = scriptContext.newRecord;// Get edited customer
+                    var customerInfo = search.lookupFields({
+                        type: search.Type.CUSTOMER,
+                        id: custom.id,
+                        columns: ['entityid']
+                    });
+                    let entityid = customerInfo.entityid;
+                    let count    = entityid.length;
+
+                    while (count < 10) {
+                        entityid = "0".concat(entityid);
+                        count ++;
+                    }
+
+                    record.submitFields({
+                        type: record.Type.CUSTOMER,
+                        id: custom.id,
+                        values: {
+                            'entityid': entityid,
+                        }
+                    });
     
                     record.submitFields({
                         type: record.Type.CUSTOMER,
@@ -56,7 +76,9 @@ define(['N/file', 'N/http', 'N/search', 'N/xml', 'N/record', 'N/query'],
                             'custentity_ptg_cliente_act_sgc': "T",
                         }
                     });
+                    log.debug('entityid', entityid);
                 }
+                return;
                 
                 let idToken = login();
 

@@ -504,6 +504,18 @@
                     value: customer.cfdi
                 })
 
+                // Tipo de industria
+                customerRecord.setValue({
+                    fieldId: 'custentity_mx_sat_industry_type',
+                    value: customer.typeIndustry
+                })
+
+                // Nombre régimen fiscal
+                customerRecord.setValue({
+                    fieldId: 'custentity_mx_sat_registered_name',
+                    value: customer.regimeFiscal
+                })
+
                 customerRecord.setValue({
                     fieldId: 'custentity_razon_social_para_facturar',
                     value: customer.razonSocialFact

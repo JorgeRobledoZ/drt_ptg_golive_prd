@@ -280,9 +280,13 @@
         }
 
         .tab.active {
-            background: #ffffff;
+            cursor: unset;
+            background: #355da7;
+            /* border-radius: 10px 0; */
+            color: #ffffff;
+            /* background: #ffffff;
             border-radius: 10px 0;
-            color: #355da7;
+            color: #355da7; */
         }
 
         .modal-header .modal-title {
@@ -581,7 +585,7 @@
 
         .tab.active {
             cursor: unset;
-            background-color: var(--color-primary);
+            /* background-color: var(--color-primary); */
         }
 
         .tab:first-child {
@@ -928,7 +932,7 @@
                 data: JSON.stringify({
                     id : item.id,
                     chofer: $("#chofer").val(),
-                    ayudante: $("#ayudante").val(),
+                    ayudante: Number( $("#ayudante").val() ) ? Number( $("#ayudante").val() ) : null,
                     telefono: $("#nuevoTelefono").val()
                 })
             }
@@ -1168,6 +1172,8 @@
             }
 
             setAjax(settings).then((response) => {
+                $("#ayudante").append('<option value="0">Seleccione una opción</option>');
+
                 response.data.forEach(element => {
                     $("#chofer, #ayudante").append('<option value="'+element.id+'">'+element.nombre+'</option>')
                 });

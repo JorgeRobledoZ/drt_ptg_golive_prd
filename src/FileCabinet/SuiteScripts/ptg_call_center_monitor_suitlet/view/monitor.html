@@ -1959,6 +1959,7 @@
         urlGetHistorico = '${ds.getHistorico}';
         urlPutNotes = '${ds.putNotes}';
         urlGetMotivosReprogramacionCasos = '${ds.getMotivosReprogramacionCasos}';
+        cusVars = JSON.parse('${ds.cusVars}');
         conceptoFugasQuejasArr = [];
         methodPayments = [];
         deftEstacionarVal = "4216";
@@ -1973,7 +1974,8 @@
         rutasEstacionarios = [];
         countServices = 0;
         concatObsPagos = ["15", "13", "2", "14", "16", "17", "8"];
-        articuloDesc  = 4217;
+        // articuloDesc  = 4217;
+        articuloDesc = cusVars.articuloDescuentoId;
         idSupervisor = 1202;
         idCilindroTipo = 1;
         idEstacionarioTipo = 2;
