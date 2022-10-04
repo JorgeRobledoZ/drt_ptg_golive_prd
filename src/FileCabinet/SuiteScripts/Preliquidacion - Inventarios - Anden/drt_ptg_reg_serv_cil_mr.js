@@ -131,6 +131,15 @@
             log.debug("vehiculoDestino", vehiculoDestino);
             log.debug("viajeDestino", viajeDestino);
 
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 1;
+
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_preliquicilndros_",
+                id: idRegistro,
+                values: valoresProceso
+            });
+            log.debug("registroCilindros map 1", registroCilindros);
+
             var condretado = 0;
             var entregado = 0;
             var ventaLitro = 0;
@@ -198,12 +207,36 @@
                 id: cliente
             });
             var rfc = clienteObj.getValue("custentity_mx_rfc");
-            log.audit("Cliente: "+ cliente, "RFC ", rfc);
+            log.audit("Cliente: "+ cliente, "RFC "+ rfc);
             var nombreClienteAFacturar = clienteObj.getValue("custentity_mx_sat_registered_name");
             if((rfc != rfcGenerico) || (rfc != rfcPublicoGeneral)){
                 log.audit("Solicita factura");
                 solicitaFactura = true;
             }
+
+            var internalIdDireccion = 0;
+            var lineasDirecciones = clienteObj.getLineCount('addressbook');
+            for(var z = 0; z < lineasDirecciones; z++){
+                idInternoDireccion = clienteObj.getSublistValue({
+                    sublistId: "addressbook",
+                    fieldId: "internalid",
+                    line: z,
+                });
+                log.audit("idInternoDireccion", idInternoDireccion);
+
+                addressBookArray = clienteObj.getSublistValue({
+                    sublistId: "addressbook",
+                    fieldId: "addressbookaddress",
+                    line: z,
+                });
+                log.audit("addressBookArray", addressBookArray);
+
+                if(addressBookArray == idDireccion){
+                    internalIdDireccion = idInternoDireccion;
+                }
+            }
+
+
             var zonaPrecioObj = record.load({
                 type: "customrecord_ptg_zonasdeprecio_",
                 id: zonaPrecio,
@@ -277,7 +310,7 @@
                         recOportunidad.setValue("custbody_ptg_codigo_movimiento",ventaLitro);
                         recOportunidad.setValue("custbody_ptg_zonadeprecioop_", zonaPrecio);
                         recOportunidad.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
-                        recOportunidad.setValue("shipaddresslist", idDireccion);
+                        recOportunidad.setValue("shipaddresslist", internalIdDireccion);
                         recOportunidad.setValue("custbody_ptg_id_direccion_envio", direccionID);
                         for (var i = 0; i < 1; i++) {
                             recOportunidad.selectLine("item", i);
@@ -340,7 +373,7 @@
                     recOportunidad.setValue("custbody_ptg_zonadeprecioop_", zonaPrecio);
                     recOportunidad.setValue("custbody_ptg_cliente_solicita_factura", solicitaFactura);
                     recOportunidad.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
-                    recOportunidad.setValue("shipaddresslist", idDireccion);
+                    recOportunidad.setValue("shipaddresslist", internalIdDireccion);
                     for (var i = 0; i < 1; i++) {
                         recOportunidad.selectLine("item", i);
                         recOportunidad.setCurrentSublistValue("item", "item", articulo);
