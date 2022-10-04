@@ -40,7 +40,7 @@ define([
                         join: idSublist,
                     },
                     {
-                        name: "custrecord_ptg_zona_precio_especial",
+                        name: "custrecord_ptg_zona_de_precio",
                         join: idSublist,
                     },
                     {
@@ -108,7 +108,7 @@ define([
                         custrecord_ptg_cliente_dir: addE.id || "",
                         custrecord_ptg_direccion_dir: `${addE.custrecord_ptg_streetaddress} ${addE.custrecord_ptg_exterior_numberaddress} ${addE.custrecord_ptg_interior_numberaddress} ${addE.custrecord_ptg_codigo_postaladdress} ${addE.custrecord_ptg_nombre_coloniaaddress} ${addE.custrecord_ptg_estadoaddress}`,
                         custrecord_ptg_direccion: addE.internalidaddress || "",
-                        custrecord_ptg_zona_precios: addE.custrecord_ptg_zona_precio_especialaddress || "",
+                        custrecord_ptg_zona_precios: addE.custrecord_ptg_zona_de_precioaddress || "",
                     };
                     arrayAddressCustomRecord.forEach((addCR) => {
                         const existObj = addCR.custrecord_ptg_cliente_dir === addE.id && addCR.custrecord_ptg_direccion === addE.internalidaddress;
