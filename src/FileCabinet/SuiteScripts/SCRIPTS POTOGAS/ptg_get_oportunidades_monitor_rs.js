@@ -422,7 +422,7 @@ define(['N/search', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (se
             }
 
             var status = request.status_oportunidad;
-            if (status) {
+            if (status.length) {
                 var statusOportunidad = search.createFilter({
                     name: "custbody_ptg_estado_pedido",
                     operator: "anyof",

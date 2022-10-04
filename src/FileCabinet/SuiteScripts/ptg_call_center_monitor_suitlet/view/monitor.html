@@ -536,6 +536,10 @@
         .content-input .select2 .select2-selection .select2-selection__rendered {
             padding-left: 0;
         }
+        
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            border-right: 0px!important;
+        }
 
         .content-gen {
             border-radius: 20px;
@@ -1214,7 +1218,7 @@
                 <div class="col-auto pb-2 tipo-pedido">
                     <div class="content-input">
                         <label>Estado de la Solicitud</label><br>
-                        <select id="filterEstadoSolicitud" onchange="getServicios(this)" class="form-ptg" style="width: 230px;">
+                        <select id="filterEstadoSolicitud" onchange="getServicios(this)" multiple="true" class="form-ptg select2" style="width: 230px;">
                             
                         </select>
                     </div>
@@ -1222,8 +1226,8 @@
                 <div class="col-auto pb-2 tipo-caso d-none">
                     <div class="content-input">
                         <label>Estado de la Solicitud</label><br>
-                        <select id="filterEstadoCaso" onchange="getServicios(this)" class="form-ptg" style="width: 230px;">
-                            <option value="0">Todos</option>
+                        <select id="filterEstadoCaso" onchange="getServicios(this)" multiple="true" class="form-ptg select2" style="width: 230px;">
+                            <!-- <option value="0">Todos</option> -->
                             <option value="1">No iniciado</option>
                             <option value="2">En curso</option>
                             <option id="optEscalado" value="3">Escalado</option>
@@ -1989,6 +1993,13 @@
         }
 
         function initComponents() {
+            //Set up the select 2 inputs
+            if ( $("select.select2").length ) {
+                $("select.select2").select2({
+                    placeholder: "Todos",
+                });
+            }
+
             $('body').delegate('#estadoQueja', 'change', function () {
                 if($(this).val() == "6") {
                     $("#motivoReprogramacionQueja").closest(".col-4").removeClass("d-none");

@@ -216,7 +216,7 @@ define(["N/search"], function (search) {
             }
 
             let estadoId = request.estado;
-            if (estadoId) {
+            if (estadoId.length) {
                 var estadoServicio = search.createFilter({
                     name: "status",
                     operator: "anyof",

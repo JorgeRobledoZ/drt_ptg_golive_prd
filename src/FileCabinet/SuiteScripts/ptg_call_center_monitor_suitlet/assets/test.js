@@ -1648,8 +1648,22 @@ function gestionarServicio($this) {
 
     $("#fechaPrometidaPedido").val(dateFormatFromDate(servicio.cierrePrevisto, "2"));
     $("#fechaPrometidaPedido").attr('disabled', true);
-    $("#desdePedido").val(servicio.entre_las ? getTimeFromString(servicio.entre_las) : null);
-    $("#hastaPedido").val(servicio.y_las ? getTimeFromString(servicio.y_las) : null);
+
+    let date = $('#fechaPrometidaPedido').val() ?? '2022-01-01';
+    let momentEntreLas = null;
+    let momentYLas     = null;
+    if ( servicio.entre_las ) {
+        let entreLas = date+' '+servicio.entre_las;
+        momentEntreLas = moment(entreLas).format('h:mm');
+    }
+
+    if ( servicio.y_las ) {
+        let yLas = date+' '+servicio.y_las;
+        momentYLas = moment(yLas).format('h:mm');
+    }
+
+    $("#desdePedido").val(momentEntreLas);
+    $("#hastaPedido").val(momentYLas);
 
     $('#viajeVentaPedido').children('option').remove();
     
@@ -1900,7 +1914,7 @@ $('body').delegate('#editarPedido', 'click', function () {
         totalMetodosPago = $('.productosMetodoPago').children('tfoot').find('td.total').data('total');
     }
 
-    if ( totalPedido != totalMetodosPago ) {
+    if ( Number(totalPedido).toFixed(2) != Number(totalMetodosPago).toFixed(2) ) {
         infoMsg('warning', 'El total a pagar debe ser igual al total de productos enlistados');
         return;
     }
