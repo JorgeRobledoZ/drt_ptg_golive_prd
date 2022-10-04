@@ -450,7 +450,7 @@ $('body').delegate('.edit-address', 'click', function () {
 
             $('#fechaInicioServicio').val(direccion.startDayService ? getMomentDateFormat(direccion.startDayService) : null);
             $('#cadaFormCliente').val(direccion.cada)
-            $('#frecuenciaFormCliente').val(direccion.frecuencia);
+            $('#frecuenciaFormCliente').val(direccion.frecuencia).trigger('change');
 
             // Días de la semana
             $('#lunesFormCliente').prop('checked', direccion.lunes ? true : false);
@@ -738,7 +738,7 @@ function saveCustomer() {
         requiereFactura: requiereFactura,
         telefono: telefonoPrinc
     }
-    console.log(customer);
+    // console.log('Se envía la dirección', customer);
     // return;
     loadMsg('Guardando información...');
     // Se envía la información del cliente por ajax

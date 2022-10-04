@@ -119,6 +119,7 @@ function validateAddressFields(type) {
     console.log(address);
     // Enlista las direcciones en  una tabla dinámica
     if ( tipoAccion == 'lista' ) {
+        console.log('Es una dirección que se va a agregar a la lista de un cliente nuevo');
         // Valida que el domicilio d facturación sólo lo tenga una dirección
         let canContinue = validateTableAddress(address.obj);
 
@@ -171,6 +172,7 @@ function validateAddressFields(type) {
 
         $('div#formDireccionesModal').modal('hide');
     } else if ( tipoAccion == 'editLista' ) {
+        console.log('Es una dirección que se va a editar en la lista de un cliente nuevo');
         // Valida que el domicilio d facturación sólo lo tenga una dirección
         /*validateTableAddress(address.obj);
         //console.log(address);
@@ -187,7 +189,7 @@ function validateAddressFields(type) {
         var auxEdit = $("#tipoAccionDireccion").data("auxEdit");
         address.obj.timeUnix = auxEdit.timeUnix;
         address.obj.principal = auxEdit.principal;
-        address.obj.domFacturacion = auxEdit.domFacturacion;
+        // address.obj.domFacturacion = auxEdit.domFacturacion;
 
         let canContinue = validateTableAddress(address.obj, true);
 
@@ -223,8 +225,21 @@ function validateAddressFields(type) {
         $('div#formDireccionesModal').modal('hide');
     } else if( tipoAccion == 'guardar' ) {// Envía una dirección a guardar o actualizar
         let idAddress = $('#internalIdDireccion').val();
-        let dataToSend = null;
+        // var auxEdit = $("#tipoAccionDireccion").data("auxEdit");
+        // address.obj.timeUnix = auxEdit.timeUnix;
+        // address.obj.principal = auxEdit.principal;
+        // address.obj.domFacturacion = auxEdit.domFacturacion;
+        let canContinue = validateCustomerAddress(address.obj, idAddress ? true : false);
 
+        // La dirección es inválida
+        if (! canContinue ) {
+            infoMsg('error', 'Sólo puede tener configurada una dirección de facturación por cliente.');
+            return;
+        }
+
+        let dataToSend = null;
+        // console.log('Se hubiera guardado la dirección');
+        // return;
         if ( idAddress ) {// Se actualiza la dirección
             // Se valida que no exista otra dirección de tipo facturación
             if (address.obj['tipoDireccion'] == tipoDirEntFact || address.obj['tipoDireccion'] == tipoDirSoloFacturacion) {
@@ -611,6 +626,7 @@ $('body').delegate('#fechaInicioServicio', 'change', function () {
 // Coloca una dirección en el listado de direcciones del cliente
 function getAddressOnList() {
     let addressStr = '';
+    let idAddress       = $('#internalIdDireccion').val();
     let tipoDireccionId = $("#tipoDireccion").val();
     let requiereFactura = $("input[name=requiereFactura]:checked").val();
     let customStartTime = customEndTime = new Date();
@@ -641,6 +657,7 @@ function getAddressOnList() {
     }
 
     let addressObj = {
+        idAddress       : idAddress,
         tipoDireccion   : tipoDireccionId,
         timeUnix        : Date.now(),
         principal       : $('table.table-address tbody').find(".address").length == 0 ? true : false,
@@ -758,39 +775,106 @@ function getAddressOnList() {
 
 // Cada que se agrega una dirección, iterará las direcciones para actualizar el domFacturación en caso de que se haya enviado
 function validateTableAddress(objAddress, validateByUnix = false) {
-    let dirValida = true;
+    console.log(objAddress);
+    let dirValida     = true;
     let trDirecciones = $('#tab-client-domicilio table.table-address tbody').children('tr.address');
-    // Si la dirección actual es el domicilio de facturación, entonces todas se desmarcan a excepción de la suya
-    if ( objAddress.domFacturacion == true ) {
-        trDirecciones.each(function( index ) {
-            let direccion = $(this).data('address');
+    let numFact       = 0;
+    let numEnt        = 0;
+    let numEntFact    = 0;
+    
+    // Se calcula el número de direcciones existentes de cada tipo
+    trDirecciones.each(function(index) {
+        let trAdd = $(this).data('address');
+
+        if ( trAdd.tipoDireccion == tipoDirEntFact ) { 
             if ( validateByUnix ) {
-                if ( direccion && direccion.domFacturacion == true && direccion.timeUnix != objAddress.timeUnix ) {
-                    dirValida = false;
+                if ( trAdd && trAdd.timeUnix != objAddress.timeUnix ) {
+                    console.log('Se suma el num de numEntFact ');
+                    numEntFact ++; 
                 }
             } else {
-                if ( direccion && direccion.domFacturacion == true ) {
-                    dirValida = false;
-                }
+                numEntFact ++; 
             }
-        });
-        // $('input.address-table').prop('checked', false);// Desmarca todos los check de la tabla
-        // $('input#domFacturacionDireccion'+objAddress.timeUnix).prop('checked', true);
-    }
+        }
+        else if ( trAdd.tipoDireccion == tipoDirSoloEntrega ) { 
+            numEnt ++; 
+        }
+        else if ( trAdd.tipoDireccion == tipoDirSoloFacturacion ) { 
+            if ( validateByUnix ) {
+                if ( trAdd && trAdd.timeUnix != objAddress.timeUnix ) {
+                    console.log('Se suma el num de numFact ');
+                    numFact ++; 
+                }
+            } else {
+                numFact ++; 
+            }
+        }
+    });
 
+    console.log(numFact,numEnt,numEntFact);
+
+    if ( objAddress.domFacturacion == true ) {// No debe de existir otra dirección de facturación
+        console.log('La direccion del modal es para facturación');
+        if ( numEntFact > 0 || numFact > 0) {
+            dirValida = false;
+            console.log('Ya tiene previamente una dirección que funge como entrega y facturación', dirValida);
+        } else {
+            console.log('La dirección es válida', dirValida);
+        }
+    } 
     return dirValida;
-    // domFacturacionDireccion'+address.obj.timeUnix+'
-    // trDirecciones.each(function( index ) {
-    //     let direccion = $(this).data('address');
-    //     if ( direccion.timeUnix != objAddress.timeUnix ) {// Va a verificar todas las direcciones a excepción de la creada recientemente
-            
-    //         if ( objAddress.domFacturacion == true ) {// Si la dirección recientemente agregada es de facturación, se remueven todas las anteriores
-    //             direccion['domFacturacion'] = false;
-    //         }
-    //         console.log('Se actualizará esta dirección');
-    //     }
-    //     $(this).data('address', direccion);
-    // });
+}
+
+// Cada que se agrega una dirección, iterará las direcciones para actualizar el domFacturación en caso de que se haya enviado
+function validateCustomerAddress(objAddress, validateById = false) {
+    console.log(objAddress);
+    let dirValida     = true;
+    let customerAdds  = customerGlobal.addr;
+    let numFact       = 0;
+    let numEnt        = 0;
+    let numEntFact    = 0;
+    
+    // Se calcula el número de direcciones existentes de cada tipo
+    customerAdds.forEach(address => {
+        console.log('Customer address', address);
+    
+        if ( address.tipoDireccionId == tipoDirEntFact ) { 
+            if ( validateById ) {
+                if ( address && address.idAdress != objAddress.idAddress ) {
+                    console.log('Se suma el num de numEntFact ');
+                    numEntFact ++; 
+                }
+            } else {
+                numEntFact ++; 
+            }
+        }
+        else if ( address.tipoDireccionId == tipoDirSoloEntrega ) { 
+            numEnt ++; 
+        }
+        else if ( address.tipoDireccionId == tipoDirSoloFacturacion ) { 
+            if ( validateById ) {
+                if ( address && address.idAdress != objAddress.idAddress ) {
+                    console.log('Se suma el num de numFact ');
+                    numFact ++; 
+                }
+            } else {
+                numFact ++; 
+            }
+        }
+    });
+
+    console.log(numFact,numEnt,numEntFact);
+
+    if ( objAddress.domFacturacion == true ) {// No debe de existir otra dirección de facturación
+        console.log('La direccion del modal es para facturación');
+        if ( numEntFact > 0 || numFact > 0) {
+            dirValida = false;
+            console.log('Ya tiene previamente una dirección que funge como entrega y facturación', dirValida);
+        } else {
+            console.log('La dirección es válida', dirValida);
+        }
+    } 
+    return dirValida;
 }
 
 // Checa si se clickea el domicilio de facturación
