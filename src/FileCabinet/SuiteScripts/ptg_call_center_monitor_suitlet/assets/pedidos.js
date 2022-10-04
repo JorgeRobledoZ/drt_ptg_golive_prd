@@ -746,6 +746,12 @@ async function savePedido() {
             return;
         }
 
+        // Si es de tipo solo facturación, no puede continuar con el pedido
+        if ( direccion.tipoDireccionId == tipoDirSoloFacturacion ) {
+            infoMsg('error', 'No puede realizar un pedido con una dirección de sólo facturación');
+            return;
+        }
+
         // Define cuál tabla de productos es la que se usará para calcular totales y descuentos
         if (! $('.productosEstacionarioPedido').parent().parent().hasClass('d-none') ) { // Estacionario
             tablaProd = $('.productosEstacionarioPedido');

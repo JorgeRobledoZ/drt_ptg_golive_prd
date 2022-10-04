@@ -310,7 +310,6 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     name: "custrecord_ptg_tipo_direccion",
                     join: "Address"
                 })
-                log.debug('tipoDireccionId', tipoDireccionId);
                 
                 let tipoServicio = '';
                 let tipoServicioAbbr = '';
@@ -343,6 +342,12 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     label: "PTG - COLONIA Y RUTA"
                 });
 
+                let idTipoDireccion = result.getValue({
+                    name: "custrecord_ptg_tipo_direccion",
+                    join: "Address",
+                    label: "PTG - TIPO DE DIRECCION"
+                });
+                
                 let dataRoute = search.lookupFields({
                     type: "customrecord_ptg_coloniasrutas_",
                     id: idColandRoute,
@@ -350,15 +355,16 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     columns: ['custrecord_ptg_nombrecolonia_', 'custrecord_ptg_rutamunicipio_', 'custrecord_ptg_rutacil_', 'custrecord_ptg_rutaest_', 'custrecord_ptg_estado_', 'custrecord_ptg_zona_de_precio_', 'custrecord_ptg_cp_', 'custrecord_ptg_pbservaciones_']
                 });
 
-                log.audit('dataRoute', dataRoute)
-
                 //Modificar esta lógica para la zona de precio
                 let dataZone = search.lookupFields({
                     type: "customrecord_ptg_zonasdeprecio_",
-                    id: dataRoute['custrecord_ptg_zona_de_precio_'][0].value,
+                    id: ( idTipoDireccion == cusVars.tipoDirSoloFacturacion ? cusVars.zonaGeneralId : dataRoute['custrecord_ptg_zona_de_precio_'][0].value ),
+                    // id: dataRoute['custrecord_ptg_zona_de_precio_'][0].value,
                     columns: ['internalid', 'name', 'custrecord_ptg_territorio_', 'custrecord_ptg_precio_', 'custrecord_ptg_precio_kg', 'custrecord_ptg_factor_conversion']
                 });
 
+                log.debug('dataidTipoDireccion', idTipoDireccion);
+                log.debug('dataRoute', dataRoute);
                 log.audit('dataZone', dataZone)
 
                 let dataZoneRoute = {
@@ -1085,14 +1091,14 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     arrayResult.push(customerObj)
                     responseData.data = arrayResult
 
-                    log.debug({
-                        title: "arrayResult",
-                        details: arrayResult
-                    })
-                    log.debug({
-                        title: "customerObj",
-                        details: customerObj
-                    })
+                    // log.debug({
+                    //     title: "arrayResult",
+                    //     details: arrayResult
+                    // })
+                    // log.debug({
+                    //     title: "customerObj",
+                    //     details: customerObj
+                    // })
 
                 })
             })
