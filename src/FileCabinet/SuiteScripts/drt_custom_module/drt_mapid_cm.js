@@ -717,7 +717,8 @@ define(
                         form_intercompany_invoice: 308,
                         subcidiary_intercompany_invoice: 25,
                         ubicacion_intercompany_invoice: 762,
-                        form_sales_order: 261
+                        form_sales_order: 261,
+                        form_full_filment_so: 290
                     },
                     [runtime.EnvType.SANDBOX]: {
                         ubicacion_desvio_planta_receipt: 1525,
@@ -731,7 +732,8 @@ define(
                         form_intercompany_invoice: 286,
                         subcidiary_intercompany_invoice: 25,
                         ubicacion_intercompany_invoice: 762,
-                        form_sales_order: 261
+                        form_sales_order: 261,
+                        form_full_filment_so: 290
                     }
                 }
                 respuesta = mapObj[runtime.envType];
