@@ -64,6 +64,10 @@ define([
                                 isTest
                             ) {
                                 objWrite.value.push(`Test id: ${objRecord.id} recordType: ${objRecord.recordType}`);
+                                reduceContext.write({
+                                    key: `Test ${objRecord.recordType}`,
+                                    value: objRecord.id,
+                                });
                             } else {
                                 const idDelete = record.delete({
                                     id: objRecord.id,
@@ -74,37 +78,34 @@ define([
                                     !!idDelete
                                 ) {
                                     objWrite.value.push(`idDelete: ${idDelete} id: ${objRecord.id} recordType: ${objRecord.recordType} = ${parseInt(objRecord.id) == parseInt(idDelete)}`);
+                                    reduceContext.write({
+                                        key: objRecord.recordType,
+                                        value: objRecord.id,
+                                    });
                                 } else {
                                     arraySinConfirmar.push(`${objRecord.recordType} ${objRecord.id}`);
+                                    reduceContext.write({
+                                        key: `sin_confirmar  ${objRecord.recordType}`,
+                                        value: objRecord.id,
+                                    });
                                 }
                             }
                         } catch (edelete) {
                             log.error(`Errpr Eliminacion ${objRecord.recordType} ${objRecord.id} `, edelete);
                             arrayError.push(`${objRecord.recordType} ${objRecord.id} : ${edelete.message}`)
+                            reduceContext.write({
+                                key: `error ${objRecord.recordType}`,
+                                value: objRecord.id,
+                            });
                         }
                     }
                 });
             } catch (error) {
                 log.error(`error reduce`, error);
             } finally {
-                objWrite.key = `${drt_ptg_delete_record_cm.keyRecordType("",reduceContext.key)} ${objWrite.value.length}`;
-                reduceContext.write(objWrite);
-                if (
-                    arraySinConfirmar.length > 0
-                ) {
-                    reduceContext.write({
-                        key: `sin_confirmar ${arraySinConfirmar.length}`,
-                        value: arraySinConfirmar,
-                    });
-                }
-                if (
-                    arrayError.length > 0
-                ) {
-                    reduceContext.write({
-                        key: `error ${arrayError.length}`,
-                        value: arrayError,
-                    });
-                }
+                log.debug(`objWrite`, objWrite);
+                log.debug(`arraySinConfirmar`, arraySinConfirmar);
+                log.debug(`arrayError`, arrayError);
             }
         }
 
@@ -115,28 +116,44 @@ define([
                 custrecord_drt_ptg_dr_error: "",
                 custrecord_drt_ptg_dr_finalizado: true,
             };
+            const objRecordId = {
+                custrecord_drt_ptg_dr_resultado: {},
+                custrecord_drt_ptg_dr_error: {},
+            };
             summaryContext.output.iterator().each(function (key, value) {
                 // log.debug(`Resultado ${key}`, value);
+
                 if (
                     key.includes("sin_confirmar") ||
                     key.includes("error")
                 ) {
-                    objUpdate.custrecord_drt_ptg_dr_error = `${objUpdate.custrecord_drt_ptg_dr_error}
-                    -
-                    ${key}
-                    ${value}
-                    -
-                    `;
+
+                    if (!objRecordId.custrecord_drt_ptg_dr_error[key]) {
+                        objRecordId.custrecord_drt_ptg_dr_error[key] = [];
+                    }
+                    objRecordId.custrecord_drt_ptg_dr_error[key].push(value);
+
                 } else {
-                    objUpdate.custrecord_drt_ptg_dr_resultado = `${objUpdate.custrecord_drt_ptg_dr_resultado}
-                    -
-                    ${key}
-                    ${value}
-                    -
-                    `;
+                    if (!objRecordId.custrecord_drt_ptg_dr_resultado[key]) {
+                        objRecordId.custrecord_drt_ptg_dr_resultado[key] = [];
+                    }
+                    objRecordId.custrecord_drt_ptg_dr_resultado[key].push(value);
                 }
                 return true;
             });
+            log.debug(`objRecordId`, objRecordId);
+            for (let typeR in objRecordId.custrecord_drt_ptg_dr_error) {
+                objUpdate.custrecord_drt_ptg_dr_error += `-
+                ${typeR} ${objRecordId.custrecord_drt_ptg_dr_error[typeR].length}
+                ${objRecordId.custrecord_drt_ptg_dr_error[typeR].join(", ")}
+                `;
+            }
+            for (let typeR in objRecordId.custrecord_drt_ptg_dr_resultado) {
+                objUpdate.custrecord_drt_ptg_dr_resultado += `-
+                ${typeR} ${objRecordId.custrecord_drt_ptg_dr_resultado[typeR].length}
+                ${objRecordId.custrecord_drt_ptg_dr_resultado[typeR].join(", ")}
+                `;
+            }
             drt_ptg_delete_record_cm.updateRecordDelete(objUpdate);
             log.debug(`summarize`, summaryContext);
         }
