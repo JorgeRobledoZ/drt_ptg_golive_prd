@@ -52,6 +52,7 @@ define([
             const arraySinConfirmar = [];
             try {
                 log.debug(`reduce key ${drt_ptg_delete_record_cm.keyRecordType("",reduceContext.key)}`, reduceContext);
+                const isTest = drt_ptg_delete_record_cm.readParameter("custscript_drt_ptg_dr_mr_is_test");
                 reduceContext.values.forEach(objRecord => {
                     objRecord = JSON.parse(objRecord);
                     if (
@@ -59,7 +60,6 @@ define([
                         !!objRecord.recordType
                     ) {
                         try {
-                            const isTest = false;
                             if (
                                 isTest
                             ) {
