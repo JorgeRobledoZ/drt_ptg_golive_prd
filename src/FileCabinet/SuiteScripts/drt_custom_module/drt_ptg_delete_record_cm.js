@@ -352,11 +352,17 @@ define([
                     scriptContext.type == scriptContext.UserEventType.VIEW
                 ) {
                     if (
-                        scriptContext.newRecord.type == "customrecord_ptg_preliquicilndros_"
+                        scriptContext.newRecord.type == "customrecord_ptg_preliquicilndros_" &&
+                        scriptContext.newRecord.getValue({
+                            fieldId: 'custrecord_ptg_liquidacion_status'
+                        }) != 4
                     ) {
                         printButton = "Preliquidacion Cilndros";
                     } else if (
-                        scriptContext.newRecord.type == "customrecord_ptg_preliqestcarburacion_"
+                        scriptContext.newRecord.type == "customrecord_ptg_preliqestcarburacion_" &&
+                        scriptContext.newRecord.getValue({
+                            fieldId: 'custrecord_ptg_liquidacion_status_carb'
+                        }) != 4
                     ) {
                         printButton = "Preliquidacion Carburacion";
                     }
