@@ -43,6 +43,7 @@ define(
                         ptgTipoServicioCar     : 4,// Carburación
                         roleSupervisor         : 1202,// Rol supervisor
                         roleAgenteHEB          : 1195,// Rol agente HEB
+                        zonaGeneralId          : 101,// Zona general, se coloca por default para las direcciones de facturación
                         urlSgcWeb              : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php",
                         urlSgcWebLogin         : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login",
                         urlSgcWebProcesar      : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
@@ -139,6 +140,7 @@ define(
                         ptgTipoServicioCar     : 4,// Carburación
                         roleSupervisor         : 1167,// Rol supervisor
                         roleAgenteHEB          : 1213,// Rol agente HEB
+                        zonaGeneralId          : 274,// Zona general, se coloca por default para las direcciones de facturación
                         urlSgcWeb              : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php",
                         urlSgcWebLogin         : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login",
                         urlSgcWebProcesar      : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
@@ -715,7 +717,8 @@ define(
                         form_intercompany_invoice: 308,
                         subcidiary_intercompany_invoice: 25,
                         ubicacion_intercompany_invoice: 762,
-                        form_sales_order: 261
+                        form_sales_order: 261,
+                        form_full_filment_so: 290
                     },
                     [runtime.EnvType.SANDBOX]: {
                         ubicacion_desvio_planta_receipt: 1525,
@@ -729,7 +732,8 @@ define(
                         form_intercompany_invoice: 286,
                         subcidiary_intercompany_invoice: 25,
                         ubicacion_intercompany_invoice: 762,
-                        form_sales_order: 261
+                        form_sales_order: 261,
+                        form_full_filment_so: 290
                     }
                 }
                 respuesta = mapObj[runtime.envType];

@@ -215,9 +215,9 @@ function setSelectStatusOp(items) {
     vrStatus = [];
     if ( items.length ) {
         $('#filterEstadoSolicitud').children('option').remove();
-        $('#filterEstadoSolicitud').append(
-            '<option value="0">Todos</option>'
-        )
+        // $('#filterEstadoSolicitud').append(
+        //     '<option value="0">Todos</option>'
+        // )
         
         items.forEach(element => {
             if(element.nombre.trim().toLowerCase() == "por notificar") {

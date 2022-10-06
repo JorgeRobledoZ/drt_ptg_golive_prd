@@ -278,8 +278,10 @@ function validateAddressFields(type) {
             address.obj['y_las'] ? updateAddress['custrecord_ptg_y_las'] = address.obj['y_las'] : '';
             address.obj['inThatWeek'] ? updateAddress['custrecord_ptg_en_la_semana'] = address.obj['inThatWeek'] : '';// Hay que actualizar el custom record
             address.obj['typeContact'] ? updateAddress['custrecord_ptg_tipo_contacto'] = address.obj['typeContact'] : '';
-            address.obj['typeService'] ? updateAddress['custrecord_ptg_tipo_servicio'] = address.obj['typeService'] : '';
-            address.obj['frequencyItem'] ? updateAddress['custrecord_ptg_articulo_frecuente'] = address.obj['frequencyItem'] : '';
+            // address.obj['typeService'] ? updateAddress['custrecord_ptg_tipo_servicio'] = ( address.obj['tipoDireccion'] == tipoDirSoloFacturacion ? '' : address.obj['typeService'] ) : '';
+            updateAddress['custrecord_ptg_tipo_servicio'] = ( address.obj['tipoDireccion'] && address.obj['tipoDireccion'] == tipoDirSoloFacturacion ? '' : ( address.obj['typeService'] ?? '' ));
+            updateAddress['custrecord_ptg_articulo_frecuente'] = ( address.obj['tipoDireccion'] && address.obj['tipoDireccion'] == tipoDirSoloFacturacion ? '' : ( address.obj['frequencyItem'] ?? '' ));
+            // address.obj['frequencyItem'] ? updateAddress['custrecord_ptg_articulo_frecuente'] = ( address.obj['tipoDireccion'] == tipoDirSoloFacturacion ? '' : address.obj['frequencyItem'] ) : '';
             address.obj['capacidad'] ? updateAddress['custrecord_ptg_capacidad_art'] = address.obj['capacidad'] : '';
             address.obj['frequencyItem2'] ? updateAddress['custrecord_ptg_articulo_frecuente2'] = address.obj['frequencyItem2'] : '';
             address.obj['capacidad2'] ? updateAddress['custrecord_ptg_capacidad_can_articulo_2'] = address.obj['capacidad2'] : '';
