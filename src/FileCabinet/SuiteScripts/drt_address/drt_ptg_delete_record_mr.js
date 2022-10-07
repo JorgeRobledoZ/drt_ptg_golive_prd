@@ -85,17 +85,19 @@ define([
                                 } else {
                                     arraySinConfirmar.push(`${objRecord.recordType} ${objRecord.id}`);
                                     reduceContext.write({
-                                        key: `sin_confirmar  ${objRecord.recordType}`,
+                                        key: `sin_confirmar ${objRecord.recordType}`,
                                         value: objRecord.id,
                                     });
                                 }
                             }
                         } catch (edelete) {
-                            log.error(`Errpr Eliminacion ${objRecord.recordType} ${objRecord.id} `, edelete);
+                            log.error(`Error Eliminacion ${objRecord.recordType} ${objRecord.id} `, edelete);
                             arrayError.push(`${objRecord.recordType} ${objRecord.id} : ${edelete.message}`)
                             reduceContext.write({
                                 key: `error ${objRecord.recordType}`,
-                                value: objRecord.id,
+                                value: `
+                                ${objRecord.id} :${edelete.message}
+                                `,
                             });
                         }
                     }
@@ -132,6 +134,16 @@ define([
                         objRecordId.custrecord_drt_ptg_dr_error[key] = [];
                     }
                     objRecordId.custrecord_drt_ptg_dr_error[key].push(value);
+                    // try {
+                    //     const typeRecord = key.split(" ");
+                    //     const idDelete = record.delete({
+                    //         id: value,
+                    //         type: typeRecord[typeRecord.length - 1],
+                    //     });
+                    //     log.debug("deleteSummarize", `idDelete: ${idDelete} id: ${value} recordType: ${key} = ${parseInt(value) == parseInt(idDelete)}`);
+                    // } catch (error2) {
+                    //     log.error(`error deleteSummarize`, error2);
+                    // }
 
                 } else {
                     if (!objRecordId.custrecord_drt_ptg_dr_resultado[key]) {
