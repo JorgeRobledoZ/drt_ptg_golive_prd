@@ -278,6 +278,27 @@ define([
                     }
                 }
                 respuesta.success = respuesta.data.length > 0;
+                if (
+                    respuesta.success
+                ) {
+                    const objUpdate = {
+                        custrecord_drt_ptg_dr_input: ""
+                    };
+                    const objRecordId = {};
+                    respuesta.data.forEach(registro => {
+                        if (!objRecordId[registro.recordType]) {
+                            objRecordId[registro.recordType] = [];
+                        }
+                        objRecordId[registro.recordType].push(registro.id);
+                    });
+                    for (let typeR in objRecordId) {
+                        objUpdate.custrecord_drt_ptg_dr_input += `-
+                        ${typeR} ${objRecordId[typeR].length}
+                        ${objRecordId[typeR].join(", ")}
+                        `;
+                    }
+                    updateRecordDelete(objUpdate);
+                }
             } catch (error) {
                 log.error(`error getAllRecord`, error);
             } finally {
