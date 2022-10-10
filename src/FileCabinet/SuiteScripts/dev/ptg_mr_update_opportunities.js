@@ -35,9 +35,10 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
                 // Se verifica que tenga folios disponibles para hacer una petición a SGC web
                 if ( folios.length && folios[index] ) {
                     let idToken = login();
+                    // log.debug('idToken', idToken);
                     let internalFileId = searchXmlFile(search);
                     let xmlContent = file.load({ id: internalFileId }).getContents();
-                    let dataToSend = setServiceData(Number(folios[index].folio) + 1, 10);
+                    let dataToSend = setServiceData(Number(folios[index].folio) + 1, 200);
                     let typeModule = "Servicios";
                     let action = "obtenerListaPorFolio";
                     let responseServ = registerSgcData(xmlContent, idToken, typeModule, action, dataToSend);
@@ -109,7 +110,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
                         viajeActivo = numViajesActivos[0].idViaje;
                     }
                 }
-                // log.debug('equipo', equipo);
+                log.debug('equipo', equipo);
 
                 const tipoPago = element.tipo_pago == 1 ? 1 : 2;
                 const tipoServ = ( element.tipo_registro == 'D' ? 1 : ( element.tipo_registro == 'J' ? 2 : element.tipo_registro == 'A' ? 3 : 1 ) );
@@ -315,59 +316,64 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm','N/file', 'N/http', 'N/htt
 
         // Try to login 
         const login = () => {
-            let res;
-            
-            let fileSearchObj = search.create({
-                type: "file",
-                filters:
-                    [
-                        ["name", "haskeywords", "login"]
-                    ],
-                columns:
-                    [
-                        search.createColumn({
-                            name: "name",
-                            sort: search.Sort.ASC,
-                            label: "Name"
-                        }),
-                        search.createColumn({ name: "folder", label: "Folder" }),
-                        search.createColumn({ name: "documentsize", label: "Size (KB)" }),
-                        search.createColumn({ name: "url", label: "URL" }),
-                        search.createColumn({ name: "created", label: "Date Created" }),
-                        search.createColumn({ name: "modified", label: "Last Modified" }),
-                        search.createColumn({ name: "filetype", label: "Type" }),
-                        search.createColumn({ name: "internalid", label: "Internal ID" })
-                    ]
-            });
-            
-            // let searchResultCount = fileSearchObj.runPaged().count;
-            // log.debug("fileSearchObj result count", searchResultCount);
-            fileSearchObj.run().each(function (result) {
-                // log.debug('Resultado petición', result);
-                // .run().each has a limit of 4,000 results
-                res = result.getValue({ name: "internalid", label: "Internal ID" });
-                return true;
-            });
-
-            let xmlContent = file.load({ id: res }).getContents();
-            // log.debug('xmlContent', xmlContent);
-
-            let headers = {};
-            headers['Content-Type'] = 'text/xml; charset=utf-8';
-            // headers['SOAPAction'] = 'http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login';
-            // let url = 'http://testpotogas.sgcweb.com.mx//ws/1094AEV2/v2/soap.php';
-            headers['SOAPAction'] = 'http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login';
-            let url = 'http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php';
-            // Method, url, body, headers
-            let response = http.request({ method: http.Method.POST, url: url, body: xmlContent, headers: headers });
-            // log.debug('response', response.body)
-            let xmlFileContent = response.body;
-            let xmlDocument = xml.Parser.fromString({ text: xmlFileContent });
-            let dataJson = xmlDocument.getElementsByTagName({ tagName: 'id' });
-            // log.debug('response status', dataJson)
-            let objResult = dataJson[0].textContent;
-            // log.debug('objResult', objResult)
-            return objResult;
+            try {
+                let res;
+                
+                let fileSearchObj = search.create({
+                    type: "file",
+                    filters:
+                        [
+                            ["name", "haskeywords", "login"]
+                        ],
+                    columns:
+                        [
+                            search.createColumn({
+                                name: "name",
+                                sort: search.Sort.ASC,
+                                label: "Name"
+                            }),
+                            search.createColumn({ name: "folder", label: "Folder" }),
+                            search.createColumn({ name: "documentsize", label: "Size (KB)" }),
+                            search.createColumn({ name: "url", label: "URL" }),
+                            search.createColumn({ name: "created", label: "Date Created" }),
+                            search.createColumn({ name: "modified", label: "Last Modified" }),
+                            search.createColumn({ name: "filetype", label: "Type" }),
+                            search.createColumn({ name: "internalid", label: "Internal ID" })
+                        ]
+                });
+                
+                // let searchResultCount = fileSearchObj.runPaged().count;
+                // log.debug("fileSearchObj result count", searchResultCount);
+                fileSearchObj.run().each(function (result) {
+                    // log.debug('Resultado petición', result);
+                    // .run().each has a limit of 4,000 results
+                    res = result.getValue({ name: "internalid", label: "Internal ID" });
+                    return true;
+                });
+    
+                let xmlContent = file.load({ id: res }).getContents();
+                // log.debug('xmlContent', xmlContent);
+    
+                let headers = {};
+                headers['Content-Type'] = 'text/xml; charset=utf-8';
+                // headers['SOAPAction'] = 'http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login';
+                // let url = 'http://testpotogas.sgcweb.com.mx//ws/1094AEV2/v2/soap.php';
+                headers['SOAPAction'] = 'http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login';
+                let url = 'http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php';
+                // Method, url, body, headers
+                let response = http.request({ method: http.Method.POST, url: url, body: xmlContent, headers: headers });
+                // log.debug('response', response.body)
+                let xmlFileContent = response.body;
+                let xmlDocument = xml.Parser.fromString({ text: xmlFileContent });
+                let dataJson = xmlDocument.getElementsByTagName({ tagName: 'id' });
+                // log.debug('response status', dataJson)
+                let objResult = dataJson[0].textContent;
+                // log.debug('objResult', objResult)
+                return objResult;
+            } catch (error) {
+                log.debug('Error al obtener el ID token', error);
+                return null;
+            }
         }
 
         // Busqueda guardada para obtener el archivo xml de peticiones a la api de SGC web
