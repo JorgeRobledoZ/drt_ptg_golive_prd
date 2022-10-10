@@ -8,9 +8,9 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm","N/record", "N/search"], f
         try {
             if (context.type == context.UserEventType.EDIT) {
 
-                var  currentRecord = context.newRecord;
+                var  currentRecord2 = context.newRecord;
 
-                var lineas = currentRecord.getLineCount({
+                var lineas = currentRecord2.getLineCount({
                     sublistId: 'item'
                 });
 
@@ -24,37 +24,37 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm","N/record", "N/search"], f
                 }
 
                 for (var i = 0; i < lineas; i++) {
-                    var pg_asignado = currentRecord.getSublistValue({
+                    var pg_asignado = currentRecord2.getSublistValue({
                         sublistId: 'item',
                         fieldId: 'custcol2',
                         line: i
                     });
 
-                    var planta_desvio = currentRecord.getSublistValue({
+                    var planta_desvio = currentRecord2.getSublistValue({
                         sublistId: 'item',
                         fieldId: 'custcol_ptg_plantadesvio_',
                         line: i
                     });
 
-                    var item = currentRecord.getSublistValue({
+                    var item = currentRecord2.getSublistValue({
                         sublistId: 'item',
                         fieldId: 'item',
                         line: i
                     });
 
-                    var quantity = currentRecord.getSublistValue({
+                    var quantity = currentRecord2.getSublistValue({
                         sublistId: 'item',
                         fieldId: 'quantity',
                         line: i
                     });
 
-                    var subsidiaria = currentRecord.getSublistValue({
+                    var subsidiaria = currentRecord2.getSublistValue({
                         sublistId: 'item',
                         fieldId: 'custcol_ptg_subsidiaria_',
                         line: i
                     });
 
-                    var proceso = currentRecord.getSublistValue({
+                    var proceso = currentRecord2.getSublistValue({
                         sublistId: 'item',
                         fieldId: 'custcol_ptg_proceso_terminado',
                         line: i
@@ -87,55 +87,58 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm","N/record", "N/search"], f
                     if (pg_asignado) {
                         log.audit('inicia proceso', '.............................0%');
 
-                        var customrecord_ptg_compras_SearchObj = search.create({
-                            type: "customrecord_ptg_compras_",
-                            filters: [
-                                ["name", "is", pg_asignado]
-                            ],
-                            columns: [
-                                search.createColumn({
-                                    name: "name",
-                                    sort: search.Sort.ASC
-                                }),
-                                "internalid"
-                            ]
-                        });
-                        var searchResultCount = customrecord_ptg_compras_SearchObj.run().getRange(0, 1);
-
-                        if(searchResultCount.length > 0) {
-                            var id = searchResultCount[0].getValue({
-                                name: "internalid"
-                            })
-                           log.audit('error', 'ya se creo un registro con este nombre se procede a actuializar el registro');
-
-                           var pgComnprasLoad = record.load({
-                                type: 'customrecord_ptg_compras_',
-                                id: id,
-                                isDynamic: true,
-                           });
-
-                           pgComnprasLoad.setValue({
-                                fieldId: 'custrecord_ptg_pg_en_uso',
-                                value: true
-                            });
-
-                            var savePgComprasLoad = pgComnprasLoad.save();
-                            log.audit('savePgComprasLoad', savePgComprasLoad);
+                        if(pg_asignado == 'DEFAULT'){
+                            log.audit('alerta', 'No se creara el pg por ser un PG de Default')
                         } else {
-                        var pgCompras = record.create({
-                            type: 'customrecord_ptg_compras_',
-                            isDynamic: 'true'
-                        });
-
-                        pgCompras.setValue({
-                            fieldId: 'name',
-                            value: pg_asignado
-                        });
-
-                        var idPgComras = pgCompras.save();
-                        log.audit('idPgCompras', idPgComras);
+                            var customrecord_ptg_compras_SearchObj = search.create({
+                                type: "customrecord_ptg_compras_",
+                                filters: [
+                                    ["name", "is", pg_asignado]
+                                ],
+                                columns: [
+                                    search.createColumn({
+                                        name: "name",
+                                        sort: search.Sort.ASC
+                                    }),
+                                    "internalid"
+                                ]
+                            });
+                            var searchResultCount = customrecord_ptg_compras_SearchObj.run().getRange(0, 1);
+    
+                            if(searchResultCount.length > 0) {
+                                var id = searchResultCount[0].getValue({
+                                    name: "internalid"
+                                })
+                               log.audit('error', 'ya se creo un registro con este nombre se procede a actuializar el registro');
+    
+                               var pgComnprasLoad = record.load({
+                                    type: 'customrecord_ptg_compras_',
+                                    id: id,
+                                    isDynamic: true,
+                               });
+    
+                               pgComnprasLoad.setValue({
+                                    fieldId: 'custrecord_ptg_pg_en_uso',
+                                    value: true
+                                });
+    
+                                var savePgComprasLoad = pgComnprasLoad.save();
+                                log.audit('savePgComprasLoad', savePgComprasLoad);
+                            } else {
+                            var pgCompras = record.create({
+                                type: 'customrecord_ptg_compras_',
+                                isDynamic: 'true'
+                            });
+    
+                            pgCompras.setValue({
+                                fieldId: 'name',
+                                value: pg_asignado
+                            });
+    
+                            var idPgComras = pgCompras.save();
+                            log.audit('idPgCompras', idPgComras);
+                            }
                         }
-
                     }
                 }
 
@@ -248,9 +251,6 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm","N/record", "N/search"], f
                     }
 
                 }
-
-
-
 
             }
         } catch (error_pg) {

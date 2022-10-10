@@ -278,6 +278,27 @@ define([
                     }
                 }
                 respuesta.success = respuesta.data.length > 0;
+                if (
+                    respuesta.success
+                ) {
+                    const objUpdate = {
+                        custrecord_drt_ptg_dr_input: ""
+                    };
+                    const objRecordId = {};
+                    respuesta.data.forEach(registro => {
+                        if (!objRecordId[registro.recordType]) {
+                            objRecordId[registro.recordType] = [];
+                        }
+                        objRecordId[registro.recordType].push(registro.id);
+                    });
+                    for (let typeR in objRecordId) {
+                        objUpdate.custrecord_drt_ptg_dr_input += `-
+                        ${typeR} ${objRecordId[typeR].length}
+                        ${objRecordId[typeR].join(", ")}
+                        `;
+                    }
+                    updateRecordDelete(objUpdate);
+                }
             } catch (error) {
                 log.error(`error getAllRecord`, error);
             } finally {
@@ -352,11 +373,17 @@ define([
                     scriptContext.type == scriptContext.UserEventType.VIEW
                 ) {
                     if (
-                        scriptContext.newRecord.type == "customrecord_ptg_preliquicilndros_"
+                        scriptContext.newRecord.type == "customrecord_ptg_preliquicilndros_" &&
+                        scriptContext.newRecord.getValue({
+                            fieldId: 'custrecord_ptg_liquidacion_status'
+                        }) != 4
                     ) {
                         printButton = "Preliquidacion Cilndros";
                     } else if (
-                        scriptContext.newRecord.type == "customrecord_ptg_preliqestcarburacion_"
+                        scriptContext.newRecord.type == "customrecord_ptg_preliqestcarburacion_" &&
+                        scriptContext.newRecord.getValue({
+                            fieldId: 'custrecord_ptg_liquidacion_status_carb'
+                        }) != 4
                     ) {
                         printButton = "Preliquidacion Carburacion";
                     }
