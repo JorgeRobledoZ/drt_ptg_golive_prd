@@ -116,7 +116,7 @@
                     type: record.Type.OPPORTUNITY,
                     id: oportunidad,
                 });
-                var idDireccionCliente = oportunidadObj.getValue("shipaddresslist");
+                var idDireccionCliente = oportunidadObj.getValue("shippingaddress_key");
                 log.audit("idDireccionCliente", idDireccionCliente);
 
                 //SS: PTG - Direccion cliente SS
@@ -166,7 +166,7 @@
                     conteoRestriccion += 0;
                 }
 
-                var urlModificarPago = urlPago + idRegistroPagos + "&e=T";
+                var urlModificarPago = urlPago + idRegistroPagos + "&e=T&customrecord=customrecord_ptg_preliquicilndros_&idcustom="+recId;
 
                 var recTipoPago = record.create({
                     type: "customrecord_ptg_registrooportunidad_",
@@ -557,7 +557,9 @@
                 redirect.toRecord({
                     type: 'customrecord_ptg_preliquicilndros_',
                     id: recId,
-                    parameters: {}
+                    parameters: {
+                        'reload' : true
+                    }
                 });
             }
            
@@ -566,7 +568,9 @@
             redirect.toRecord({
                 type: 'customrecord_ptg_preliquicilndros_',
                 id: recId,
-                parameters: {}
+                parameters: {
+                    'reload' : true
+                }
             });
         }
     }
