@@ -111,8 +111,9 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 
 			 result = {
 				 rfcemisor: subsidiary.getValue('federalidnumber') || 'XAXX010101000',
-				 regfiscal: subsidiary.getText('custrecord_mx_sat_industry_type').split('-')[0] || '',
-				 razonsoc: subsidiary.getValue('name')
+				 regfiscal: subsidiary.getText('custrecord_mx_sat_industry_type').split('-')[0].trim() || '',
+				 razonsoc: subsidiary.getValue('name'),
+				 codigoPostalEmisor: subsidiary.getText('mainaddress_text').split('_')[1].trim() || '',
 			 };
 
 		 } else if (!SUBSIDIARIES) {
@@ -124,8 +125,9 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 
 			 result = {
 				 rfcemisor: configRecObj.getValue('employerid') || '',
-				 regfiscal: configRecObj.getText('custrecord_mx_sat_industry_type').split('-')[0] || '',
-				 razonsoc: configRecObj.getValue('legalname')
+				 regfiscal: configRecObj.getText('custrecord_mx_sat_industry_type').split('-')[0].trim() || '',
+				 razonsoc: configRecObj.getValue('legalname'),
+				 codigoPostalEmisor: configRecObj.getText('mainaddress_text').split('_')[1].trim() || '',
 			 };
 		 }
 		 return result;
@@ -203,7 +205,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 		 xmlDoc += '    </fx:AsignacionSolicitada>';
 		 //xmlDoc += '	<fx:Exportacion>'+ jsonData.exportacion +'</fx:Exportacion>'
 		 xmlDoc += '	<fx:Exportacion>01</fx:Exportacion>'
-		 xmlDoc += '    <fx:LugarExpedicion>64780</fx:LugarExpedicion>';
+		 xmlDoc += '    <fx:LugarExpedicion>'+ jsonData.codigoPostalEmisor+ '</fx:LugarExpedicion>';
 		 xmlDoc += '  </fx:Identificacion>';
 		 xmlDoc += '  <fx:Emisor>';
 		 xmlDoc += '    <fx:RegimenFiscal>';
@@ -213,13 +215,10 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 		 xmlDoc += '  <fx:Receptor>';
 		 xmlDoc += '    <fx:CdgPaisReceptor>MX</fx:CdgPaisReceptor>';
 		 xmlDoc += '    <fx:RFCReceptor>' + jsonData.rfcrecepFin + '</fx:RFCReceptor>';
-		 //xmlDoc += '    <fx:NombreReceptor>' + jsonData.entity.replace("2 ", "").replace("1 ", "") + '</fx:NombreReceptor>';
 		 xmlDoc += '    <fx:NombreReceptor>' + jsonData.entityFin + '</fx:NombreReceptor>';
-		 //xmlDoc += '    <fx:NombreReceptor>JIMENEZ ESTRADA SALAS A A</fx:NombreReceptor>';
-		 // xmlDoc += '    <fx:NombreReceptor>PUBLICO EN GENERAL</fx:NombreReceptor>';
-		 //xmlDoc += '	<fx:DomicilioFiscalReceptor>'+jsonData.codigopostal+'</fx:DomicilioFiscalReceptor>';
+		 xmlDoc += '	<fx:DomicilioFiscalReceptor>'+jsonData.codigoPostalReceptor+'</fx:DomicilioFiscalReceptor>';
 		 //xmlDoc += '	<fx:DomicilioFiscalReceptor>78139</fx:DomicilioFiscalReceptor>'; //Este es el que estaba originalmente se comenta por pruebas
-		 xmlDoc += '	<fx:DomicilioFiscalReceptor>01030</fx:DomicilioFiscalReceptor>';
+		 //xmlDoc += '	<fx:DomicilioFiscalReceptor>01030</fx:DomicilioFiscalReceptor>'; //Estaba en pruebas pero se debe quitar
 		 //xmlDoc += '	<fx:RegimenFiscalReceptor>'+ jsonData.regimenFiscalReceptor +'</fx:RegimenFiscalReceptor>';
 		 xmlDoc += '	<fx:RegimenFiscalReceptor>' + jsonData.tipoIndustria + '</fx:RegimenFiscalReceptor>';
 		 xmlDoc += '    <fx:UsoCFDI>' + jsonData.cfdi.split('-')[0].trim() + '</fx:UsoCFDI>'; //P01
@@ -409,9 +408,9 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 				fieldId: 'units_display',
 				line: j
 			 });
-			if(nameArray == "GAS LP TEST UNIDAD GAS LP TEST UNIDAD" || nameArray == "GAS LP - PI GAS LP - PI" || nameArray == "GAS LP - PI" || nameArray == "GAS LP GAS LP" || nameArray == "GAS LP"){
+			/*if(nameArray == "GAS LP TEST UNIDAD GAS LP TEST UNIDAD" || nameArray == "GAS LP - PI GAS LP - PI" || nameArray == "GAS LP - PI" || nameArray == "GAS LP GAS LP" || nameArray == "GAS LP"){
 				unitArray = "LTS"
-			}
+			}*/ //Revisar si así quedará, se comenta por pruebas
 			var taxcodeidArray = rec.getSublistValue({
 				sublistId: 'item', 
 				fieldId: 'taxcode',
@@ -689,7 +688,8 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						id: jsonData.entityID
 					});
 					var clienteEspecial = clienteObj.getValue("custentity_ptg_cliente_especial");
-					var tipoDeIndustria = clienteObj.getText('custentity_mx_sat_industry_type').split('-')[0] || '';
+					var tipoDeIndustria = clienteObj.getText('custentity_mx_sat_industry_type').split(' ')[0] || '';
+					var codigoPostalCliente = clienteObj.getValue('billzip');
 					if(clienteEspecial){
 						log.debug("cliente especial", clienteEspecial);
 						//jsonData.rfcrecepFin = "XAXX010101000"; //Este es el que estaba originalmente se comenta por pruebas
@@ -697,11 +697,13 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						//jsonData.entityFin = "Público en General"; //Este es el que estaba originalmente se comenta por pruebas
 						jsonData.entityFin = "JIMENEZ ESTRADA SALAS A A";
 						jsonData.tipoIndustria = "601";
+						jsonData.codigoPostalReceptor = "01030";
 					} else {
 
 						jsonData.rfcrecepFin = jsonData.rfcrecep;
 						jsonData.entityFin = jsonData.entity;
 						jsonData.tipoIndustria = tipoDeIndustria;
+						jsonData.codigoPostalReceptor = codigoPostalCliente;
 
 					}
 					 log.audit("jsonData", jsonData);
@@ -913,6 +915,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 				 jsonData.rfcemisor = setupConfig.rfcemisor;
 				 jsonData.regfiscal = setupConfig.regfiscal;
 				 jsonData.razonsoc = setupConfig.razonsoc;
+				 jsonData.codigoPostalEmisor = setupConfig.codigoPostalEmisor;
 			 }
 			 // Cargo la configuracion del PAC
 			 var mySuiteConfig = record.load({
