@@ -546,7 +546,7 @@
                     custrecord_ptg_facturas_errores_carb: facturasGeneradasErroresCount,
                 };
 
-                log.audit("objUpdateVentas", objUpdateVentas);
+                log.audit("objUpdateVentas_1", objUpdateVentas);
                 record.submitFields({
                     id: customRec.id,
                     type: customRec.type,
@@ -1108,14 +1108,19 @@
                        search.createColumn({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})
                     ]
                 });
+                log.audit("tipoPagoOtrosServGasObj", tipoPagoOtrosServGasObj);
                 var tipoPagoOtrosServGasObjCount = tipoPagoOtrosServGasObj.runPaged().count;
-
+                log.audit("tipoPagoOtrosServGasObjCount", tipoPagoOtrosServGasObjCount);
                 if(tipoPagoOtrosServGasObjCount > 0){
                     var tipoPagoOtrosServGasObjResult = tipoPagoOtrosServGasObj.run().getRange({
                         start: 0,
                         end: 2,
                     });
-                    sumaOtros = parseFloat(tipoPagoOtrosServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
+                    log.audit("tipoPagoOtrosServGasObjResult", tipoPagoOtrosServGasObjResult);
+                    sumaOtros = tipoPagoOtrosServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"});
+                } else {
+                    sumaOtros = 0;
+                    log.audit("entra sumaOtros cero");
                 }
                 log.audit("sumaOtros", sumaOtros);
 
@@ -1137,7 +1142,7 @@
                     custrecord_ptg_conteo_exceso_preliq_carb: conteoExceso,
                     custrecord_ptg_conteo_restri_preliq_carb: conteoRestriccion,
                 };
-                log.audit("objUpdateVentas", objUpdateVentas);
+                log.audit("objUpdateVentas_2", objUpdateVentas);
                 record.submitFields({
                     id: customRec.id,
                     type: customRec.type,
