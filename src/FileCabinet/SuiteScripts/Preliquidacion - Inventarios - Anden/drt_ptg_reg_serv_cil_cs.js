@@ -479,7 +479,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var totalServCilindros = currentRecord.getCurrentSublistValue({ sublistId: sublistName, fieldId: "custrecord_ptg_total_reg_serv_cil_lin",});
         var totalServCilindrosOld = currentRecord.getCurrentSublistValue({ sublistId: sublistName, fieldId: "custrecord_ptg_tot_ctrl_reg_serv_cil_lin",});
 
-        if (!direccionCliente || !clienteServCilindros || !articuloServCilindros || !cantidadServCilindros || !precioUnitarioServCilindros || !formaPago){
+        //if (!direccionCliente || !clienteServCilindros || !articuloServCilindros || !cantidadServCilindros || !precioUnitarioServCilindros || !formaPago){
+        if (!direccionCliente || !clienteServCilindros || !articuloServCilindros || !precioUnitarioServCilindros || !formaPago){
         log.debug("formaPago", formaPago);
           var options = {
             title: "Faltan datos",
@@ -818,6 +819,21 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           end: movimientoMasObjCount,
         });
         log.audit("movimientoMasObjResult", movimientoMasObjResult);
+        /*for(var k = 0; k < lineasRegistro; k++){
+          idInternoDireccion = currentRecord.getSublistValue({
+            sublistId: idRegistroDeServicios,
+            fieldId: "custrecord_ptg_total_reg_serv_cil_lin",
+            line: k,
+          });
+          if(!idInternoDireccion){
+            var xx = currentRecord.removeLine({
+              sublistId: idRegistroDeServicios,
+              line: k,
+              ignoreRecalc: true
+            });
+            log.audit("xx", xx);
+          }
+        }*/
         for(var i = 0; i < movimientoMasObjCount; i++){
           articulosDotacion = parseInt(movimientoMasObjResult[i].getValue({name: "custrecord_ptg_cilindro_dotacion_", summary: "GROUP", label: "PTG - Cilindro dotación"}));
           dotacionMas = parseInt(movimientoMasObjResult[i].getValue({name: "custrecord_ptg_dotacion_cilindros", summary: "SUM", label: "PTG - Dotación cilndros"}));
@@ -854,7 +870,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             }
           }
   
-        }        
+        }
         return true;
       }
     } catch (error) {
