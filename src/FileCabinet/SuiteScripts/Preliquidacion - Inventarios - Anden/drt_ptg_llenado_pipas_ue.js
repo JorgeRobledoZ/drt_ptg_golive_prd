@@ -67,6 +67,8 @@ function beforeSubmit(context) {
       var metodoDeEnvio = 0;
       var formularioOrdenTraslado = 0;
       var gasLP = 0;
+      var listoParaEnviar = 0;
+      var etapaProceso = {};
 
       var objMap=drt_mapid_cm.drt_liquidacion();
       if (Object.keys(objMap).length>0) {
@@ -75,8 +77,13 @@ function beforeSubmit(context) {
         metodoDeEnvio = objMap.metodoDeEnvio;
         formularioOrdenTraslado = objMap.formularioOrdenTraslado;
         gasLP = objMap.gasLP;
+        listoParaEnviar = objMap.listoParaEnviar;
       }
 
+      log.audit("1", transacciones);
+
+      log.debug("vehiculo :"+vehiculo+"porcentajeDespuesLlenado :"+porcentajeDespuesLlenado+"porcentajeAntesLlenado :"+porcentajeAntesLlenado+
+      "numeroViajeLlenadoPipas :"+numeroViajeLlenadoPipas+"transaccion :"+transaccion+"estacionCarburacion :"+estacionCarburacion);
       if(!transacciones || transacciones == ""){
 
       var equipoObj = record.load({
@@ -155,6 +162,7 @@ function beforeSubmit(context) {
         newRecordItemFulfillment.setValue("shipstatus", "C");
         newRecordItemFulfillment.setValue("custbody_psg_ei_template", plantillaDocumentoElectronico);
         newRecordItemFulfillment.setValue("custbody_psg_ei_sending_method", metodoDeEnvio);
+        newRecordItemFulfillment.setValue("custbody_psg_ei_status", listoParaEnviar);
 
         var idItemFulfillment = newRecordItemFulfillment.save({
           enableSourcing: false,
@@ -185,6 +193,8 @@ function beforeSubmit(context) {
         details: JSON.stringify(idTransaccionArray),
       });
 
+      etapaProceso.custrecord_ptg_llp_etapa_proceso = 2
+
       var objUpdate = {
         custrecord_drt_ptg_transferencia_lp: idTransaccionArray,
       };
@@ -203,9 +213,25 @@ function beforeSubmit(context) {
       });
 
       
+    } else {
+      etapaProceso.custrecord_ptg_llp_etapa_proceso = 2
     }
+
     } catch (e) {
       log.error({ title: e.name, details: e.message });
+      etapaProceso.custrecord_ptg_llp_etapa_proceso = 3
+      
+      
+    } finally {
+      record.submitFields({
+        id: customRec.id,
+        type: customRec.type,
+        values: etapaProceso,
+        options: {
+          enableSourcing: false,
+          ignoreMandatoryFields: true,
+        },
+      });
     }
   }
   return {
