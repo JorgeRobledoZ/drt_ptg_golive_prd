@@ -69,7 +69,7 @@
         } finally {
             
             var registroCilindros = record.submitFields({
-                type: "customrecord_ptg_preliquicilndros_",
+                type: "customrecord_ptg_registro_servicios_cili",
                 id: idRegistro,
                 values: valoresProceso
             });
@@ -94,7 +94,23 @@
             }) || '';
             log.debug("idRegistro", idRegistro);
 
-            var objValue = JSON.parse(context.value);
+            var valoresProceso = {};
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 1;
+
+           /* var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_registro_servicios_cili",
+                id: idRegistro,
+                values: valoresProceso
+            });
+            log.debug("registroCilindros map 1", registroCilindros);*/
+
+            var mapKey = context.key;
+            var mapValue = JSON.parse(context.value);
+            log.audit("mapValue", mapValue);
+
+            
+
+/*            var objValue = JSON.parse(context.value);
             var idRegistroCilindroLinea = objValue.id;
             var objPagos = {};
             var arrayPagos = [];
@@ -134,7 +150,7 @@
             valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 1;
 
             var registroCilindros = record.submitFields({
-                type: "customrecord_ptg_preliquicilndros_",
+                type: "customrecord_ptg_registro_servicios_cili",
                 id: idRegistro,
                 values: valoresProceso
             });
@@ -266,7 +282,7 @@
                 log.audit("descuentoPrecioLitro", descuentoPrecioLitro);
                 litrosConversion = capacidadArticulo / factorConversion;
                 log.audit("litrosConversion", litrosConversion);*/
-                descuentoUnitario = (litrosConversion * descuentoSinIVA) * -1;
+/*                descuentoUnitario = (litrosConversion * descuentoSinIVA) * -1;
                 log.audit("descuentoUnitario", descuentoUnitario);
             }
             
@@ -553,6 +569,11 @@
             context.write({
                 key: recOportunidadIdSaved,
                 value: recOportunidadIdSaved
+            });*/
+
+            context.write({
+                key: mapKey,
+                value: mapValue
             });
                
         } catch (error) {
@@ -568,6 +589,7 @@
                 details: JSON.stringify(error)
             });
         } finally {
+            log.audit("valoresProceso finally map", valoresProceso);
             
             var registroCilindros = record.submitFields({
                 type: "customrecord_ptg_registro_servicios_cili",
@@ -584,15 +606,499 @@
                 title: 'context reduce',
                 details: JSON.stringify(context)
             });
-            var idOportunidad = JSON.parse(context.key);
-            log.audit("idOportunidad", idOportunidad);
+            var idRegistro = runtime.getCurrentScript().getParameter({
+                name: 'custscript_drt_ptg_id_registro_serv_cil'
+            }) || '';
+            log.debug("idRegistro reduce", idRegistro);
+
+            var objValue = JSON.parse(context.values);
+            var idRegistroCilindroLinea = objValue.id;
+            var objPagos = {};
+            var arrayPagos = [];
+            var objPagosOportunidad = {};
+            var regServCilUpdate = {};
+            var oportunidadArray = [];
+            var valoresProceso = {};
+            var publicoGeneral = 0;
+            var cilindro10 = 0;
+            var cilindro20 = 0;
+            var cilindro30 = 0;
+            var cilindro45 = 0;
+            var unidad = 0;
+            var gasLPUnidades = 0;
+            var unidad10 = 0;
+            var unidad20 = 0;
+            var unidad30 = 0;
+            var unidad45 = 0;
+            var direccionID = objValue.values["custrecord_ptg_cil_direccion_venta"].value;
+            var cliente = objValue.values["custrecord_ptg_cliente_reg_serv_cil_lin"].value;
+            var articulo = objValue.values["custrecord_ptg_articulo_reg_serv_cil_lin"].value;
+            var cantidad = objValue.values["custrecord_ptg_cantidad_reg_serv_cil_lin"];
+            var subTotal = objValue.values["custrecord_ptg_subtotal_registro_servs_"];
+            var precio = objValue.values["custrecord_ptg_precio_reg_serv_cil_lin"];
+            var impuesto = objValue.values["custrecord_ptg_impuesto_reg_serv_cil_lin"];
+            var montoPago = objValue.values["custrecord_ptg_total_reg_serv_cil_lin"];
+            var formaPago = objValue.values["custrecord_ptg_form_pago_reg_serv_cil_li"].value;
+            var formaPagoTXT = objValue.values["custrecord_ptg_form_pago_reg_serv_cil_li"].text;
+            var zonaPrecio = objValue.values["custrecord_ptg_zonadeprecio_"].value;
+            var vehiculoDestino = objValue.values["custrecord_ptg_vehiculo_reg_serv_cil_lin"].value;
+            var viajeDestino = objValue.values["custrecord_ptg_num_vdes_reg_serv_cil_lin"].value;
+            var referencia = objValue.values["custrecord_ptg_referencia_"];
+            var kilometraje = objValue.values["custrecord_ptg_kilometraje_serv_carb_lin"];
+            log.debug("vehiculoDestino", vehiculoDestino);
+            log.debug("viajeDestino", viajeDestino);
+
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 1;
+
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_registro_servicios_cili",
+                id: idRegistro,
+                values: valoresProceso
+            });
+            log.debug("registroCilindros reduce 1", registroCilindros);
+
+            var condretado = 0;
+            var entregado = 0;
+            var ventaLitro = 0;
+            var traspasoId = 0;
+            var formularioRecepcion = 0;
+            var formularioOportunidad = 0;
+            var formularioOrdenTraslado = 0;
+            var rfcGenerico = "";
+            var rfcPublicoGeneral = "";
+            var idArticuloDescuento = 0;
+            var subTotalSinDecuento = 0;
+
+            var objMap=drt_mapid_cm.drt_liquidacion();
+            if (Object.keys(objMap).length>0) {
+                publicoGeneral = objMap.publicoGeneral;
+                cilindro10 = objMap.cilindro10;
+                cilindro20 = objMap.cilindro20;
+                cilindro30 = objMap.cilindro30;
+                cilindro45 = objMap.cilindro45;
+                gasLPUnidades = objMap.gasLPUnidades;
+                unidad10 = objMap.unidad10;
+                unidad20 = objMap.unidad20;
+                unidad30 = objMap.unidad30;
+                unidad45 = objMap.unidad45;
+                //condretado = objMap.condretado;
+                condretado = 13;
+                entregado = objMap.entregado;
+                ventaLitro = objMap.ventaLitro;
+                traspasoId = objMap.traspasoId;
+                formularioRecepcion = objMap.formularioRecepcion;
+                formularioOportunidad = objMap.formularioOportunidad;
+                formularioOrdenTraslado = objMap.formularioOrdenTraslado;
+                rfcGenerico = objMap.rfcGenerico;
+                rfcPublicoGeneral = objMap.rfcPublicoGeneral;
+                idArticuloDescuento = objMap.idArticuloDescuento;
+            }
+
+            var direccionObj = record.load({
+                type: "customrecord_ptg_direcciones",
+                id: direccionID,
+            });
+            var idDireccion = parseInt(direccionObj.getValue("custrecord_ptg_direccion"));
+
+            var itemCilObj = record.load({
+                type: search.Type.INVENTORY_ITEM,
+                id: articulo,
+              });
+              var capacidadArticulo = itemCilObj.getValue("custitem_ptg_capacidadcilindro_");
+              log.emergency("capacidadArticulo", capacidadArticulo);
+              if(capacidadArticulo == 10){
+                unidad = unidad10;
+              } else if(capacidadArticulo == 20){
+                unidad = unidad20;
+              } else if(capacidadArticulo == 30){
+                unidad = unidad30;
+              }  else if(capacidadArticulo == 45){
+                unidad = unidad45;
+              }
+              log.audit("unidad: ", unidad);
+
             
-			
+            var solicitaFactura = false;
+            var clienteObj = record.load({
+                type: search.Type.CUSTOMER,
+                id: cliente
+            });
+            var rfc = clienteObj.getValue("custentity_mx_rfc");
+            log.audit("Cliente: "+ cliente, "RFC "+ rfc);
+            var nombreClienteAFacturar = clienteObj.getValue("custentity_mx_sat_registered_name");
+            if((rfc != rfcGenerico) || (rfc != rfcPublicoGeneral)){
+                log.audit("Solicita factura");
+                solicitaFactura = true;
+            }
+
+            var internalIdDireccion = 0;
+            var lineasDirecciones = clienteObj.getLineCount('addressbook');
+            for(var z = 0; z < lineasDirecciones; z++){
+                idInternoDireccion = clienteObj.getSublistValue({
+                    sublistId: "addressbook",
+                    fieldId: "internalid",
+                    line: z,
+                });
+                log.audit("idInternoDireccion", idInternoDireccion);
+
+                addressBookArray = clienteObj.getSublistValue({
+                    sublistId: "addressbook",
+                    fieldId: "addressbookaddress",
+                    line: z,
+                });
+                log.audit("addressBookArray", addressBookArray);
+
+                if(idInternoDireccion == idDireccion){
+                    internalIdDireccion = idInternoDireccion;
+                }
+            }
+
+
+            var zonaPrecioObj = record.load({
+                type: "customrecord_ptg_zonasdeprecio_",
+                id: zonaPrecio,
+            });
+            var factorConversion = parseFloat(zonaPrecioObj.getValue("custrecord_ptg_factor_conversion"));
+            log.audit("factorConversion", factorConversion);
+            var precioPorLitro = parseFloat(zonaPrecioObj.getValue("custrecord_ptg_precio_"));
+            log.audit("precioPorLitro", precioPorLitro);
+            var precioPorKilo = parseFloat(zonaPrecioObj.getValue("custrecord_ptg_precio_kg"));
+            log.audit("precioPorKilo", precioPorKilo);
+            subTotalSinDecuento = capacidadArticulo * precioPorKilo;
+            log.audit("subTotalSinDecuento", subTotalSinDecuento);
+            var clienteDescuento = false;
+            var descuentoSinIVA = 0;
+            var descuentoUnitario = 0;
+            var descuentoPrecioLitro = 0;
+            var litrosConversion = 0;
+            var descuentoPeso = parseFloat(clienteObj.getValue("custentity_ptg_descuento_asignar"));
+            log.audit("descuentoPeso", descuentoPeso);
+            if(descuentoPeso > 0){
+                clienteDescuento = true;
+                descuentoSinIVA = descuentoPeso / 1.16;
+                log.audit("descuentoSinIVA", descuentoSinIVA);
+                litrosConversion = capacidadArticulo / factorConversion;
+                log.audit("litrosConversion", litrosConversion);
+                /*descuentoPrecioLitro = precioPorLitro - descuentoSinIVA;
+                log.audit("descuentoPrecioLitro", descuentoPrecioLitro);
+                litrosConversion = capacidadArticulo / factorConversion;
+                log.audit("litrosConversion", litrosConversion);*/
+                descuentoUnitario = (litrosConversion * descuentoSinIVA) * -1;
+                log.audit("descuentoUnitario", descuentoUnitario);
+            }
+            
+            var numeroViaje = runtime.getCurrentScript().getParameter({
+                name: 'custscript_drt_ptg_num_viaje_serv_cil'
+            }) || '';
+            var vehiculo = runtime.getCurrentScript().getParameter({
+                name: 'custscript_drt_ptg_vehiculo_serv_cil'
+            }) || '';
+
+            if (formaPago != traspasoId) {
+                log.audit("entra oportunidad");
+
+                if(cliente == publicoGeneral && ((articulo == cilindro10)||(articulo == cilindro20)||(articulo == cilindro30)||(articulo == cilindro45))){
+                    var montoPagoIndividual = montoPago/cantidad;
+                    objPagos = {
+                        metodo_txt: formaPagoTXT,
+                        tipo_pago: formaPago,
+                        monto: montoPagoIndividual,
+                        folio: referencia,
+                    };
+                    var montoPF = parseFloat(montoPagoIndividual);
+                    var rate = montoPF / 1.16;
+                    arrayPagos.push(objPagos);
+                    objPagosOportunidad = { pago: arrayPagos };
+                    var objValue = JSON.stringify(objPagosOportunidad);
+                    log.debug("objValue 245", objValue);
+
+                    for(var j = 0; j < cantidad; j++){
+                        var recOportunidad = record.create({
+                            type: record.Type.OPPORTUNITY,
+                            isDynamic: true,
+                        });
+                        recOportunidad.setValue("customform", formularioOportunidad);
+                        recOportunidad.setValue("entity", cliente);
+                        recOportunidad.setValue("entitystatus", condretado);
+                        recOportunidad.setValue("probability", 100);
+                        recOportunidad.setValue("custbody_ptg_numero_viaje", numeroViaje);
+                        recOportunidad.setValue("custbody_ptg_estado_pedido", entregado);
+                        recOportunidad.setValue("custbody_ptg_opcion_pago_obj", objValue);
+                        recOportunidad.setValue("custbody_ptg_codigo_movimiento",ventaLitro);
+                        recOportunidad.setValue("custbody_ptg_zonadeprecioop_", zonaPrecio);
+                        recOportunidad.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
+                        recOportunidad.setValue("shipaddresslist", internalIdDireccion);
+                        recOportunidad.setValue("custbody_ptg_id_direccion_envio", direccionID);
+                        for (var i = 0; i < 1; i++) {
+                            recOportunidad.selectLine("item", i);
+                            recOportunidad.setCurrentSublistValue("item", "item", articulo);
+                            recOportunidad.setCurrentSublistValue("item", "quantity", 1);
+                            recOportunidad.setCurrentSublistValue("item", "rate", rate);
+                            recOportunidad.commitLine("item");
+                        }
+                        // log.audit("Hasta aqui quedo", "********************");
+                        // return;
+                        var recOportunidadIdSaved = recOportunidad.save();
+                        log.debug({
+                            title: "Oportunidad Creada",
+                            details: "Id Saved: " + recOportunidadIdSaved,
+                        });
+
+                        oportunidadArray.push(recOportunidadIdSaved);
+
+
+                        var objRecordLoad = record.load({
+                            type: record.Type.OPPORTUNITY,
+                            id: recOportunidadIdSaved,
+                        });
+
+                        var idObjRecordLoad = objRecordLoad.save();
+
+                        log.debug({
+                            title: "Oportunidad Cargada",
+                            details: "Id Saved: " + idObjRecordLoad,
+                        });
+                    }
+                    regServCilUpdate.custrecord_ptg_oportun_reg_serv_cil_lin = oportunidadArray;
+
+                    record.submitFields({
+                        id: idRegistroCilindroLinea,
+                        type: "customrecord_ptg_registro_servicios_ci_l",
+                        values: regServCilUpdate,
+                    });
+                 } else{
+                    objPagos = {
+                        metodo_txt: formaPagoTXT,
+                        tipo_pago: formaPago,
+                        monto: montoPago,
+                        folio: referencia,
+                    };
+                    arrayPagos.push(objPagos);
+                    objPagosOportunidad = { pago: arrayPagos };
+                    var objValue = JSON.stringify(objPagosOportunidad);
+
+                    var recOportunidad = record.create({
+                        type: record.Type.OPPORTUNITY,
+                        isDynamic: true,
+                    });
+                    recOportunidad.setValue("customform", formularioOportunidad);
+                    recOportunidad.setValue("entity", cliente);
+                    recOportunidad.setValue("entitystatus", condretado);
+                    recOportunidad.setValue("probability", 100);
+                    recOportunidad.setValue("custbody_ptg_numero_viaje", numeroViaje);
+                    recOportunidad.setValue("custbody_ptg_estado_pedido", entregado);
+                    recOportunidad.setValue("custbody_ptg_opcion_pago_obj", objValue);
+                    recOportunidad.setValue("custbody_ptg_codigo_movimiento",ventaLitro);
+                    recOportunidad.setValue("custbody_ptg_zonadeprecioop_", zonaPrecio);
+                    recOportunidad.setValue("custbody_ptg_cliente_solicita_factura", solicitaFactura);
+                    recOportunidad.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
+                    recOportunidad.setValue("shipaddresslist", internalIdDireccion);
+                    for (var i = 0; i < 1; i++) {
+                        recOportunidad.selectLine("item", i);
+                        recOportunidad.setCurrentSublistValue("item", "item", articulo);
+                        recOportunidad.setCurrentSublistValue("item", "quantity", cantidad);
+                        recOportunidad.setCurrentSublistValue("item", "rate", subTotalSinDecuento);
+                        recOportunidad.commitLine("item");
+                    }
+                    if((articulo == cilindro10)||(articulo == cilindro20)||(articulo == cilindro30)||(articulo == cilindro45)){
+                        //Se agrega la línea de descuento en caso que el cliente tenga descuento
+                        if(clienteDescuento){
+                            for (var i = 1; i < 2; i++) {
+                                recOportunidad.selectLine("item", i);
+                                recOportunidad.setCurrentSublistValue("item", "item", idArticuloDescuento);
+                                recOportunidad.setCurrentSublistValue("item", "price", -1);
+                                recOportunidad.setCurrentSublistValue("item", "rate", descuentoUnitario);
+                                recOportunidad.commitLine("item");
+                            }
+                        }
+                    }
+
+                    // log.audit("Hasta aqui quedo 1", "********************");
+                    // return;
+                    var recOportunidadIdSaved = recOportunidad.save();
+                    regServCilUpdate.custrecord_ptg_oportun_reg_serv_cil_lin = recOportunidadIdSaved;
+                    log.debug({
+                        title: "Oportunidad Creada",
+                        details: "Id Saved: " + recOportunidadIdSaved,
+                    });
+
+                    record.submitFields({
+                        id: idRegistroCilindroLinea,
+                        type: "customrecord_ptg_registro_servicios_ci_l",
+                        values: regServCilUpdate,
+                    });
+
+                    var objRecordLoad = record.load({
+                        type: record.Type.OPPORTUNITY,
+                        id: recOportunidadIdSaved,
+                    });
+
+                    var idObjRecordLoad = objRecordLoad.save();
+
+                    log.debug({
+                        title: "Oportunidad Cargada",
+                        details: "Id Saved: " + idObjRecordLoad,
+                    });
+                 }
+                 
+            } else {
+
+                var vehiculoObj = record.load({
+                    type: "customrecord_ptg_equipos",
+                    id: vehiculo,
+                });
+
+                var subsidiary = vehiculoObj.getValue("custrecord_ptg_subsidiaria_1");
+                var parent = vehiculoObj.getValue("custrecord_ptg_ubicacionruta_");
+
+                var vehiculoDestinoObj = record.load({
+                    type: "customrecord_ptg_equipos",
+                    id: vehiculoDestino,
+                });
+
+                var ruta = vehiculoDestinoObj.getValue("custrecord_ptg_ubicacionruta_");
+
+                var recOrdenTraslado = record.create({
+                    type: "transferorder",
+                    isDynamic: true,
+                });
+        
+                recOrdenTraslado.setValue("customform", formularioOrdenTraslado);
+                recOrdenTraslado.setValue("subsidiary", subsidiary);
+                recOrdenTraslado.setValue("location", parent);
+                recOrdenTraslado.setValue("transferlocation", ruta);
+                recOrdenTraslado.setValue("custbody_ptg_numero_viaje", numeroViaje)
+                recOrdenTraslado.setValue("custbody_ptg_numero_viaje_destino", viajeDestino);
+        
+                for (var i = 0; i < 1; i++) {
+                  recOrdenTraslado.selectLine("item", i);
+                  recOrdenTraslado.setCurrentSublistValue("item", "item", gasLPUnidades);
+                  recOrdenTraslado.setCurrentSublistValue("item", "quantity", cantidad);
+                  recOrdenTraslado.setCurrentSublistValue("item", "units", unidad);
+                  recOrdenTraslado.commitLine("item");
+                }
+        
+                // log.audit("Hasta aqui quedo 2", "********************");
+                // return;
+                var idOrdenTraslado = recOrdenTraslado.save();
+                log.debug("idOrdenTraslado", idOrdenTraslado);
+
+                if (idOrdenTraslado) {
+                    var newRecordItemFulfillment = record.transform({
+                      fromType: record.Type.TRANSFER_ORDER,
+                      fromId: idOrdenTraslado,
+                      toType: record.Type.ITEM_FULFILLMENT,
+                      isDynamic: true,
+                      ignoreMandatoryFields: true,
+                    });
+                    newRecordItemFulfillment.setValue("shipstatus", "C");
+        
+                    var idItemFulfillment = newRecordItemFulfillment.save({
+                      enableSourcing: false,
+                      ignoreMandatoryFields: true,
+                    }) || "";
+        
+                    log.debug("idItemFulfillment", idItemFulfillment);
+
+                    var objRecordOrdenTrasladoLoad = record.load({
+                        type: record.Type.TRANSFER_ORDER,
+                        id: idOrdenTraslado,
+                    });
+
+                    var idObjRecordOrdenTrasladoLoad = objRecordOrdenTrasladoLoad.save();
+
+                    log.debug({
+                        title: "Orden de Traslado Cargada",
+                        details: "Id Saved: " + idObjRecordOrdenTrasladoLoad,
+                    });
+        
+                }
+        
+                if (idItemFulfillment) {
+                    var newRecordItemReceipt = record.transform({
+                      fromType: record.Type.TRANSFER_ORDER,
+                      fromId: idOrdenTraslado,
+                      toType: record.Type.ITEM_RECEIPT,
+                      isDynamic: true,
+                      ignoreMandatoryFields: true,
+                    });
+                    newRecordItemReceipt.setValue("customform", formularioRecepcion);//PTG- Recepción Orden de Traslado
+        
+                    newRecordItemReceipt.setValue("location", ruta);
+        
+                    var idItemReceipt = newRecordItemReceipt.save({
+                      enableSourcing: false,
+                      ignoreMandatoryFields: true,
+                    }) || "";
+        
+                    log.debug("idItemReceipt", idItemReceipt);
+    
+                    regServCilUpdate.custrecord_ptg_transa_reg_serv_cil_lin = idOrdenTraslado;
+
+                    record.submitFields({
+                        id: idRegistroCilindroLinea,
+                        type: "customrecord_ptg_registro_servicios_ci_l",
+                        values: regServCilUpdate,
+                    });
+
+                    var objUpdateVehiculo = {
+                        custrecord_ptg_totalizador_: kilometraje,
+                    }
+
+                    var updateVehiculo = record.submitFields({
+                        type: "customrecord_ptg_equipos",
+                        id: vehiculo,
+                        values: objUpdateVehiculo,
+                    });
+                    log.debug("Vehiculo actualizado", updateVehiculo);
+                }
+
+                if (idItemReceipt) {
+                    var objRecordRecepcionLoad = record.load({
+                        type: record.Type.ITEM_RECEIPT,
+                        id: idItemReceipt,
+                    });
+
+                    var idObjRecordRecepcionLoad = objRecordRecepcionLoad.save({
+                        enableSourcing: false,
+                        ignoreMandatoryFields: true,
+                      }) || "";
+
+                    log.debug({
+                        title: "Recepcion Cargada",
+                        details: "Id Saved: " + idObjRecordRecepcionLoad,
+                    });
+
+                }
+            }
+            
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 1;
+
+            context.write({
+                key: recOportunidadIdSaved,
+                value: recOportunidadIdSaved
+            });
+               
         } catch (error) {
+            valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 3;
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_registro_servicios_cili",
+                id: idRegistro,
+                values: valoresProceso
+            });
+            log.debug("registroCilindros reduce 1 error", registroCilindros);
             log.error({
                 title: 'error reduce',
                 details: JSON.stringify(error)
             });
+        } finally {
+            
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_registro_servicios_cili",
+                id: idRegistro,
+                values: valoresProceso
+            });
+            log.debug("registroCilindros reduce 1 finally", registroCilindros);
         }
     }
 
