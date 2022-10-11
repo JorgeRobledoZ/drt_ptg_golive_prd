@@ -186,20 +186,23 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 		 xmlDoc += '<fx:FactDocMX ';
 		 xmlDoc += 'xmlns:fx="http://www.fact.com.mx/schema/fx" ';
 		 xmlDoc += 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
-		 xmlDoc += 'xsi:schemaLocation="http://www.fact.com.mx/schema/fx http://www.mysuitemex.com/fact/schema/fx_2010_f.xsd">';
-		 xmlDoc += '  <fx:Version>7</fx:Version>';
+		 xmlDoc += 'xsi:schemaLocation="http://www.fact.com.mx/schema/fx http://www.mysuitemex.com/fact/schema/fx_2010_g.xsd">';
+		 xmlDoc += '  <fx:Version>8</fx:Version>';
 		 xmlDoc += '  <fx:Identificacion>';
 		 xmlDoc += '    <fx:CdgPaisEmisor>MX</fx:CdgPaisEmisor>';
 		 xmlDoc += '    <fx:TipoDeComprobante>FACTURA</fx:TipoDeComprobante>';
 		 xmlDoc += '    <fx:RFCEmisor>' + jsonData.rfcemisor + '</fx:RFCEmisor>';
 		  //xmlDoc += '    <fx:RFCEmisor>XAXX010101000</fx:RFCEmisor>';
-		 xmlDoc += '    <fx:RazonSocialEmisor>' + jsonData.razonsoc + '</fx:RazonSocialEmisor>';
+		 //xmlDoc += '    <fx:RazonSocialEmisor>' + jsonData.razonsoc + '</fx:RazonSocialEmisor>'; //Este es el que estaba originalmente se comenta por pruebas
+		 xmlDoc += '    <fx:RazonSocialEmisor>JIMENEZ ESTRADA SALAS A A</fx:RazonSocialEmisor>';
 		 xmlDoc += '    <fx:Usuario>' + userName + '</fx:Usuario>';
 		 xmlDoc += '    <fx:AsignacionSolicitada>';
 		 xmlDoc += '      <fx:Serie>' + jsonData.tranid.substring(0,1) + '</fx:Serie>';
 		 xmlDoc += '      <fx:Folio>' + jsonData.tranid.substring(1) + '</fx:Folio>';
 		 xmlDoc += '      <fx:TiempoDeEmision>' + jsonData.today + '</fx:TiempoDeEmision>'; // 2020-11-11T00:00:00
 		 xmlDoc += '    </fx:AsignacionSolicitada>';
+		 //xmlDoc += '	<fx:Exportacion>'+ jsonData.exportacion +'</fx:Exportacion>'
+		 xmlDoc += '	<fx:Exportacion>01</fx:Exportacion>'
 		 xmlDoc += '    <fx:LugarExpedicion>64780</fx:LugarExpedicion>';
 		 xmlDoc += '  </fx:Identificacion>';
 		 xmlDoc += '  <fx:Emisor>';
@@ -212,12 +215,19 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 		 xmlDoc += '    <fx:RFCReceptor>' + jsonData.rfcrecepFin + '</fx:RFCReceptor>';
 		 //xmlDoc += '    <fx:NombreReceptor>' + jsonData.entity.replace("2 ", "").replace("1 ", "") + '</fx:NombreReceptor>';
 		 xmlDoc += '    <fx:NombreReceptor>' + jsonData.entityFin + '</fx:NombreReceptor>';
+		 //xmlDoc += '    <fx:NombreReceptor>JIMENEZ ESTRADA SALAS A A</fx:NombreReceptor>';
 		 // xmlDoc += '    <fx:NombreReceptor>PUBLICO EN GENERAL</fx:NombreReceptor>';
+		 //xmlDoc += '	<fx:DomicilioFiscalReceptor>'+jsonData.codigopostal+'</fx:DomicilioFiscalReceptor>';
+		 //xmlDoc += '	<fx:DomicilioFiscalReceptor>78139</fx:DomicilioFiscalReceptor>'; //Este es el que estaba originalmente se comenta por pruebas
+		 xmlDoc += '	<fx:DomicilioFiscalReceptor>01030</fx:DomicilioFiscalReceptor>';
+		 //xmlDoc += '	<fx:RegimenFiscalReceptor>'+ jsonData.regimenFiscalReceptor +'</fx:RegimenFiscalReceptor>';
+		 xmlDoc += '	<fx:RegimenFiscalReceptor>' + jsonData.tipoIndustria + '</fx:RegimenFiscalReceptor>';
 		 xmlDoc += '    <fx:UsoCFDI>' + jsonData.cfdi.split('-')[0].trim() + '</fx:UsoCFDI>'; //P01
 		 xmlDoc += '  </fx:Receptor>';
 		 xmlDoc += '  <fx:Conceptos>';
 
 		 var totTaxAmount = 0;
+		 var totBase = 0;
 		 for (var i = 0; i < jsonData.items.length; i++) {
 
 			 var codeItem = jsonData.items[i].itemid;
@@ -241,9 +251,11 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 				 }
 			 }
 
+			var liquidacion = "";
+			var descripcionArticulo = "";
 			 if(jsonData.oportunidadID){
-				var liquidacion = "";
-				var descripcionArticulo = "";
+				liquidacion = "";
+				descripcionArticulo = "";
 				var oportunidadRec = record.load({
 				   type: search.Type.OPPORTUNITY,
 				   id: jsonData.oportunidadID,
@@ -258,23 +270,28 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 			 }
 
 			 
-
-
 			 if(jsonData.preliqCilind){
+				log.audit("Cilindros");
 				liquidacion = jsonData.preliqCilind;
 				descripcionArticulo = nameItem + " Nota: " + jsonData.oportunidad.substring(1) + " - Liquidación.: " + liquidacion;
 			 } else if(jsonData.preliqEstaci){
+				log.audit("Estacionarios");
 				liquidacion = jsonData.preliqEstaci;
 				descripcionArticulo = nameItem + " Nota: " + folioEstacionario + " - Liquidación.: " + liquidacion;
-			 } else if(jsonData.preLiqCarbur){
+			 } else if(jsonData.preliqCarbur){
+				log.audit("Carburacion");
 				liquidacion = jsonData.preliqCarbur;
 				descripcionArticulo = nameItem + " Nota: " + jsonData.oportunidad.substring(1) + " - Liquidación.: " + liquidacion;
 			 } else if(jsonData.preliqVenAnd){
+				log.audit("Anden");
 				liquidacion = jsonData.preliqVenAnd;
 				descripcionArticulo = nameItem + " Nota: " + jsonData.oportunidad.substring(1) + " - Liquidación.: " + liquidacion;
 			 } else if(jsonData.preliqViaEsp){
+				log.audit("Especial");
 				liquidacion = jsonData.preliqViaEsp;
 				descripcionArticulo = nameItem + " Nota: " + jsonData.creadoDesde.substring(1) + " - Liquidación.: " + liquidacion;
+			 } else {
+				log.audit("No entro en nunguno");
 			 }
 			 log.audit("liquidacion", liquidacion);
 			 log.audit("descripcionArticulo", descripcionArticulo);
@@ -292,6 +309,8 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 			 xmlDoc += '      <fx:ValorUnitario>' + jsonData.items[i].rate + '</fx:ValorUnitario>';
 			 xmlDoc += '      <fx:Importe>' + jsonData.items[i].amount + '</fx:Importe>';
 			 xmlDoc += '      <fx:Descuento>' + jsonData.items[i].discount + '</fx:Descuento>';
+			 xmlDoc += '	  <fx:ObjetoImp>' + jsonData.items[i].objetoImp + '</fx:ObjetoImp>';
+			 //xmlDoc += '	  <fx:ObjetoImp>02</fx:ObjetoImp>';
 			 //xmlDoc += '      <fx:Descuento>11.60</fx:Descuento>';
 			 xmlDoc += '      <fx:ImpuestosSAT>';
 			 xmlDoc += '        <fx:Traslados>';
@@ -304,12 +323,14 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 			 xmlDoc += '      </fx:ImpuestosSAT>';
 			 xmlDoc += '    </fx:Concepto>';
 			 totTaxAmount += parseFloat(jsonData.items[i].taxamt);
+			 totBase += parseFloat(jsonData.items[i].amount);
 		 }
 
 		 xmlDoc += '  </fx:Conceptos>';
 		 xmlDoc += '  <fx:ImpuestosSAT TotalImpuestosTrasladados="' + totTaxAmount.toFixed(2) + '">';
 		 xmlDoc += '    <fx:Traslados>';
-		 xmlDoc += '      <fx:Traslado Importe="' + totTaxAmount.toFixed(2) + '" Impuesto="002" TasaOCuota="' + jsonData.items[0].taxrate + '" TipoFactor="Tasa" />';
+		 xmlDoc += '      <fx:Traslado Base="' + totBase.toFixed(2) + '" Importe="' + totTaxAmount.toFixed(2) + '" Impuesto="002" TasaOCuota="' + jsonData.items[0].taxrate + '" TipoFactor="Tasa" />';
+		 //xmlDoc += '      <fx:Traslado Importe="' + totTaxAmount.toFixed(2) + '" Impuesto="002" TasaOCuota="' + jsonData.items[0].taxrate + '" TipoFactor="Tasa" />';
 		 xmlDoc += '    </fx:Traslados>';
 		 xmlDoc += '  </fx:ImpuestosSAT>';
 		 xmlDoc += '  <fx:Totales>';
@@ -446,10 +467,16 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 				line: j
 			 }) || " ").split(' ')[0];
 
+			 var objetoImpArray = (rec.getSublistText({
+				sublistId: 'item', 
+				fieldId: 'custcol_mx_txn_line_sat_tax_object',
+				line: j
+			 }) || " ").split(' ')[0];
+
 			 if(nameArray != "Descuentos, bonificaciones y devoluciones" && nameArray != "PTG - Descuentos, bonificaciones y devoluciones"){
 
 				objItems = {line: lineaArray, itemid: itemidArray, name: nameArray, quantity: quantityArray, unit: unitArray, taxcodeid: taxcodeidArray, taxcode: taxcodeArray, taxrate: taxrateArray, rate: rateArray,
-					taxamt: taxamtArray, amount: amountArray, discount: discouArray, idinvo: idinvoArray, type: typeArray, ClaveUnidad: ClaveUArray, ClaveProdServ: ClavePArray}
+					taxamt: taxamtArray, amount: amountArray, discount: discouArray, idinvo: idinvoArray, type: typeArray, ClaveUnidad: ClaveUArray, ClaveProdServ: ClavePArray, objetoImp: objetoImpArray}
 
 				lineaSubtotales = amountArray * 1;
 				subtotales += lineaSubtotales;
@@ -662,13 +689,20 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						id: jsonData.entityID
 					});
 					var clienteEspecial = clienteObj.getValue("custentity_ptg_cliente_especial");
+					var tipoDeIndustria = clienteObj.getText('custentity_mx_sat_industry_type').split('-')[0] || '';
 					if(clienteEspecial){
 						log.debug("cliente especial", clienteEspecial);
-						jsonData.rfcrecepFin = "XAXX010101000";
-						jsonData.entityFin = "Público en General";
+						//jsonData.rfcrecepFin = "XAXX010101000"; //Este es el que estaba originalmente se comenta por pruebas
+						jsonData.rfcrecepFin = "JES900109Q90";
+						//jsonData.entityFin = "Público en General"; //Este es el que estaba originalmente se comenta por pruebas
+						jsonData.entityFin = "JIMENEZ ESTRADA SALAS A A";
+						jsonData.tipoIndustria = "601";
 					} else {
+
 						jsonData.rfcrecepFin = jsonData.rfcrecep;
 						jsonData.entityFin = jsonData.entity;
+						jsonData.tipoIndustria = tipoDeIndustria;
+
 					}
 					 log.audit("jsonData", jsonData);
 					//log.audit("jsonData.items.length", jsonData.items.length);
