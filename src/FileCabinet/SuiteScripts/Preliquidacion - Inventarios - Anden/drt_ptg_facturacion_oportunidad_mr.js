@@ -85,6 +85,8 @@
 
             var valoresProceso = {};
 
+            var objSumbitError = {};
+
             var objUpdate = {
                 custrecord_ptg_terminado_cilindros: false,
                 custrecord_ptg_error_cilindro: '',
@@ -238,6 +240,7 @@
             var idRegistroPagos = oportunidadObj.getValue("custbody_ptg_registro_pagos");
             var subsidiariaOportunidad = oportunidadObj.getValue("subsidiary");
             var cliente = oportunidadObj.getValue("entity");
+            var fecha = oportunidadObj.getValue("createddate");
             var razonSocial = oportunidadObj.getValue("custbody_razon_social_para_facturar");
             var nombreClienteAFacturar = "";
             var zonaPrecioID = oportunidadObj.getValue("custbody_ptg_zonadeprecioop_");
@@ -245,6 +248,12 @@
                 type: "customrecord_ptg_zonasdeprecio_",
                 id: zonaPrecioID,
             });
+
+            objSumbitError.custrecord_ptg_id_oportunidad = idOportunidad;
+            objSumbitError.custrecord_ptg_cliente_facturado = cliente;
+            objSumbitError.custrecord_ptg_fecha_creacion = fecha;
+            objSumbitError.custrecord_ptg_tipos_pagos = tipoPago;
+            objSumbitError.custrecord_ptg_num_viaje_fac_ = objValue3;
             
             var precioPorLitro = zonaPrecioObj.getValue("custrecord_ptg_precio_");
             var clienteObj = record.load({
@@ -529,12 +538,28 @@
             objUpdate.custrecord_ptg_plc_etapa = 1;
                
         } catch (error) {
-            objUpdate.custrecord_ptg_plc_etapa = 3;
             log.error({
                 title: 'error map',
                 details: JSON.stringify(error)
             });
             objUpdate.custrecord_ptg_error_cilindro = error.message || '';
+            objSumbitError.custrecord_ptg_status = error.message;
+
+            var customRecFactura = record.create({
+                type: "customrecord_drt_ptg_registro_factura",
+                isDynamic: true,
+            });
+            var recIdSaved = customRecFactura.save();
+            log.debug({
+                title: "Registro de facturacion con error creado",
+                details: "Id Saved: " + recIdSaved,
+            });
+
+            record.submitFields({
+                id: recIdSaved,
+                type: "customrecord_drt_ptg_registro_factura",
+                values: objSumbitError,
+            })
         } finally {
             var registroCilindros = record.submitFields({
                 type: "customrecord_ptg_preliquicilndros_",
@@ -789,7 +814,6 @@
         }
 
             objUpdate.custrecord_ptg_terminado_cilindros = true;
-            objUpdate.custrecord_ptg_plc_etapa = 2;
             
 			
         } catch (error) {
@@ -798,8 +822,8 @@
                 details: JSON.stringify(error)
             });
             objUpdate.custrecord_ptg_error_cilindro = error.message || '';
-            objUpdate.custrecord_ptg_plc_etapa = 3;
         } finally {
+            objUpdate.custrecord_ptg_plc_etapa = 2;
             var registroCilindros = record.submitFields({
                 type: "customrecord_ptg_preliquicilndros_",
                 id: id_search,
