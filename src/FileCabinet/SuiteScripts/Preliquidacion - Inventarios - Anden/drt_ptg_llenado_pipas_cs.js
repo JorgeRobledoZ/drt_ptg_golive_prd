@@ -134,6 +134,10 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         title: "error fieldChanged",
         details: JSON.stringify(error),
     });
+    log.error({
+      title: "error fieldChanged",
+      details: JSON.stringify(error),
+  });
 }
   }
 
