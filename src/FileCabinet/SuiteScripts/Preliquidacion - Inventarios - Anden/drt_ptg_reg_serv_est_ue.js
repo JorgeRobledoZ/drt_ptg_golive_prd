@@ -89,6 +89,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var numViaje = newRecord.getValue("custrecord_ptg_num_viaje_reg_serv_est");
         var etapa = newRecord.getValue("custrecord_ptg_etapa_reg_serv_est");
         var fechaInicio = newRecord.getValue("custrecord_ptg_fecha_inicio_reg_serv_est");
+        var tipoServicio = newRecord.getValue("custrecord_ptg_tipo_servici_reg_serv_est");
         log.audit("fechaInicio", fechaInicio);
         var fechaFin = newRecord.getValue("custrecord_ptg_fecha_fin_reg_serv_est");
         log.audit("fechaFin", fechaFin);
@@ -112,7 +113,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         if (Object.keys(objMap).length>0) {
           estatusEtapaCarga = 1;
           estatusEtapaProcesado = 2;
-          estatusEtapaConciliado = 3;
+          estatusEtapaConciliado = 4;
         }
 
         if(fechaInicio && fechaFin){
@@ -143,7 +144,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         
 
 
-        if(etapa == estatusEtapaConciliado){
+        if(etapa == estatusEtapaConciliado && !tipoServicio && type_interface === "USERINTERFACE"){
 
           //SS: PTG - Registro Conciliacion Esta
           var recConciliarEstaObj = search.create({
@@ -199,12 +200,12 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
 
           log.audit("registroUpd", registroUpd);
 
-  
+          var parametros = {};
           if(busquedaMayor > 0){
             log.audit("af");
             for(var i = 0; i < busquedaMayor; i++){
                 log.audit("*****Entra implementacion "+i+"*****", "*****Entra implementacion "+i+"*****");
-                var parametros = {
+                parametros = {
                     'recId': recId,
                     'vehiculo': vehiculo,
                     'fechaInicio': tmInicio,
@@ -220,11 +221,21 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                 });
                 log.audit("redirectToStl", redirectToStl);
             }            
+          } else {
+            redirect.toRecord({
+              type: 'customrecord_ptg_registro_servicios_esta',
+              id: recId,
+              isEditMode: true,
+              parameters: {
+                etapa: estatusEtapaConciliado,
+                tiposervicio: 2,
+              }
+          });
           }
         }
 
         
-        else if (etapa == estatusEtapaCarga && type_interface === "USERINTERFACE") {
+        else if (etapa == estatusEtapaConciliado && tipoServicio == 2 && type_interface === "USERINTERFACE") {
           log.debug("pasa");
         var mrTask = task.create({
           taskType: task.TaskType.MAP_REDUCE,
