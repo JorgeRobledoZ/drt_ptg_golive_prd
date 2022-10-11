@@ -28,6 +28,10 @@
         log.audit("parametroVehiculo", parametroVehiculo);
         var parametroNoViaje = urlParametro.get('noviaje');
         log.audit("parametroNoViaje", parametroNoViaje);
+        var element = document.getElementById("btn_multibutton_submitter");
+        log.audit("element", element);
+
+        element.value = "Procesar";
 
           if(parametroVehiculo){
             currentRecord.setValue("custrecord_ptg_nodevehiculo_prelicil_", parametroVehiculo);
@@ -228,7 +232,7 @@
           (idRegistro = preliquidacionObjResult[0].getValue({name: "internalid", label: "Internal ID"}));
           log.emergency("preliquidacionExiste", preliquidacionExiste);
           log.emergency("idRegistro", idRegistro);
-        } 
+        }
 
         if(preliquidacionExiste && recId != idRegistro){
           var options = {
@@ -237,7 +241,7 @@
           };
           dialog.alert(options);
           //return false
-          return true
+          return false;
         }
         
         else {
