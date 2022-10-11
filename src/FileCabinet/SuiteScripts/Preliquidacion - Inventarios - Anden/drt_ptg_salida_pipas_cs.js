@@ -37,6 +37,7 @@
           id: vehiculo,
         });
         var totalizador = equipoObj.getValue("custrecord_ptg_totalizador_");
+        log.audit("totalizador", totalizador);
         currentRecord.setValue("custrecord_ptg_lts_totalizador_salida_", totalizador);
 
         //BÚSQUEDA GUARDADA: PTG - Viaje activo SS
