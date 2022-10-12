@@ -12,7 +12,7 @@
  * @NApiVersion 2.1
  * @NScriptType UserEventScript
  */
-define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/task", "N/runtime"], function (drt_mapid_cm, record, search, task, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/task", "N/runtime", "N/redirect"], function (drt_mapid_cm, record, search, task, runtime, redirect) {
   
   function beforeLoad(context) {
     try {
@@ -32,6 +32,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           servicioCilindros = objMap.servicioCilindros;
           servicioEstacionarios = objMap.servicioEstacionarios;
         }
+        log.debug("beforeLoad",context);
 
         if (type_event == "view") {
           var status = newRecord.getValue("custrecord_ptg_etapa_reg_serv_cil");
@@ -63,7 +64,37 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
 
           form.clientScriptModulePath = "./drt_ptg_reg_serv_cil_cs.js";       
 
+        } else if (type_event == "edit"){
+          var parms = context.request.parameters;
+          log.audit("beforeLoad parms", parms);
+          var reload = parms.reload;
+          var etapa = newRecord.getValue("custrecord_ptg_etapa_reg_serv_cil");
+
+          if(reload == "false"){
+            log.audit("beforeLoad", "hay reload");
+          } else {
+            log.audit("beforeLoad", "entra en edicion");
+            var objUpdate = {};
+            objUpdate.custrecord_ptg_etapa_reg_serv_cil = null;
+            record.submitFields({
+              type: newRecord.type,
+              id: newRecord.id,
+              values: objUpdate
+            });
+            log.audit("beforeLoad", "submit");
+
+            redirect.toRecord({
+              type: newRecord.type,
+              id: newRecord.id,
+              parameters: {
+                'reload' : false,
+                'e':'T',
+              }
+            });
+          }          
         }
+
+        
     } catch (e) {
       log.error({
         title: e.name,
