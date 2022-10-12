@@ -39,7 +39,8 @@
                 search.createColumn({name: "custrecord_ptg_vehiculo_reg_serv_cil_lin", label: "PTG - No. Vehiculo Destino"}),
                 search.createColumn({name: "custrecord_ptg_num_vdes_reg_serv_cil_lin", label: "PTG - Número de Viaje Destino"}),
                 search.createColumn({name: "custrecord_ptg_referencia_", label: "PTG - Referencia"}),
-                search.createColumn({name: "custrecord_ptg_kilometraje_serv_carb_lin", label: "PTG - Kilometraje"})
+                search.createColumn({name: "custrecord_ptg_kilometraje_serv_carb_lin", label: "PTG - Kilometraje"}),
+                search.createColumn({name: "custrecord_ptg_cil_limited", label: "PTG - Elija dirección de Publico General"})
             ];
 
             var arrayFilters = [
@@ -645,6 +646,7 @@
             var viajeDestino = objValue.values["custrecord_ptg_num_vdes_reg_serv_cil_lin"].value;
             var referencia = objValue.values["custrecord_ptg_referencia_"];
             var kilometraje = objValue.values["custrecord_ptg_kilometraje_serv_carb_lin"];
+            var direccionIDPublicoGeneral = objValue.values["custrecord_ptg_cil_limited"].value;
             log.debug("vehiculoDestino", vehiculoDestino);
             log.debug("viajeDestino", viajeDestino);
 
@@ -694,9 +696,14 @@
                 idArticuloDescuento = objMap.idArticuloDescuento;
             }
 
+            var idDireccionCliente = direccionID;
+            if(direccionIDPublicoGeneral){
+                idDireccionCliente = direccionIDPublicoGeneral;
+            }
+
             var direccionObj = record.load({
                 type: "customrecord_ptg_direcciones",
-                id: direccionID,
+                id: idDireccionCliente,
             });
             var idDireccion = parseInt(direccionObj.getValue("custrecord_ptg_direccion"));
 
