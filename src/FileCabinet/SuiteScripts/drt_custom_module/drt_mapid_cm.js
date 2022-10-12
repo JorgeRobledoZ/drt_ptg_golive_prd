@@ -518,6 +518,7 @@ define(
                         cajaGeneralCorpogas: 3153,
                         cajaGeneralSanLuis: 3151,
                         servicioViajeEspecial: 7,
+                        listoParaEnviar: 1,
                         
                     },
                     [runtime.EnvType.SANDBOX]: {
@@ -678,6 +679,7 @@ define(
                         cajaGeneralCorpogas: 2844,
                         cajaGeneralSanLuis: 2788,
                         servicioViajeEspecial: 7,
+                        listoParaEnviar: 1,
                     }
                 }
                 respuesta = mapObj[runtime.envType];
