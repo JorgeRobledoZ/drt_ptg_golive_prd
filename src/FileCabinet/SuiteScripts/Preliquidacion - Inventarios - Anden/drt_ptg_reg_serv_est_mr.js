@@ -184,7 +184,7 @@
                 formularioRecepcion = objMap.formularioRecepcion;
                 formularioOportunidad = objMap.formularioOportunidad;
                 formularioOrdenTraslado = objMap.formularioOrdenTraslado;
-                idPublicoGeneral = objMap.idPublicoGeneral;
+                idPublicoGeneral = objMap.publicoGeneral;
                 idArticuloDescuento = objMap.idArticuloDescuento;
             }
 
