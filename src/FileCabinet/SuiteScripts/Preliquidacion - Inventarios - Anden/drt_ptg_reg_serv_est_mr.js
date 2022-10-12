@@ -433,6 +433,7 @@
                                 ]
                             });
                             var searchResultCount = opportunitySearchObj.runPaged().count;
+                            log.debug('INFO', 'Cantidad de registros encontrados: '+searchResultCount);
 
                             if (searchResultCount > 0) {
                                 try {
@@ -536,7 +537,8 @@
                                     log.error("Error loading record: ", error);
                                 }
                             } else {
-                                log.audit('No se encontró oportunidad para el servicio:', servicio_id);
+                                //log.audit('No se encontró oportunidad para el servicio:', servicio_id);
+                                log.audit('No se encontró oportunidad para el servicio');
                             }
                         }
                     } else {
