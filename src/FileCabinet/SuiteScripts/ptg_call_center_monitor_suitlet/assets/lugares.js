@@ -1,20 +1,21 @@
+// lugares.js
 // Abre el modal de direcciones
-$("#agregarDirecciones, #agregarDireccion").click(function() {
-    //loadMsg();
-    if(loadColonias) {
-        infoMsg('warning', 'Aun están cargando los datos para direcciones, favor de esperar un momento');
-    } else {
-        if($("#estadoDireccion option").length == 2) {
-            $("#estadoDireccion").prop("disabled", true);
-            $("#estadoDireccion").val($($("#estadoDireccion option")[1]).val()).trigger("change");
-        } else {
-            $("#estadoDireccion").prop("disabled", false);
-        }    
-        $("#formDireccionesModal").modal("show");
-    }    
-    //swal.close();            
-    //getStates();
-});
+// $("#agregarDirecciones, #agregarDireccion").click(function() {
+//     //loadMsg();
+//     if(loadColonias) {
+//         infoMsg('warning', 'Aun están cargando los datos para direcciones, favor de esperar un momento');
+//     } else {
+//         if($("#estadoDireccion option").length == 2) {
+//             $("#estadoDireccion").prop("disabled", true);
+//             $("#estadoDireccion").val($($("#estadoDireccion option")[1]).val()).trigger("change");
+//         } else {
+//             $("#estadoDireccion").prop("disabled", false);
+//         }    
+//         $("#formDireccionesModal").modal("show");
+//     }    
+//     //swal.close();            
+//     //getStates();
+// });
 
 // Prellena los datos de una dirección en el modal
 $("#editarDireccion").click(function() {
@@ -25,11 +26,14 @@ $("#editarDireccion").click(function() {
         $("#tipoAccionDireccion").val('guardar');
         let periodo = '';
         if ( direccion ) {
-            if(customerGlobal.requiereFactura) {
-                $($(".dato-facturacion").removeClass("d-none"));
-            } else {
-                $($(".dato-facturacion").addClass("d-none"));
-            }
+            // Setea el tipo de dirección
+            $('#tipoDireccion').val(direccion.tipoDireccionId ?? "").trigger('change');
+            
+            // if(customerGlobal.requiereFactura) {
+            //     $($(".dato-facturacion").removeClass("d-none"));
+            // } else {
+            //     $($(".dato-facturacion").addClass("d-none"));
+            // }
             // Se ocultan los campos de frecuencia y posteriormente se decide si se muestran o no
             $('.frecuencia-cada, .frecuencia-semana').addClass('d-none');
             if ( direccion.defaultBilling ) {// Dirección de facturación
@@ -191,11 +195,13 @@ $("#copiarDireccion").click(function() {
         $("#tipoAccionDireccion").val('guardar');
         let periodo = '';
         if ( direccion ) {
-            if(customerGlobal.requiereFactura) {
-                $($(".dato-facturacion").removeClass("d-none"));
-            } else {
-                $($(".dato-facturacion").addClass("d-none"));
-            }
+            // Setea el tipo de dirección
+            $('#tipoDireccion').val(direccion.tipoDireccionId ?? "").trigger('change');
+            // if(customerGlobal.requiereFactura) {
+            //     $($(".dato-facturacion").removeClass("d-none"));
+            // } else {
+            //     $($(".dato-facturacion").addClass("d-none"));
+            // }
             // Se ocultan los campos de frecuencia y posteriormente se decide si se muestran o no
             $('.frecuencia-cada, .frecuencia-semana').addClass('d-none');
             if ( direccion.defaultBilling ) {// Dirección de facturación
@@ -476,11 +482,8 @@ function setDataRutas(items, elem, trigger = true) {
     });
 
     if(Object.keys(items).length == 1) {
-        if(trigger) {
-            elem.val(Object.keys(items)[0]).trigger("change");
-        } else {
-            elem.val(Object.keys(items)[0]);
-        }
+        elem.val(items[Object.keys(items)[0]].name).trigger("change");
+        // elem.val(Object.keys(items)[0].name).trigger("change");
         elem.prop("disabled", true);
     } else {
         elem.val(null);

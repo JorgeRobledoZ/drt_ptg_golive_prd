@@ -215,9 +215,9 @@ function setSelectStatusOp(items) {
     vrStatus = [];
     if ( items.length ) {
         $('#filterEstadoSolicitud').children('option').remove();
-        $('#filterEstadoSolicitud').append(
-            '<option value="0">Todos</option>'
-        )
+        // $('#filterEstadoSolicitud').append(
+        //     '<option value="0">Todos</option>'
+        // )
         
         items.forEach(element => {
             if(element.nombre.trim().toLowerCase() == "por notificar") {
@@ -896,7 +896,7 @@ function getObservacionesFormat(item, separador) {
     return auxObs.trim();
 }
 
-function getMetodoPagoFormat(item) {    
+function getMetodoPagoFormat(item, moneda = true) {    
     let auxMet = item.metodo_txt,
         auxFol = item.folio;
     if(auxMet.split(" ").length > 1) {
@@ -911,7 +911,7 @@ function getMetodoPagoFormat(item) {
             }
         }
     }
-    return auxMet + (auxFol ? " - " + auxFol : '') + " - $" + getCorrectFormat(item.monto) + " MXN";
+    return auxMet + (auxFol ? " - " + auxFol : '') + " - $" + getCorrectFormat(item.monto) + (moneda ? " MXN" : "");
 }
 
 function getDireccionFormat(item, tipo) { 
@@ -1940,7 +1940,7 @@ function getDefaultNotification(tipo, item, observacion = "") {
                 if(auxNoti.sms != "") {
                     auxNoti.sms += ", "
                 }
-                auxNoti.sms += (element.quantity ? element.quantity + "-" : '') + element.item;
+                auxNoti.sms += (element.quantity ? element.quantity + "-" : '') + (element.item.trim() == 'GAS LP' ? 'LTS' : element.item);
             }            
         });
         if(item.objPagos) {
@@ -1949,12 +1949,13 @@ function getDefaultNotification(tipo, item, observacion = "") {
                 if(auxNoti.sms != "") {
                     auxNoti.sms += ","
                 }
-                auxPagos.pago.forEach(element => {
-                    auxNoti.sms += getMetodoPagoFormat(element);
+                auxPagos.pago.forEach((element, i) => {
+                    auxNoti.sms += (i == 0 ? '' : ',') + getMetodoPagoFormat(element, false);
                 });
             }
         }
-        auxNoti.sms += (item.saldoDisponible && item.saldoDisponible.trim() && parseFloat(item.saldoDisponible.trim()) > 0) ? ', LC $'+getCorrectFormat(item.saldoDisponible) + " MXN" : '';
+        // auxNoti.sms += (item.saldoDisponible && item.saldoDisponible.trim() && parseFloat(item.saldoDisponible.trim()) > 0) ? ', LC $'+getCorrectFormat(item.saldoDisponible) + " MXN" : '';
+        auxNoti.sms += (item.saldoDisponible && item.saldoDisponible.trim() && parseFloat(item.saldoDisponible.trim()) > 0) ? ', LC $'+getCorrectFormat(item.saldoDisponible) : '';
         if(observacion) {
             auxNoti.sms += (observacion && observacion.trim()) ? ","+observacion.trim() : '';
         } else {
@@ -1970,7 +1971,7 @@ function getDefaultNotification(tipo, item, observacion = "") {
             auxNoti.notificacion += "Artículos:";
             item.articulos.forEach(element => {
                 if(element.itemId != articuloDesc) {
-                    auxNoti.notificacion += "\n\t- "+ (element.quantity ? element.quantity + " | " : '') + element.item;
+                    auxNoti.notificacion += "\n\t- "+ (element.quantity ? element.quantity + " | " : '') + (element.item.trim() == 'GAS LP' ? 'LTS' : element.item);
                 }
             });
         }
@@ -1981,11 +1982,11 @@ function getDefaultNotification(tipo, item, observacion = "") {
             if(auxPagos.pago && auxPagos.pago.length > 0) {
                 auxNoti.notificacion += "\nTipos de pago:";
                 auxPagos.pago.forEach(element => {
-                    auxNoti.notificacion += "\n\t- "+getMetodoPagoFormat(element);
+                    auxNoti.notificacion += "\n\t- "+getMetodoPagoFormat(element, false);
                 });
             }
         }
-        auxNoti.notificacion += (item.saldoDisponible && item.saldoDisponible.trim() && parseFloat(item.saldoDisponible) > 0) ? '\nLímite de crédito: $' + getCorrectFormat(item.saldoDisponible) + " MXN" : '';     
+        auxNoti.notificacion += (item.saldoDisponible && item.saldoDisponible.trim() && parseFloat(item.saldoDisponible) > 0) ? '\nLímite de crédito: $' + getCorrectFormat(item.saldoDisponible) : '';     
         if(observacion) {
             auxNoti.notificacion += (observacion && observacion.trim() ? '\nObservaciones: ' +observacion.trim() : '');
         } else {
@@ -2899,6 +2900,7 @@ $("#guardarSeguimiento").click(function() {
                 setAjax(settings2).then((response) => {
                     if(response.success) {
                         if((item.numero_caso && item.asignado_a) || (!item.numero_caso && item.choferId)) {
+                            let text = getDefaultNotification(item.numero_caso ? 'caso' : 'pedido', item, $("#nuevaNotaSeguimiento").val().trim());
                             let dataSend = {
                                 notification: {
                                     title: 'Nueva nota '+(item.numero_caso ? 'caso - '+item.numero_caso : 'pedido - '+item.documentNumber),
@@ -2909,10 +2911,10 @@ $("#guardarSeguimiento").click(function() {
                             if($("#sendSmsSeguimiento").prop("checked")) {
                                 dataSend.sms = {
                                     title: item.id_cliente+item.label+dateFormatFromDate(new Date(), "8"),
-                                    message: $("#nuevaNotaSeguimiento").val().trim().replace(/(\r\n|\n|\r)/gm," ")+"\n"+(item.numero_caso ? item.numberAsiggned : item.phoneChofer)
+                                    message: text.sms.trim().replace(/(\r\n|\n|\r)/gm," ")+"\n"+(item.numero_caso ? item.numberAsiggned : item.phoneChofer)
                                 }
                             }
-
+                            
                             sendNotification(dataSend, (item.numero_caso ? "caso" : "pedido"), (item.numero_caso ? item.internalId : item.no_pedido), ($("#sendSmsSeguimiento").prop("checked") ? new Date().getTime()+"|"+$("#nuevaNotaSeguimiento").val().trim() : ""), function(resp) {
                                 swal.close();
                                 if(resp.success) {

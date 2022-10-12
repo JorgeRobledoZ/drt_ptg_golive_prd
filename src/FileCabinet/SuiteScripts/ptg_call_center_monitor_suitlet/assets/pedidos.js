@@ -1,3 +1,4 @@
+// pedidos.js
 //#region Variable de Elementos
 
 let comboArticulos = $('#capacidadFormProductos');
@@ -144,6 +145,9 @@ $("#agregarProducto").click(function () {
         $(".opt-pro-pedido-cilindro, .opt-pro-pedido-estacionario, .opt-pro-pedido-montacarga").attr("disabled", false);
     }
 
+    // Se limpia el timeunix
+    $('#pedidoProductoTimeUnix').val('');
+
     $("#envaseFormProductos").prop("checked", false);
     $('#formProductosModal').modal('show');
 });
@@ -157,6 +161,7 @@ $('body').delegate('.edit-producto-cil, .edit-producto-est, .edit-producto-mont'
     let total    = 0;
     let subtotal = 0;
     // let direccion = $('select#direccionCliente').children('option:selected').data('address');
+    $('#pedidoProductoTimeUnix').val(artObj.timeUnix);
     
     if ( button.hasClass('edit-producto-cil') ) {// Producto cilindro
         prices = Number($('#zonaPrecioCliente').data("precioKg"));
@@ -314,14 +319,17 @@ $('#guardarMetodoPagoForm').on('click', function () {
         tipo_pago    : metodoId,
         tipo_cuenta  : tipoCuenta,
         tipo_tarjeta : tipoTarjeta,
-        monto        : total,
+        monto        : Number(total).toFixed(6),
         folio        : folioAut,
     };
 
     if($("#formMetodoPagosModal").data("tipo") == "add") {
+        console.log("entre al if");
         agregarMetodoPago(metodoObj);
     } else {
+        console.log("entre al else");
         let tr = $("#formMetodoPagosModal").data("tr");
+        console.log(tr, tr.data());
         tr.data("metodoId", metodoId);
         tr.data("metodo", metodoObj);
         $(tr.find("td")[0]).html(metodoObj.metodo_txt);
@@ -341,8 +349,10 @@ $('#guardarMetodoPagoForm').on('click', function () {
 
 async function onClickAddProducto() {
     btnAddArticles.on('click', function () {
-        let tipoProducto = $('#productoFormProductos').val();
-        let productoId  = $('#pedidoProductoId').val();
+        let tipoProducto  = $('#productoFormProductos').val();
+        let productoId    = $('#pedidoProductoId').val();
+        let timeUnixEdit  = $('#pedidoProductoTimeUnix').val();
+        let newTimeUnix   = Date.now();
         let defaultProMsg = $('#sinProductos');
         let prices = 0;
         if(validateForm($("#formProductosModal"))) {
@@ -358,7 +368,8 @@ async function onClickAddProducto() {
         defaultProMsg.addClass('d-none');
 
         let itemId   = ( tipoProducto == 'cilindro' ? $( '#capacidadFormProductos' ).val() : articuloGasLp );
-        let searchTr = $('tr[data-item-id="'+itemId+'"]');
+        let searchTrByItem = $('tr[data-item-id="'+itemId+'"]');
+        let searchTr       = $('tr[data-time-unix="'+timeUnixEdit+'"]');
 
         // Se agrega el artículo a la tabla
         if ( tipoProducto == 'cilindro' ) {// Cilindro
@@ -370,6 +381,7 @@ async function onClickAddProducto() {
             let capacidad = parseInt( ( artSel && artSel.capacidad_litros ? artSel.capacidad_litros : 0 ) );
             let envase    = $('#envaseFormProductos').is(':checked');
             let articulo  = {
+                "timeUnix"  : timeUnixEdit,
                 "zoneprice" : prices,// Este es el valor de la zona
                 "tipo"      : 1,
                 "capacity"  : capacidad,
@@ -379,46 +391,89 @@ async function onClickAddProducto() {
 
             agregarEnvase(envase, $(".productosCilindroPedido"), artSel, prices);
             
-            if ( searchTr.length ) {// Se verifica si el artículo fue previamente registrado
-
-                if ( productoId ) {// Si es una edición, se reemplazará todo el contenido
-                    searchTr.data('item', articulo);
-                    // searchTr.data('item-id', articulo.article);
-                    searchTr.children('td').siblings("td:nth-child(1)").text(artSel && artSel.nombre ? artSel.nombre : 'Sin nombre asignado');
-                    searchTr.children('td').siblings("td:nth-child(2)").text(articulo['quantity']);
-                    searchTr.children('td').siblings("td:nth-child(3)").text(capacidad+' kg');
-                    searchTr.children('td').siblings("td:nth-child(4)").data('total', total);
-                    searchTr.children('td').siblings("td:nth-child(4)").text('$'+getCorrectFormat(total)+' MXN');
-                    // searchTr.children('td').siblings("td:nth-child(4)").children('button.delete-producto-cil').data('item-id', articulo.article);
-                } else {
-                    let firstItem         = searchTr.data('item');
-                    let firstTotal        = parseFloat( searchTr.children('td').siblings("td:nth-child(4)").data('total') );
+            if ( searchTr.length ) {// Se verifica si el artículo está siendo editado
+                if ( searchTrByItem.length && articulo.timeUnix != searchTrByItem.data('item').timeUnix ) {// Se trata de un artículo previamente agregado, por lo que debe sumarizarse a este y quitar el tr editado
+                    console.log('Es un articulo de cilindro editado y se elimina el previo', articulo['article']);
+                    let firstItem         = searchTrByItem.data('item');
+                    let firstTotal        = parseFloat( searchTrByItem.children('td').siblings("td:nth-child(4)").data('total') );
                     firstItem['quantity'] = parseInt( Number(firstItem['quantity']) + Number(articulo['quantity']));
-    
+                    firstItem['article']  = articulo['article'];
+
                     total = parseFloat(Number(total) + Number(firstTotal));
-                    searchTr.data('item', firstItem);
-                    searchTr.children('td').siblings("td:nth-child(2)").text(firstItem['quantity']);
-                    searchTr.children('td').siblings("td:nth-child(4)").data('total', total);
-                    searchTr.children('td').siblings("td:nth-child(4)").text('$'+getCorrectFormat(total)+' MXN');
-                    console.log(firstItem);
+                    searchTrByItem.data('item', firstItem);
+                    searchTrByItem.data('item-id', firstItem.article);
+                    searchTrByItem.children('td').siblings("td:nth-child(2)").text(firstItem['quantity']);
+                    searchTrByItem.children('td').siblings("td:nth-child(4)").data('total', total);
+                    searchTrByItem.children('td').siblings("td:nth-child(4)").text('$'+getCorrectFormat(total)+' MXN');
+
+                    searchTr.remove();
+                    // console.log(firstItem);
+                } else {// Se edita un articulo por otro, y se reemplaza todo su contenido
+                    console.log('Es un articulo de cilindro editado que se reemplazará su contenido', articulo.article);
+                    articulo.timeUnix = newTimeUnix;
+                    // Se llena la información del item
+                    $(".productosCilindroPedido tbody").append(
+                        '<tr data-item-id='+articulo.article+' data-time-unix='+articulo.timeUnix+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
+                            '<td class="text-center">'+(artSel && artSel.nombre ? artSel.nombre : 'Sin nombre asignado')+'</td>'+
+                            '<td class="text-center">'+articulo['quantity']+'</td>'+
+                            '<td class="text-center">'+capacidad+' kg</td>'+
+                            '<td class="text-center" data-total='+total.toFixed(6)+'>$'+getCorrectFormat(total)+' MXN</td>'+
+                            // '<td class="text-center">'+(envase ? 'Si' : 'No')+'</td>'+
+                            '<td class="text-center">'+
+                                '<button class="btn btn-sm btn-info edit-producto-cil"> <i class="fa fa-pen-to-square"></i> </button> '+
+                                '<button class="btn btn-sm btn-danger delete-producto-cil" data-table-ref=".productosCilindroPedido" data-item-id='+articulo.article+'> <i class="fa-solid fa-trash-can"></i> </button>'+
+                            '</td>'+
+                        '</tr>'
+                    );
+                    searchTr.remove();
+
+                    // articulo.timeUnix = newTimeUnix;
+                    // console.log('Es un articulo de cilindro editado que se reemplazará su contenido', articulo.article);
+                    // searchTr.data('time-unix', newTimeUnix);
+                    // searchTr.data('item', articulo);
+                    // searchTr.data('item-id', articulo.article);
+                    // // searchTr.data('item-id', articulo.article);
+                    // searchTr.children('td').siblings("td:nth-child(1)").text(artSel && artSel.nombre ? artSel.nombre : 'Sin nombre asignado');
+                    // searchTr.children('td').siblings("td:nth-child(2)").text(articulo['quantity']);
+                    // searchTr.children('td').siblings("td:nth-child(3)").text(capacidad+' kg');
+                    // searchTr.children('td').siblings("td:nth-child(4)").data('total', total);
+                    // searchTr.children('td').siblings("td:nth-child(5)").children('button.delete-producto-cil').data('item-id', articulo.article);
+                    // searchTr.children('td').siblings("td:nth-child(4)").text('$'+getCorrectFormat(total)+' MXN');
+
+                    // console.log('este es el searchTr', $('tr[data-time-unix="'+newTimeUnix+'"]'));
+                    // searchTr.children('td').siblings("td:nth-child(4)").children('button.delete-producto-cil').data('item-id', articulo.article);
                 }
                 
             } else {
-
-                // Se llena la información del item
-                $(".productosCilindroPedido tbody").append(
-                    '<tr data-item-id='+articulo.article+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
-                        '<td class="text-center">'+(artSel && artSel.nombre ? artSel.nombre : 'Sin nombre asignado')+'</td>'+
-                        '<td class="text-center">'+articulo['quantity']+'</td>'+
-                        '<td class="text-center">'+capacidad+' kg</td>'+
-                        '<td class="text-center" data-total='+total.toFixed(6)+'>$'+getCorrectFormat(total)+' MXN</td>'+
-                        // '<td class="text-center">'+(envase ? 'Si' : 'No')+'</td>'+
-                        '<td class="text-center">'+
-                            '<button class="btn btn-sm btn-info edit-producto-cil"> <i class="fa fa-pen-to-square"></i> </button> '+
-                            '<button class="btn btn-sm btn-danger delete-producto-cil" data-table-ref=".productosCilindroPedido" data-item-id='+articulo.article+'> <i class="fa-solid fa-trash-can"></i> </button>'+
-                        '</td>'+
-                    '</tr>'
-                );
+                if ( searchTrByItem.length ) {// Se trata de un artículo previamente agregado, por lo que debe sumarizarse a este
+                    let firstItem         = searchTrByItem.data('item');
+                    let firstTotal        = parseFloat( searchTrByItem.children('td').siblings("td:nth-child(4)").data('total') );
+                    firstItem['quantity'] = parseInt( Number(firstItem['quantity']) + Number(articulo['quantity']));
+    
+                    total = parseFloat(Number(total) + Number(firstTotal));
+                    searchTrByItem.data('item', firstItem);
+                    searchTrByItem.children('td').siblings("td:nth-child(2)").text(firstItem['quantity']);
+                    searchTrByItem.children('td').siblings("td:nth-child(4)").data('total', total);
+                    searchTrByItem.children('td').siblings("td:nth-child(4)").text('$'+getCorrectFormat(total)+' MXN');
+                    console.log('Es un articulo nuevo pero coincidía con uno que ya estaba');
+                } else {
+                    console.log('Es un articulo de cilindro 100% NUEVO');
+                    articulo.timeUnix = newTimeUnix;
+                    // Se llena la información del item
+                    $(".productosCilindroPedido tbody").append(
+                        '<tr data-item-id='+articulo.article+' data-time-unix='+articulo.timeUnix+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
+                            '<td class="text-center">'+(artSel && artSel.nombre ? artSel.nombre : 'Sin nombre asignado')+'</td>'+
+                            '<td class="text-center">'+articulo['quantity']+'</td>'+
+                            '<td class="text-center">'+capacidad+' kg</td>'+
+                            '<td class="text-center" data-total='+total.toFixed(6)+'>$'+getCorrectFormat(total)+' MXN</td>'+
+                            // '<td class="text-center">'+(envase ? 'Si' : 'No')+'</td>'+
+                            '<td class="text-center">'+
+                                '<button class="btn btn-sm btn-info edit-producto-cil"> <i class="fa fa-pen-to-square"></i> </button> '+
+                                '<button class="btn btn-sm btn-danger delete-producto-cil" data-table-ref=".productosCilindroPedido" data-item-id='+articulo.article+'> <i class="fa-solid fa-trash-can"></i> </button>'+
+                            '</td>'+
+                        '</tr>'
+                    );
+                }
 
             }
 
@@ -469,6 +524,7 @@ async function onClickAddProducto() {
                 if(total < minimoGasLp) {
                     infoMsg("warning", "El pedido es menor a la cantidad minima");
                 }
+                articulo.timeUnix = newTimeUnix;
                 $(".productosEstacionarioPedido tbody").append(
                     '<tr data-item-id='+articulo.article+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
                         '<td>Gas LP</td>'+
@@ -623,15 +679,18 @@ function onChangeValue(element) {
         $('.precio-unitario-label').html(lblPrice);
         $("#formProductosModalPrecio").html('$'.concat(getCorrectFormat(Number(prices * 1.16))));
         if ( elementId == 'totalFormProductos' || elementId == 'productoFormProductos' ) {// Se calculan los litros a contratar
+            if ( elementId == 'totalFormProductos' ) {
+                total = parseFloat( $('#totalFormProductos').val() );
+                
+                $('#totalFormProductos').data("value", total.toFixed(6));
+            } else {
+                total = parseFloat( $('#totalFormProductos').data("value") );
+            }
 
-            total = parseFloat( $('#totalFormProductos').data("value") );
             total = ( isNaN(total) ? 0 : total );
             subtotal = parseFloat(total / 1.16);
-            // subtotal = Math.ceil( $('#valorFormProductos').val() );
-            // subtotal = ( isNaN(subtotal) ? 0 : subtotal );
             litros = parseFloat(subtotal / prices);
             $('#litrosFormProductos').val(litros.toFixed(2));
-            
 
         } else if( elementId == 'litrosFormProductos' ) {// Se calcula el total acorde a los litros
 
@@ -687,6 +746,12 @@ async function savePedido() {
             return;
         }
 
+        // Si es de tipo solo facturación, no puede continuar con el pedido
+        if ( direccion.tipoDireccionId == tipoDirSoloFacturacion ) {
+            infoMsg('error', 'No puede realizar un pedido con una dirección de sólo facturación');
+            return;
+        }
+
         // Define cuál tabla de productos es la que se usará para calcular totales y descuentos
         if (! $('.productosEstacionarioPedido').parent().parent().hasClass('d-none') ) { // Estacionario
             tablaProd = $('.productosEstacionarioPedido');
@@ -709,7 +774,7 @@ async function savePedido() {
             totalMetodosPago = $('.productosMetodoPago').children('tfoot').find('td.total').data('total');
         }
 
-        if ( totalPedido != totalMetodosPago ) {
+        if ( Number(totalPedido).toFixed(2) != Number(totalMetodosPago).toFixed(2) ) {
             infoMsg('warning', 'El total a pagar debe ser igual al total de productos enlistados');
             return;
         }
@@ -940,7 +1005,7 @@ $('body').delegate('.delete-producto-cil, .delete-producto-est, .delete-producto
 $('body').delegate('.edit-metodo-pago','click', function() {
     let metodo = $(this).closest("tr").data("metodo");
     $("#metodoPagoPedido").val(metodo.tipo_pago).trigger("change");
-    $("#montoPagoPedido").val(metodo.monto);
+    $("#montoPagoPedido").val(Number(metodo.monto).toFixed(2));
     $("#tipoCuenta").val(metodo.tipo_cuenta);
     $("#tipoTarjeta").val(metodo.tipo_tarjeta);
     $("#folioAutorizacionPedido").val(metodo.folio);
@@ -953,6 +1018,7 @@ $('body').delegate('.edit-metodo-pago','click', function() {
 
 // Elimina un método de pago de la tabla
 $('body').delegate('.delete-metodo-pago','click', function() {
+    let tr = $(this).closest("tr");
     let metodo  = $(this).parent().parent().data('metodo');
     let table = $(this).data('table-ref');
     let id    = ( metodo && metodo.tipo_pago ? metodo.tipo_pago : 0 );
@@ -979,7 +1045,7 @@ $('body').delegate('.delete-metodo-pago','click', function() {
         dangerMode: true,
     }).then((accept) => {
         if ( accept ) {
-            $(table).children('tbody').children('tr[data-metodo-id="'+id+'"]').remove();
+            tr.remove();
             validarTablaMetodosPago( $(table) );
         }
     }).catch(swal.noop);
@@ -987,14 +1053,22 @@ $('body').delegate('.delete-metodo-pago','click', function() {
 
 // Agrega un método de pago a la tabla de métodos
 function agregarMetodoPago(metodoObj) {
-    let searchTr = $('table.productosMetodoPago > tbody > tr[data-metodo-id="'+metodoObj.tipo_pago+'"]');
-
+    let searchTr = [];
+    for (let x = 0; x <  $('table.productosMetodoPago > tbody > tr').length; x++) {
+        const element =  $('table.productosMetodoPago > tbody > tr')[x];
+        if(metodoObj.tipo_pago == $(element).data("metodoId")) {
+            searchTr.push($(element));
+        }        
+    }
+    
+    //let searchTr = $('table.productosMetodoPago > tbody > tr[data-metodo-id="'+metodoObj.tipo_pago+'"]');
+    //console.log(searchTr, searchTr.data());
     if ( searchTr.length && ( !metodosPagoPrepago.includes(metodoObj.tipo_pago) && metodoObj.tipo_pago != metodoTransferencia ) ) {// Se verifica si el artículo fue previamente registrado y si no es un prepago se edita el row
 
-        searchTr.data('metodo', metodoObj);
-        searchTr.children('td').siblings("td:nth-child(2)").text(metodoObj.folio ? metodoObj.folio : 'No aplica');
-        searchTr.children('td').siblings("td:nth-child(3)").data('total', metodoObj.monto);
-        searchTr.children('td').siblings("td:nth-child(3)").text('$'+getCorrectFormat(metodoObj.monto)+' MXN');
+        searchTr[0].data('metodo', metodoObj);
+        searchTr[0].children('td').siblings("td:nth-child(2)").text(metodoObj.folio ? metodoObj.folio : 'No aplica');
+        searchTr[0].children('td').siblings("td:nth-child(3)").data('total', metodoObj.monto);
+        searchTr[0].children('td').siblings("td:nth-child(3)").text('$'+getCorrectFormat(metodoObj.monto)+' MXN');
         console.log(metodoObj);
         
     } else {// Se llena la información del item

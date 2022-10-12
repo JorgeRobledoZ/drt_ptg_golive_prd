@@ -2,13 +2,13 @@
  * @NApiVersion 2.1
  * @NScriptType ScheduledScript
  */
- define(['N/https', 'N/record', 'N/search', 'N/format'],
+ define(['N/https', 'N/record', 'N/search', 'N/format', 'SuiteScripts/drt_custom_module/drt_mapid_cm'],
  /**
 * @param{https} https
 * @param{record} record
 * @param{search} search
 */
- (https, record, search, format) => {
+ (https, record, search, format, drt_mapid_cm) => {
      /**
       * Defines the Scheduled script trigger point.
       * @param {Object} scriptContext
@@ -17,6 +17,7 @@
       */
     const execute = (scriptContext) => {
         try {
+            const customVars = drt_mapid_cm.getVariables();
             // Buscar plantas que tienen SGC Local
             var locationsArray = search.create({
                 type: "customrecord_ptg_folio_sgc_local",
@@ -60,7 +61,12 @@
                 let folio = location.getValue({ name: "custrecord_ptg_sgc_local_folio" });
                 let planta = location.getValue({ name: "custrecord_ptg_sgc_local_planta" });
                 let ip = location.getValue({ name: "custrecord_ptg_ip_sgc", join: "CUSTRECORD_PTG_SGC_LOCAL_PLANTA" });
-                let fecha = "2022-08-30";
+                let no_autotanque = '4802';
+                let limit = '';
+                // let limit = 'LIMIT 1';
+                // let fecha = "2022-08-30";
+                let fecha     = "2022-10-01";
+                let fechaFin  = "2022-10-06";
                 log.audit('Entra en la ubicación', `SGC ID: ${sgc_id} - Location Id: ${location_id} - Folio: ${folio} - Nombre Planta: ${planta} - IP: ${ip}`);
 
                 // Getting all services by folio + 100
@@ -80,11 +86,14 @@
                 let data = {
                     credentials,
                     folio,
-                    fecha
+                    fecha,
+                    fechaFin,
+                    no_autotanque,
+                    limit
                 }
 
-                let url = `https://b03c-177-226-112-81.ngrok.io/api/getServicios`;
-                // let url = `https://i-ptg-sgclc-middleware-api-dtt-middleware.apps.mw-cluster.kt77.p1.openshiftapps.com/api/getServicios`;
+                // let url = `https://b03c-177-226-112-81.ngrok.io/api/getServicios`;
+                let url = `https://i-ptg-sgclc-middleware-api-dtt-middleware.apps.mw-cluster.kt77.p1.openshiftapps.com/api/getServicios`;
 
                 let headers = {
                     'content-type': 'application/json',
@@ -132,34 +141,34 @@
                         try {
                             // customrecord_ptg_registro_servicios_es_l
                             // Antes de crear servicio no conciliado, buscar si ya existe uno con el mismo folio
-                            var customrecord_ptg_registro_servicios_es_lSearchObj = search.create({
-                                type: "customrecord_ptg_registro_servicios_es_l",
-                                filters:
-                                    [
-                                        ["custrecord_ptg_folio_reg_sin_c_2", "is", servicio.id_servicio],
-                                        "AND",
-                                        ["custrecord_ptg_planta_sin_conciliar_2", "anyof", location_id],
-                                    ],
-                                columns:
-                                    [
-                                        "internalid",
-                                        "custrecord_ptg_planta_sin_conciliar_2",
-                                        search.createColumn({
-                                            name: "custrecord_ptg_ruta_sin_conciliar_2",
-                                            sort: search.Sort.ASC
-                                        }),
-                                        "custrecord_ptg_folio_reg_sin_c_2"
-                                    ]
-                            });
-                            var customrecord_ptg_registro_servicios_es_lSearchObjCount = customrecord_ptg_registro_servicios_es_lSearchObj.runPaged().count;
-                            log.debug("Validación de servicio_id como folio:", customrecord_ptg_registro_servicios_es_lSearchObjCount);
+                            // var customrecord_ptg_registro_servicios_es_lSearchObj = search.create({
+                            //     type: "customrecord_ptg_registro_servicios_es_l",
+                            //     filters:
+                            //         [
+                            //             ["custrecord_ptg_folio_reg_sin_c_2", "is", servicio.id_servicio],
+                            //             "AND",
+                            //             ["custrecord_ptg_planta_sin_conciliar_2", "anyof", location_id],
+                            //         ],
+                            //     columns:
+                            //         [
+                            //             "internalid",
+                            //             "custrecord_ptg_planta_sin_conciliar_2",
+                            //             search.createColumn({
+                            //                 name: "custrecord_ptg_ruta_sin_conciliar_2",
+                            //                 sort: search.Sort.ASC
+                            //             }),
+                            //             "custrecord_ptg_folio_reg_sin_c_2"
+                            //         ]
+                            // });
+                            // var customrecord_ptg_registro_servicios_es_lSearchObjCount = customrecord_ptg_registro_servicios_es_lSearchObj.runPaged().count;
+                            // log.debug("Validación de servicio_id como folio:", customrecord_ptg_registro_servicios_es_lSearchObjCount);
 
-                            if (customrecord_ptg_registro_servicios_es_lSearchObjCount > 0) {
-                                log.audit({
-                                    title: `Servicio ${servicio.id_servicio} ya existe.`,
-                                    details: `Folio: ${servicio.id_servicio}`
-                                });
-                            } else {
+                            // if (customrecord_ptg_registro_servicios_es_lSearchObjCount > 0) {
+                                // log.audit({
+                                //     title: `Servicio ${servicio.id_servicio} ya existe.`,
+                                //     details: `Folio: ${servicio.id_servicio}`
+                                // });
+                            // } else {
                                 // Buscar numero de ruta/id del equipo en base al id de vehiculo
                                 var customrecord_ptg_equiposSearchObj = search.create({
                                     type: "customrecord_ptg_equipos",
@@ -181,7 +190,7 @@
                                 var customrecord_ptg_equiposSearchObjCount = customrecord_ptg_equiposSearchObj.runPaged().count;
                                 log.debug("Buscando equipo por no. autotanque:", customrecord_ptg_equiposSearchObjCount);
 
-                                const PUBLICO_GENERAL = 27041;
+                                const PUBLICO_GENERAL = customVars.publicoGeneralId;
                                 let recServicioNoConciliado = record.create({
                                     type: "customrecord_ptg_registro_servicios_es_l",
                                     // type: "customrecord_ptg_registros_sin_conciliar",
@@ -323,7 +332,7 @@
 
                                 let savedFolio = recSGC.save();
                                 log.debug('Folio Actualizado:', servicio.id_servicio);
-                            }
+                            // }
                         } catch (error) {
                             log.error({
                                 title: "Error al crear la oportunidad",

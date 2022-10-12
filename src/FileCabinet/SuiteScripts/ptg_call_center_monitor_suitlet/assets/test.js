@@ -1,3 +1,4 @@
+// test.js
 $(function() {
     $('.select-search-customer').select2({
         ajax: {
@@ -18,7 +19,12 @@ $(function() {
                 if(response.data.length > 0) {
                     response.data = removeDuplicates(response.data, 'idAux');
                     response.data.forEach(element => {
-                        element.text = element.nombre + " - " + getDireccionFormat(element, "cliente") + " - " + element.telefono;
+                        let tipoServicio = element.tipoServicioNom ? " - "+element.tipoServicioNom : "";
+                        let telefono     = element.telefono;
+                        let text         = element.nombre + " - " + getDireccionFormat(element, "cliente");
+                        if ( telefono ) { text += " - "+telefono; }
+                        if ( tipoServicio ) { text += tipoServicio; }
+                        element.text = text;
                     });
                 }
                 return {                     
@@ -131,11 +137,9 @@ $('span#role').text(userRole);
 
 // Si el rol es distinto a administrador HEB, se eliminan los campos
 if ( userRoleId != idAgenteHEB ) {
-    console.log(userRole);
     $('.campos-contrato').addClass('d-none');
     // $('.campos-contrato').remove();
 } else {
-    console.log(userRole);
     $('.campos-contrato').removeClass('d-none');
 }
 
@@ -192,6 +196,9 @@ function setCustomerInfo(customer, idAddress = null) {
     $("#requiereFacturaPedido").prop("checked", false).trigger("change");
     // Campos del formulario quejas y fugas
     $('#emailFugaQueja').val(customer.email);
+
+    // Muestra la opción de elegir un tipo de dirección con facturación
+    if( customer.requiereFactura ){ $('.opt-tipo-dir-fact').removeClass('d-none'); }
 
     if ( customer.statusCostumer == 'Activo') { $('#badgeActivo').removeClass('d-none'); }
     else if ( customer.statusCostumer == 'Inactivo') { $('#badgeInactivo').removeClass('d-none');  }
@@ -490,6 +497,7 @@ function setDir(direccion, requiereFactura = false) {
     direccion.zip             ? str+= ', C.P. '+direccion.zip : '';
     direccion.stateName       ? str+= ', '+direccion.stateName : '';
     direccion.city            ? str+= ', '+direccion.city : '';
+    direccion.tipoServicioAbbr ? str+= ' - '+direccion.tipoServicioAbbr : '';
     console.log(requiereFactura);
     if(requiereFactura) {
         direccion.defaultBilling  ? str+= ', Facturación' : '';
@@ -939,7 +947,7 @@ function setTrOppCases(item, type = 'casos', numItems = 1, posicion) {
                     '<li onclick="verNotasAdicionales(this)" class="'+type+' px-2 py-1 c-pointer" style="font-size: 16px">'+
                         '<i class="fa-solid fa-list color-primary"></i> Ver comentarios'+
                     '</li>'+
-                    '<li onclick="verNotasAgregarDescuento(this)" class="'+(type) +' '+ (type == 'oportunidades' && userRoleId == idSupervisor ? '' : 'd-none')+' px-2 py-1 c-pointer" style="font-size: 16px">'+
+                    '<li onclick="verNotasAgregarDescuento(this)" class="'+(type) +' '+ (type == 'oportunidades' && ( userRoleId == idSupervisor || isAdmin ) ? '' : 'd-none')+' px-2 py-1 c-pointer" style="font-size: 16px">'+
                         '<i class="fa-solid fa-tag color-primary"></i> Agregar descuento'+
                     '</li>'+
                     (type == 'oportunidades' && (item.estadoId == idPorNotificar || item.estadoId == idAsignado) && !item.solicitudCancelacion ? '<li onclick="cancelarPedido(this)" class="'+type+' px-2 py-1 c-pointer" style="font-size: 16px">'+
@@ -1013,6 +1021,9 @@ function clearCustomerInfo () {
     // Se remueven los badge de información adicional del cliente
     $('.badgesClientes').addClass('d-none');
 
+    // Se remueven las opciones de poder agregar una dirección de facturación
+    $('.opt-tipo-dir-fact').addClass('d-none');
+
     // Se oculta el select de casos pendientes
     $('select#casoPedido').parent().parent().addClass('d-none');
     $('select#casoPedido').children('option').remove();
@@ -1044,6 +1055,7 @@ function resetProductList(){
 
 function setDefaultItem() {
     if($("#direccionCliente").val() && $("#direccionCliente").val() != 'Sin direcciones' && $('#zonaPrecioCliente').data("precioKg") && $('#zonaPrecioCliente').data("precioLt")) {
+        let timeUnix = Date.now();
         let direccion = $("#direccionCliente option:selected").data("address");
         let prices = 0;
         if ( direccion.typeServiceId == idCilindro ) {
@@ -1061,6 +1073,7 @@ function setDefaultItem() {
         let capacidad = parseInt( ( auxArt && auxArt.capacidad_litros ? auxArt.capacidad_litros : 0 ) );
         if(direccion.typeServiceId == idCilindro) {
             let articulo  = {
+                "timeUnix"  : timeUnix,// Este dato es únicamente para mantener el item con id único
                 "zoneprice" : prices,// Este es el valor de la zona
                 "tipo"      : 1,
                 "capacity"  : capacidad,
@@ -1071,7 +1084,7 @@ function setDefaultItem() {
             let total    = parseFloat( Number(subtotal) * 1.16 );
 
             $(".productosCilindroPedido tbody").append(
-                '<tr data-item-id='+articulo.article+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
+                '<tr data-item-id='+articulo.article+' data-time-unix='+articulo.timeUnix+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
                     '<td class="text-center">'+(auxArt && auxArt.nombre ? auxArt.nombre : 'Sin nombre asignado')+'</td>'+
                     '<td class="text-center">'+articulo['quantity']+'</td>'+
                     '<td class="text-center">'+capacidad+' kg</td>'+
@@ -1088,6 +1101,7 @@ function setDefaultItem() {
             setTotalPedido( $(".productosCilindroPedido") );
         } else if(direccion.typeServiceId == idEstacionario) {
             let articulo = {
+                "timeUnix"  : timeUnix,// Este dato es únicamente para mantener el item con id único
                 "zoneprice" : prices,// Este es el valor de la zona
                 "tipo"      : 2,
                 "capacity"  : item1Capacidad,
@@ -1101,7 +1115,7 @@ function setDefaultItem() {
             $('#sinProductos').addClass('d-none');
             $('.productosEstacionarioPedido').parent().parent().removeClass('d-none');
             $(".productosEstacionarioPedido tbody").append(
-                '<tr data-item-id='+articulo.article+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
+                '<tr data-item-id='+articulo.article+' data-time-unix='+articulo.timeUnix+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
                     '<td>Gas LP</td>'+
                     //'<td class="text-center">1</td>'+
                     '<td class="text-center">'+item1Capacidad+'</td>'+
@@ -1115,6 +1129,7 @@ function setDefaultItem() {
             setTotalPedido( $(".productosEstacionarioPedido") );
         } else if(direccion.typeServiceId == idMontacarga) {
             let articulo = {
+                "timeUnix"  : timeUnix,// Este dato es únicamente para mantener el item con id único
                 "zoneprice" : prices,// Este es el valor de la zona
                 "tipo"      : 2,
                 "capacity"  : item1Capacidad,
@@ -1128,7 +1143,7 @@ function setDefaultItem() {
             $('#sinProductos').addClass('d-none');
             $('.productosEstacionarioPedido').parent().parent().removeClass('d-none');
             $(".productosEstacionarioPedido tbody").append(
-                '<tr data-item-id='+articulo.article+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
+                '<tr data-item-id='+articulo.article+' data-time-unix='+articulo.timeUnix+' class="product-item" data-item=' + "'" + JSON.stringify(articulo) + "'" + '>' +
                     '<td>Montacarga Gas LP</td>'+
                     //'<td class="text-center">1</td>'+
                     '<td class="text-center">'+item1Capacidad+'</td>'+
@@ -1633,8 +1648,22 @@ function gestionarServicio($this) {
 
     $("#fechaPrometidaPedido").val(dateFormatFromDate(servicio.cierrePrevisto, "2"));
     $("#fechaPrometidaPedido").attr('disabled', true);
-    $("#desdePedido").val(servicio.entre_las ? getTimeFromString(servicio.entre_las) : null);
-    $("#hastaPedido").val(servicio.y_las ? getTimeFromString(servicio.y_las) : null);
+
+    let date = $('#fechaPrometidaPedido').val() ?? '2022-01-01';
+    let momentEntreLas = null;
+    let momentYLas     = null;
+    if ( servicio.entre_las ) {
+        let entreLas = date+' '+servicio.entre_las;
+        momentEntreLas = moment(entreLas).format('h:mm');
+    }
+
+    if ( servicio.y_las ) {
+        let yLas = date+' '+servicio.y_las;
+        momentYLas = moment(yLas).format('h:mm');
+    }
+
+    $("#desdePedido").val(momentEntreLas);
+    $("#hastaPedido").val(momentYLas);
 
     $('#viajeVentaPedido').children('option').remove();
     
@@ -1885,7 +1914,7 @@ $('body').delegate('#editarPedido', 'click', function () {
         totalMetodosPago = $('.productosMetodoPago').children('tfoot').find('td.total').data('total');
     }
 
-    if ( totalPedido != totalMetodosPago ) {
+    if ( Number(totalPedido).toFixed(2) != Number(totalMetodosPago).toFixed(2) ) {
         infoMsg('warning', 'El total a pagar debe ser igual al total de productos enlistados');
         return;
     }

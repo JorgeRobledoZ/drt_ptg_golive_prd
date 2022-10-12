@@ -24,6 +24,7 @@ define(
                         customFormOppPotogas   : 265, // Oportunidad-Potogas
                         customFormOppCarb      : 264, // Oportunidad-Carburación
                         productgasLpId         : 4216,// Gas LP
+                        articuloDescuentoId    : 4217,// Artículo de descuento
                         publicoGeneralId       : 27041,
                         currency               : 1,// Pesos
                         tipoServicioEst        : 2,// Estacionario
@@ -32,6 +33,17 @@ define(
                         statusPedidoAsignado   : 2,// Asignado
                         entityStatusConcretado : 13,// Concretado
                         tipoSgcWeb             : 1,// Web
+                        tipoDirSoloEntrega     : 1,// Sólo entrega
+                        tipoDirSoloFacturacion : 2,// Sólo facturación
+                        tipoDirEntFact         : 3,// Entrega y facturación
+                        // Estas variables hacen referencia a la lista PTG - Tipo Servicio
+                        ptgTipoServicioCil     : 1,// Cilindro
+                        ptgTipoServicioEst     : 2,// Estacionario
+                        ptgTipoServicioMon     : 3,// Montacargas
+                        ptgTipoServicioCar     : 4,// Carburación
+                        roleSupervisor         : 1202,// Rol supervisor
+                        roleAgenteHEB          : 1195,// Rol agente HEB
+                        zonaGeneralId          : 101,// Zona general, se coloca por default para las direcciones de facturación
                         urlSgcWeb              : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php",
                         urlSgcWebLogin         : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login",
                         urlSgcWebProcesar      : "http://potogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
@@ -82,7 +94,7 @@ define(
                         statusViajePreliqui    : 1,
                         statusViajeLiquidacion : 2,
                         statusViajeEjecutado   : 3,
-                        statusViajeFacturacion : 4,  
+                        statusViajeFacturacion : 4,
                         tipoContactoTelefono   : 1,
                         tipoContactoAviso      : 2,
                         tipoContactoEjecutiva  : 3,
@@ -109,6 +121,7 @@ define(
                         customFormOppPotogas   : 305, // Oportunidad-Potogas
                         customFormOppCarb      : 307, // Oportunidad-Carburación
                         productgasLpId         : 4088,// Gas LP
+                        articuloDescuentoId    : 4528,// Artículo de descuento
                         publicoGeneralId       : 14508,
                         currency               : 1,// Pesos
                         tipoServicioEst        : 2,// Estacionario
@@ -117,6 +130,17 @@ define(
                         statusPedidoAsignado   : 2,// Asignado
                         entityStatusConcretado : 13,// Concretado
                         tipoSgcWeb             : 1,// Web
+                        tipoDirSoloEntrega     : 1,// Sólo entrega
+                        tipoDirSoloFacturacion : 2,// Sólo facturación
+                        tipoDirEntFact         : 3,// Entrega y facturación
+                        // Estas variables hacen referencia a la lista PTG - Tipo Servicio
+                        ptgTipoServicioCil     : 1,// Cilindro
+                        ptgTipoServicioEst     : 2,// Estacionario
+                        ptgTipoServicioMon     : 3,// Montacargas
+                        ptgTipoServicioCar     : 4,// Carburación
+                        roleSupervisor         : 1167,// Rol supervisor
+                        roleAgenteHEB          : 1213,// Rol agente HEB
+                        zonaGeneralId          : 274,// Zona general, se coloca por default para las direcciones de facturación
                         urlSgcWeb              : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php",
                         urlSgcWebLogin         : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/login",
                         urlSgcWebProcesar      : "http://testpotogas.sgcweb.com.mx/ws/1094AEV2/v2/soap.php/procesarPeticion",
@@ -167,7 +191,7 @@ define(
                         statusViajePreliqui    : 1,
                         statusViajeLiquidacion : 2,
                         statusViajeEjecutado   : 3,
-                        statusViajeFacturacion : 4,  
+                        statusViajeFacturacion : 4,
                         tipoContactoTelefono   : 1,
                         tipoContactoAviso      : 2,
                         tipoContactoEjecutiva  : 3,
@@ -197,7 +221,7 @@ define(
             } catch (error) {
                 log.error(`error getVariables`, error);
             } finally {
-                log.debug(`respuesta getVariables ${runtime.envType}`, respuesta);
+                log.debug(`respuesta getVariables ${runtime.envType}`);
                 return respuesta;
             }
         }
@@ -382,7 +406,7 @@ define(
                         cilindro20: 4211,
                         cilindro30: 4212,
                         cilindro45: 4213,
-                        articuloEstacionario: 2, 
+                        articuloEstacionario: 2,
                         unidad10: 12,
                         unidad20: 13,
                         unidad30: 14,
@@ -706,7 +730,9 @@ define(
                         form_item_receipt: 303,
                         form_intercompany_invoice: 308,
                         subcidiary_intercompany_invoice: 25,
-                        ubicacion_intercompany_invoice: 762
+                        ubicacion_intercompany_invoice: 762,
+                        form_sales_order: 261,
+                        form_full_filment_so: 290
                     },
                     [runtime.EnvType.SANDBOX]: {
                         ubicacion_desvio_planta_receipt: 1525,
@@ -719,12 +745,14 @@ define(
                         form_item_receipt: 268,
                         form_intercompany_invoice: 286,
                         subcidiary_intercompany_invoice: 25,
-                        ubicacion_intercompany_invoice: 762
+                        ubicacion_intercompany_invoice: 762,
+                        form_sales_order: 261,
+                        form_full_filment_so: 290
                     }
                 }
                 respuesta = mapObj[runtime.envType];
             } catch (error_compras) {
-                log.error(`error drt_compras`, error_compras)     
+                log.error(`error drt_compras`, error_compras)
             } finally {
                 log.debug(`respuesta drt_compras ${runtime.envType}`, respuesta);
                 return respuesta;
@@ -744,7 +772,7 @@ define(
                 }
                 respuesta = mapObj[runtime.envType];
             } catch (error_compras) {
-                log.error(`error drt_compras`, error_compras)     
+                log.error(`error drt_compras`, error_compras)
             } finally {
                 log.debug(`respuesta drt_compras ${runtime.envType}`, respuesta);
                 return respuesta;

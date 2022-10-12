@@ -1,6 +1,29 @@
+// direcciones.js
 // Valida una dirección a guardar
 $('body').delegate('#guardarDireccion', 'click', function () {
     validateAddressFields("guardar");
+});
+
+// Valida el select de tipo de dirección
+$("#tipoDireccion").on('change', function(e) {
+    let val = $(this).val();
+    
+    if ( val == tipoDirSoloEntrega || val == tipoDirEntFact ) {// Sólo entrega / entrega y facturación
+        $('.direccion-entrega').removeClass('d-none');
+        $("input[name=tipoAccionFormCliente]").trigger("change");
+        // $('#tipoServicioFormCliente').val("").trigger('change');
+    } else if ( val == tipoDirSoloFacturacion ) {// Sólo facturación
+        $('.direccion-entrega').addClass('d-none');
+        $('.tipo-aviso-programado').addClass('d-none');
+        // $("input[name=tipoAccionFormCliente]").trigger("change");
+        $('#tipoServicioFormCliente').val("").trigger('change');
+
+    } else {// Se ocultan todos los campos de entre calles para abajo
+        $('.direccion-entrega').addClass('d-none');
+        $('.tipo-aviso-programado').addClass('d-none');
+        // $("input[name=tipoAccionFormCliente]").trigger("change");
+        $('#tipoServicioFormCliente').val("").trigger('change');
+    }
 });
 
 // Valida la frecuencia de un pedido tipo aviso o programado
@@ -96,8 +119,15 @@ function validateAddressFields(type) {
     console.log(address);
     // Enlista las direcciones en  una tabla dinámica
     if ( tipoAccion == 'lista' ) {
+        console.log('Es una dirección que se va a agregar a la lista de un cliente nuevo');
         // Valida que el domicilio d facturación sólo lo tenga una dirección
-        validateTableAddress(address.obj);
+        let canContinue = validateTableAddress(address.obj);
+
+        // La dirección es inválida
+        if (! canContinue ) {
+            infoMsg('error', 'Sólo puede tener configurada una dirección de facturación por cliente.');
+            return;
+        }
         // Si es la primera dirección que se agrega, se limpia el texto por defecto de la tabla
         if (! numAddress ) {
             $('table.table-address tbody').children('tr').remove();
@@ -106,11 +136,12 @@ function validateAddressFields(type) {
         if(address.obj.domFacturacion) {
             let trs = $('table.table-address tbody').find(".address");
             for (let x = 0; x < trs.length; x++) {
-                const element = $(trs[x]);
-                let addressAux = element.data('address');
-                addressAux.domFacturacion = false;
-                element.data('address', address);
-                element.find('.check-fact').parent().html('<i class="fa-regular fa-square color-primary check-fact" style="cursor: pointer;"></i>');
+                // Preguntar a Alexis para qué este bloque de código
+                // const element = $(trs[x]);
+                // let addressAux = element.data('address');
+                // addressAux.domFacturacion = false;
+                // element.data('address', address.obj);
+                // element.find('.check-fact').parent().html('<i class="fa-regular fa-square color-primary check-fact" style="cursor: pointer;"></i>');
             }
         }
         $('table.table-address tbody').append(
@@ -121,16 +152,16 @@ function validateAddressFields(type) {
                         (address.obj.principal ? '<i class="fa-solid fa-square-check color-primary check-entrega" style="cursor: pointer;"></i>' : '<i class="fa-regular fa-square color-primary check-entrega" style="cursor: pointer;"></i>')+
                     '</div>'+
                 '</td>'+
-                '<td class="text-center dato-facturacion '+($("input[name=requiereFactura]:checked").val() == "si" ? '' : 'd-none')+'">'+
-                    '<div class="text-center" style="font-size: 26px;">'+
-                        (address.obj.domFacturacion ? '<i class="fa-solid fa-square-check color-primary check-fact" style="cursor: pointer;"></i>' : '<i class="fa-regular fa-square color-primary check-fact" style="cursor: pointer;"></i>')+
-                    '</div>'+/*'<div class="text-center" style="font-size: 20px;">'+
-                        '<div class="content-input content-input-primary">'+
-                            '<input id="domFacturacionDireccion'+address.obj.timeUnix+'" type="checkbox" class="form-check-input form-ptg address-table" '+(address.obj.domFacturacion ? 'checked' : '')+' style="width: auto;" value="">'+
-                        '</div>'+
-                        // (address.obj.principal ? '<i class="fa-solid fa-square-check color-primary check-entrega" style="cursor: pointer;"></i>' : '<i class="fa-regular fa-square color-primary check-entrega" style="cursor: pointer;"></i>')+
-                    '</div>'+*/
-                '</td>'+
+                // '<td class="text-center dato-facturacion '+($("input[name=requiereFactura]:checked").val() == "si" ? '' : 'd-none')+'">'+
+                //     '<div class="text-center" style="font-size: 26px;">'+
+                //         (address.obj.domFacturacion ? '<i class="fa-solid fa-square-check color-primary check-fact" style="cursor: pointer;"></i>' : '<i class="fa-regular fa-square color-primary check-fact" style="cursor: pointer;"></i>')+
+                //     '</div>'+/*'<div class="text-center" style="font-size: 20px;">'+
+                //         '<div class="content-input content-input-primary">'+
+                //             '<input id="domFacturacionDireccion'+address.obj.timeUnix+'" type="checkbox" class="form-check-input form-ptg address-table" '+(address.obj.domFacturacion ? 'checked' : '')+' style="width: auto;" value="">'+
+                //         '</div>'+
+                //         // (address.obj.principal ? '<i class="fa-solid fa-square-check color-primary check-entrega" style="cursor: pointer;"></i>' : '<i class="fa-regular fa-square color-primary check-entrega" style="cursor: pointer;"></i>')+
+                //     '</div>'+*/
+                // '</td>'+
                 '<td class="text-center">'+
                     '<button class="btn btn-sm btn-info edit-address"> <i class="fa fa-pen-to-square"></i> </button>&nbsp;&nbsp;'+
                     '<button class="btn btn-sm btn-danger delete-address"> <i class="fa-solid fa-trash-can"></i> </button>&nbsp;&nbsp;'+
@@ -141,6 +172,7 @@ function validateAddressFields(type) {
 
         $('div#formDireccionesModal').modal('hide');
     } else if ( tipoAccion == 'editLista' ) {
+        console.log('Es una dirección que se va a editar en la lista de un cliente nuevo');
         // Valida que el domicilio d facturación sólo lo tenga una dirección
         /*validateTableAddress(address.obj);
         //console.log(address);
@@ -157,7 +189,15 @@ function validateAddressFields(type) {
         var auxEdit = $("#tipoAccionDireccion").data("auxEdit");
         address.obj.timeUnix = auxEdit.timeUnix;
         address.obj.principal = auxEdit.principal;
-        address.obj.domFacturacion = auxEdit.domFacturacion;
+        // address.obj.domFacturacion = auxEdit.domFacturacion;
+
+        let canContinue = validateTableAddress(address.obj, true);
+
+        // La dirección es inválida
+        if (! canContinue ) {
+            infoMsg('error', 'Sólo puede tener configurada una dirección de facturación por cliente.');
+            return;
+        }
         
         $('table.table-address tbody').find("tr[data-time="+address.obj.timeUnix+"]").data("address", address.obj)
         $('table.table-address tbody').find("tr[data-time="+address.obj.timeUnix+"]").html('<td>'+address.str+'</td>'+
@@ -166,16 +206,16 @@ function validateAddressFields(type) {
                     (address.obj.principal ? '<i class="fa-solid fa-square-check color-primary check-entrega" style="cursor: pointer;"></i>' : '<i class="fa-regular fa-square color-primary check-entrega" style="cursor: pointer;"></i>')+
                 '</div>'+
             '</td>'+
-            '<td class="text-center dato-facturacion '+($("input[name=requiereFactura]:checked").val() == "si" ? '' : 'd-none')+'">'+
-                '<div class="text-center" style="font-size: 26px;">'+
-                    (address.obj.domFacturacion ? '<i class="fa-solid fa-square-check color-primary check-fact" style="cursor: pointer;"></i>' : '<i class="fa-regular fa-square color-primary check-fact" style="cursor: pointer;"></i>')+
-                '</div>'+/*'<div class="text-center" style="font-size: 20px;">'+
-                    '<div class="content-input content-input-primary">'+
-                        '<input id="domFacturacionDireccion'+address.obj.timeUnix+'" type="checkbox" class="form-check-input form-ptg address-table" '+(address.obj.domFacturacion ? 'checked' : '')+' style="width: auto;" value="">'+
-                    '</div>'+
-                    // (address.obj.principal ? '<i class="fa-solid fa-square-check color-primary check-entrega" style="cursor: pointer;"></i>' : '<i class="fa-regular fa-square color-primary check-entrega" style="cursor: pointer;"></i>')+
-                '</div>'+*/
-            '</td>'+
+            // '<td class="text-center dato-facturacion '+($("input[name=requiereFactura]:checked").val() == "si" ? '' : 'd-none')+'">'+
+            //     '<div class="text-center" style="font-size: 26px;">'+
+            //         (address.obj.domFacturacion ? '<i class="fa-solid fa-square-check color-primary check-fact" style="cursor: pointer;"></i>' : '<i class="fa-regular fa-square color-primary check-fact" style="cursor: pointer;"></i>')+
+            //     '</div>'+/*'<div class="text-center" style="font-size: 20px;">'+
+            //         '<div class="content-input content-input-primary">'+
+            //             '<input id="domFacturacionDireccion'+address.obj.timeUnix+'" type="checkbox" class="form-check-input form-ptg address-table" '+(address.obj.domFacturacion ? 'checked' : '')+' style="width: auto;" value="">'+
+            //         '</div>'+
+            //         // (address.obj.principal ? '<i class="fa-solid fa-square-check color-primary check-entrega" style="cursor: pointer;"></i>' : '<i class="fa-regular fa-square color-primary check-entrega" style="cursor: pointer;"></i>')+
+            //     '</div>'+*/
+            // '</td>'+
             '<td class="text-center">'+
                 '<button class="btn btn-sm btn-info edit-address"> <i class="fa fa-pen-to-square"></i> </button>&nbsp;&nbsp;'+
                 '<button class="btn btn-sm btn-danger delete-address"> <i class="fa-solid fa-trash-can"></i> </button>&nbsp;&nbsp;'+
@@ -185,11 +225,36 @@ function validateAddressFields(type) {
         $('div#formDireccionesModal').modal('hide');
     } else if( tipoAccion == 'guardar' ) {// Envía una dirección a guardar o actualizar
         let idAddress = $('#internalIdDireccion').val();
-        let dataToSend = null;
+        // var auxEdit = $("#tipoAccionDireccion").data("auxEdit");
+        // address.obj.timeUnix = auxEdit.timeUnix;
+        // address.obj.principal = auxEdit.principal;
+        // address.obj.domFacturacion = auxEdit.domFacturacion;
+        let canContinue = validateCustomerAddress(address.obj, idAddress ? true : false);
 
+        // La dirección es inválida
+        if (! canContinue ) {
+            infoMsg('error', 'Sólo puede tener configurada una dirección de facturación por cliente.');
+            return;
+        }
+
+        let dataToSend = null;
+        // console.log('Se hubiera guardado la dirección');
+        // return;
         if ( idAddress ) {// Se actualiza la dirección
+            // Se valida que no exista otra dirección de tipo facturación
+            if (address.obj['tipoDireccion'] == tipoDirEntFact || address.obj['tipoDireccion'] == tipoDirSoloFacturacion) {
+                let itemDireccion = customerGlobal.addr.filter(add => {
+                    return (add.idAdress != idAddress && ( add.tipoDireccionId == tipoDirEntFact || add.tipoDireccionId == tipoDirSoloFacturacion) )
+                });
+    
+                if ( itemDireccion.length ) {
+                    infoMsg('error', 'Sólo puede tener configurada una dirección de facturación por cliente.');
+                    return;
+                }
+            }
             let updateAddress = {}
 
+            address.obj['tipoDireccion']  ? updateAddress['custrecord_ptg_tipo_direccion'] = address.obj['tipoDireccion'] : '';
             address.obj['domFacturacion'] ? updateAddress['defaultbilling'] = address.obj['domFacturacion'] : '';
             address.obj['stateName'] ? updateAddress['custrecord_ptg_estado'] = address.obj['stateName'] : '';
             address.obj['ruta'] ? updateAddress['custrecord_ptg_colonia_ruta'] = address.obj['ruta'] : '';
@@ -213,8 +278,10 @@ function validateAddressFields(type) {
             address.obj['y_las'] ? updateAddress['custrecord_ptg_y_las'] = address.obj['y_las'] : '';
             address.obj['inThatWeek'] ? updateAddress['custrecord_ptg_en_la_semana'] = address.obj['inThatWeek'] : '';// Hay que actualizar el custom record
             address.obj['typeContact'] ? updateAddress['custrecord_ptg_tipo_contacto'] = address.obj['typeContact'] : '';
-            address.obj['typeService'] ? updateAddress['custrecord_ptg_tipo_servicio'] = address.obj['typeService'] : '';
-            address.obj['frequencyItem'] ? updateAddress['custrecord_ptg_articulo_frecuente'] = address.obj['frequencyItem'] : '';
+            // address.obj['typeService'] ? updateAddress['custrecord_ptg_tipo_servicio'] = ( address.obj['tipoDireccion'] == tipoDirSoloFacturacion ? '' : address.obj['typeService'] ) : '';
+            updateAddress['custrecord_ptg_tipo_servicio'] = ( address.obj['tipoDireccion'] && address.obj['tipoDireccion'] == tipoDirSoloFacturacion ? '' : ( address.obj['typeService'] ?? '' ));
+            updateAddress['custrecord_ptg_articulo_frecuente'] = ( address.obj['tipoDireccion'] && address.obj['tipoDireccion'] == tipoDirSoloFacturacion ? '' : ( address.obj['frequencyItem'] ?? '' ));
+            // address.obj['frequencyItem'] ? updateAddress['custrecord_ptg_articulo_frecuente'] = ( address.obj['tipoDireccion'] == tipoDirSoloFacturacion ? '' : address.obj['frequencyItem'] ) : '';
             address.obj['capacidad'] ? updateAddress['custrecord_ptg_capacidad_art'] = address.obj['capacidad'] : '';
             address.obj['frequencyItem2'] ? updateAddress['custrecord_ptg_articulo_frecuente2'] = address.obj['frequencyItem2'] : '';
             address.obj['capacidad2'] ? updateAddress['custrecord_ptg_capacidad_can_articulo_2'] = address.obj['capacidad2'] : '';
@@ -326,11 +393,21 @@ function validateAddressFields(type) {
                     }
                 ] 
             };
-        } else {// Se guarda
+        } else {// Se guarda una nueva
+            if ( address.obj.tipoDireccion == tipoDirEntFact || address.obj.tipoDireccion == tipoDirSoloFacturacion ) {
+                let itemDireccion = customerGlobal.addr.filter(add => {
+                    return ( add.tipoDireccionId == tipoDirEntFact || add.tipoDireccionId == tipoDirSoloFacturacion) 
+                });
+    
+                if ( itemDireccion.length ) {
+                    infoMsg('error', 'Sólo puede tener configurada una dirección de facturación por cliente.');
+                    return;
+                }
+            }
             console.log(address);
             address.obj.tag = $("#direccionCliente").children("option").length > 9 ? $("#direccionCliente").children("option").length.toString() : "0"+$("#direccionCliente").children("option").length.toString();
-            address.obj.defaultshipping = false;
-            address.obj.addresses = {defaultshipping : false}
+            address.obj.defaultshipping = address.obj.tipoDireccion == tipoDirEntFact || address.obj.tipoDireccion == tipoDirSoloFacturacion;
+            address.obj.addresses = {defaultshipping : address.obj.tipoDireccion == tipoDirEntFact || address.obj.tipoDireccion == tipoDirSoloFacturacion}
             address.obj.principal = false;
             dataToSend = {
                 "customers" : [
@@ -551,6 +628,8 @@ $('body').delegate('#fechaInicioServicio', 'change', function () {
 // Coloca una dirección en el listado de direcciones del cliente
 function getAddressOnList() {
     let addressStr = '';
+    let idAddress       = $('#internalIdDireccion').val();
+    let tipoDireccionId = $("#tipoDireccion").val();
     let requiereFactura = $("input[name=requiereFactura]:checked").val();
     let customStartTime = customEndTime = new Date();
     let yLas            = $("#lasFormCliente").val();
@@ -580,10 +659,13 @@ function getAddressOnList() {
     }
 
     let addressObj = {
+        idAddress       : idAddress,
+        tipoDireccion   : tipoDireccionId,
         timeUnix        : Date.now(),
         principal       : $('table.table-address tbody').find(".address").length == 0 ? true : false,
         stateName       : $("#estadoDireccion option:selected").data('item').name.trim(),
-        domFacturacion  : ( $('table.table-address tbody').find(".address").length == 0 ? (requiereFactura == 'si' ? true : false) : ( requiereFactura == 'si' ? $('#domFacturacionDireccion').is(':checked') : false ) ),
+        domFacturacion  : ( tipoDireccionId == tipoDirEntFact || tipoDireccionId == tipoDirSoloFacturacion ),
+        // domFacturacion  : ( $('table.table-address tbody').find(".address").length == 0 ? (requiereFactura == 'si' ? true : false) : ( requiereFactura == 'si' ? $('#domFacturacionDireccion').is(':checked') : false ) ),
         city            : $("#municipioDireccion option:selected").data('item').name.trim(),
         zip             : $("#cpDireccion option:selected").data('item').cp.trim(),
         nameStreet      : $("#calleDireccion").val().trim(),
@@ -694,25 +776,107 @@ function getAddressOnList() {
 }
 
 // Cada que se agrega una dirección, iterará las direcciones para actualizar el domFacturación en caso de que se haya enviado
-function validateTableAddress(objAddress) {
+function validateTableAddress(objAddress, validateByUnix = false) {
+    console.log(objAddress);
+    let dirValida     = true;
     let trDirecciones = $('#tab-client-domicilio table.table-address tbody').children('tr.address');
-    // Si la dirección actual es el domicilio de facturación, entonces todas se desmarcan a excepción de la suya
-    if ( objAddress.domFacturacion == true ) {
-        $('input.address-table').prop('checked', false);// Desmarca todos los check de la tabla
-        $('input#domFacturacionDireccion'+objAddress.timeUnix).prop('checked', true);
-    }
-    // domFacturacionDireccion'+address.obj.timeUnix+'
-    trDirecciones.each(function( index ) {
-        let direccion = $(this).data('address');
-        if ( direccion.timeUnix != objAddress.timeUnix ) {// Va a verificar todas las direcciones a excepción de la creada recientemente
-            
-            if ( objAddress.domFacturacion == true ) {// Si la dirección recientemente agregada es de facturación, se remueven todas las anteriores
-                direccion['domFacturacion'] = false;
+    let numFact       = 0;
+    let numEnt        = 0;
+    let numEntFact    = 0;
+    
+    // Se calcula el número de direcciones existentes de cada tipo
+    trDirecciones.each(function(index) {
+        let trAdd = $(this).data('address');
+
+        if ( trAdd.tipoDireccion == tipoDirEntFact ) { 
+            if ( validateByUnix ) {
+                if ( trAdd && trAdd.timeUnix != objAddress.timeUnix ) {
+                    console.log('Se suma el num de numEntFact ');
+                    numEntFact ++; 
+                }
+            } else {
+                numEntFact ++; 
             }
-            console.log('Se actualizará esta dirección');
         }
-        $(this).data('address', direccion);
+        else if ( trAdd.tipoDireccion == tipoDirSoloEntrega ) { 
+            numEnt ++; 
+        }
+        else if ( trAdd.tipoDireccion == tipoDirSoloFacturacion ) { 
+            if ( validateByUnix ) {
+                if ( trAdd && trAdd.timeUnix != objAddress.timeUnix ) {
+                    console.log('Se suma el num de numFact ');
+                    numFact ++; 
+                }
+            } else {
+                numFact ++; 
+            }
+        }
     });
+
+    console.log(numFact,numEnt,numEntFact);
+
+    if ( objAddress.domFacturacion == true ) {// No debe de existir otra dirección de facturación
+        console.log('La direccion del modal es para facturación');
+        if ( numEntFact > 0 || numFact > 0) {
+            dirValida = false;
+            console.log('Ya tiene previamente una dirección que funge como entrega y facturación', dirValida);
+        } else {
+            console.log('La dirección es válida', dirValida);
+        }
+    } 
+    return dirValida;
+}
+
+// Cada que se agrega una dirección, iterará las direcciones para actualizar el domFacturación en caso de que se haya enviado
+function validateCustomerAddress(objAddress, validateById = false) {
+    console.log(objAddress);
+    let dirValida     = true;
+    let customerAdds  = customerGlobal.addr;
+    let numFact       = 0;
+    let numEnt        = 0;
+    let numEntFact    = 0;
+    
+    // Se calcula el número de direcciones existentes de cada tipo
+    customerAdds.forEach(address => {
+        console.log('Customer address', address);
+    
+        if ( address.tipoDireccionId == tipoDirEntFact ) { 
+            if ( validateById ) {
+                if ( address && address.idAdress != objAddress.idAddress ) {
+                    console.log('Se suma el num de numEntFact ');
+                    numEntFact ++; 
+                }
+            } else {
+                numEntFact ++; 
+            }
+        }
+        else if ( address.tipoDireccionId == tipoDirSoloEntrega ) { 
+            numEnt ++; 
+        }
+        else if ( address.tipoDireccionId == tipoDirSoloFacturacion ) { 
+            if ( validateById ) {
+                if ( address && address.idAdress != objAddress.idAddress ) {
+                    console.log('Se suma el num de numFact ');
+                    numFact ++; 
+                }
+            } else {
+                numFact ++; 
+            }
+        }
+    });
+
+    console.log(numFact,numEnt,numEntFact);
+
+    if ( objAddress.domFacturacion == true ) {// No debe de existir otra dirección de facturación
+        console.log('La direccion del modal es para facturación');
+        if ( numEntFact > 0 || numFact > 0) {
+            dirValida = false;
+            console.log('Ya tiene previamente una dirección que funge como entrega y facturación', dirValida);
+        } else {
+            console.log('La dirección es válida', dirValida);
+        }
+    } 
+    return dirValida;
 }
 
 // Checa si se clickea el domicilio de facturación

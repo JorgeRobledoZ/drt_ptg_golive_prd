@@ -2,7 +2,7 @@
  * @NApiVersion 2.1
  * @NScriptType Restlet
  */
-define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors'], function (log, search, record, error) {
+define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_module_errors', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (log, search, record, error, drt_mapid_cm) {
 
     // se crea la estructura donde se cargará toda la data
 
@@ -280,9 +280,16 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     name: "custrecord_ptg_zona_precio_especial",
                     join: "Address",
                     label: "PTG - ZONA DE PRECIO ESPECIAL"
+                }),
+                search.createColumn({
+                    name: "custrecord_ptg_tipo_direccion",
+                    join: "Address",
+                    label: "PTG - TIPO DE DIRECCION"
                 })
             ]
         });
+
+        const cusVars = drt_mapid_cm.getVariables();
 
         let customSearchPagedData = customSearch.runPaged({
             pageSize: 1000
@@ -299,15 +306,34 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     name: "custrecord_ptg_tipo_servicio",
                     join: "Address"
                 })
+                let tipoDireccionId = result.getValue({
+                    name: "custrecord_ptg_tipo_direccion",
+                    join: "Address"
+                })
+                
                 let tipoServicio = '';
-                if (idTipoServicio == 1) {
-                    tipoServicio = 'Cilindro'
-                } else if (idTipoServicio == 2) {
-                    tipoServicio = 'Estacionario'
-                } else if (idTipoServicio == 3) {
-                    tipoServicio = 'Montacarga'
-                } else if (idTipoServicio == 4) {
-                    tipoServicio = 'Otros'
+                let tipoServicioAbbr = '';
+                if (idTipoServicio == cusVars.ptgTipoServicioCil) {
+                    tipoServicio = 'Cilindro';
+                    tipoServicioAbbr = 'CIL';
+                } else if (idTipoServicio == cusVars.ptgTipoServicioEst) {
+                    tipoServicio = 'Estacionario';
+                    tipoServicioAbbr = 'EST';
+                } else if (idTipoServicio == cusVars.ptgTipoServicioMon) {
+                    tipoServicio = 'Montacarga';
+                    tipoServicioAbbr = 'MC';
+                } else if (idTipoServicio == cusVars.ptgTipoServicioCar) {
+                    tipoServicio = 'Otros';
+                    tipoServicioAbbr = 'CAR';
+                }
+
+                let tipoDireccion = '';
+                if (tipoDireccionId == cusVars.tipoDirSoloEntrega) {
+                    tipoDireccion = 'Sólo entrega';
+                } else if (tipoDireccionId == cusVars.tipoDirSoloFacturacion) {
+                    tipoDireccion = 'Sólo facturación';
+                } else if (tipoDireccionId == cusVars.tipoDirEntFact) {
+                    tipoDireccion = 'Entrega y facturación';
                 }
 
                 let idColandRoute = result.getValue({
@@ -316,6 +342,12 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     label: "PTG - COLONIA Y RUTA"
                 });
 
+                let idTipoDireccion = result.getValue({
+                    name: "custrecord_ptg_tipo_direccion",
+                    join: "Address",
+                    label: "PTG - TIPO DE DIRECCION"
+                });
+                
                 let dataRoute = search.lookupFields({
                     type: "customrecord_ptg_coloniasrutas_",
                     id: idColandRoute,
@@ -323,14 +355,16 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     columns: ['custrecord_ptg_nombrecolonia_', 'custrecord_ptg_rutamunicipio_', 'custrecord_ptg_rutacil_', 'custrecord_ptg_rutaest_', 'custrecord_ptg_estado_', 'custrecord_ptg_zona_de_precio_', 'custrecord_ptg_cp_', 'custrecord_ptg_pbservaciones_']
                 });
 
-                log.audit('dataRoute', dataRoute)
-
+                //Modificar esta lógica para la zona de precio
                 let dataZone = search.lookupFields({
                     type: "customrecord_ptg_zonasdeprecio_",
-                    id: dataRoute['custrecord_ptg_zona_de_precio_'][0].value,
+                    id: ( idTipoDireccion == cusVars.tipoDirSoloFacturacion ? cusVars.zonaGeneralId : dataRoute['custrecord_ptg_zona_de_precio_'][0].value ),
+                    // id: dataRoute['custrecord_ptg_zona_de_precio_'][0].value,
                     columns: ['internalid', 'name', 'custrecord_ptg_territorio_', 'custrecord_ptg_precio_', 'custrecord_ptg_precio_kg', 'custrecord_ptg_factor_conversion']
                 });
 
+                log.debug('dataidTipoDireccion', idTipoDireccion);
+                log.debug('dataRoute', dataRoute);
                 log.audit('dataZone', dataZone)
 
                 let dataZoneRoute = {
@@ -491,11 +525,14 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                         name: "custrecord_ptg_ruta_asignada_4",
                         join: "Address"
                     }),
+                    tipoServicioAbbr: tipoServicioAbbr,
                     typeService: tipoServicio,
                     typeServiceId: result.getValue({
                         name: "custrecord_ptg_tipo_servicio",
                         join: "Address"
                     }),
+                    tipoDireccionId: tipoDireccionId,
+                    tipoDireccion: tipoDireccion,
                     commentsAddr: result.getValue({
                         name: "custrecord_ptg_obesarvaciones_direccion_",
                         join: "Address"
@@ -691,7 +728,7 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
     }
 
     function customSearch(request, arrayResult, responseData) {
-
+        const cusVars = drt_mapid_cm.getVariables();
         var filter = [];
         log.audit('request', request);
         try {
@@ -774,7 +811,9 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     "custentity_disa_uso_de_cfdi_",
                     "custentity_ptg_requiere_factura",
                     "custentity_razon_social_para_facturar",
-                    "custentity_ptg_condicion_credito"
+                    "custentity_ptg_condicion_credito",
+                    "custentity_mx_sat_registered_name",
+                    "custentity_mx_sat_industry_type"
                 ]
             })
             /*
@@ -948,6 +987,14 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                         name: "custentity_mx_rfc"
                     });
 
+                    let regimeFiscal = result.getValue({
+                        name: "custentity_mx_sat_registered_name"
+                    });
+
+                    let tipoIndustria = result.getValue({
+                        name: "custentity_mx_sat_industry_type"
+                    });
+
                     let primerNombre = result.getValue({
                         name: "firstname"
                     });
@@ -973,7 +1020,7 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     })
 
                     let objInfoComercial = {};
-                    if (idAlianzaComercial == 1) {
+                    if (idAlianzaComercial == cusVars.tipoAlianzaComContrato) {
                         objInfoComercial.terms = terminos;
                         objInfoComercial.limiteCredito = limiteCredito;
                         objInfoComercial.creditoUtilizado = creditoUtilizado;
@@ -987,7 +1034,7 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                         //     name: 'custentity_ptg_descuento_asignar'
                         // });  
 
-                    } else if (idAlianzaComercial == 2) {
+                    } else if (idAlianzaComercial == cusVars.tipoAlianzaComCredito) {
                         objInfoComercial.terms = terminos;
                         objInfoComercial.limiteCredito = limiteCredito;
                         objInfoComercial.creditoUtilizado = creditoUtilizado;
@@ -1029,6 +1076,8 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                         descuento,
                         terminos,
                         rfc,
+                        regimeFiscal,
+                        tipoIndustria,
                         primerNombre,
                         apellidos,
                         addr,
@@ -1042,14 +1091,14 @@ define(['N/log', "N/search", "N/record", 'SuiteScripts/SCRIPTS POTOGAS/ptg_modul
                     arrayResult.push(customerObj)
                     responseData.data = arrayResult
 
-                    log.debug({
-                        title: "arrayResult",
-                        details: arrayResult
-                    })
-                    log.debug({
-                        title: "customerObj",
-                        details: customerObj
-                    })
+                    // log.debug({
+                    //     title: "arrayResult",
+                    //     details: arrayResult
+                    // })
+                    // log.debug({
+                    //     title: "customerObj",
+                    //     details: customerObj
+                    // })
 
                 })
             })

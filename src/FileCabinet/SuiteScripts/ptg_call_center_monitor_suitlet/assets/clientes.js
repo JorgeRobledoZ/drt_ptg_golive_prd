@@ -1,18 +1,24 @@
+// Clientes.js
 // Revisa que acción ejecutará el modal de acuerdo al botón cliqueado
 $("#agregarDirecciones, #agregarDireccion").click( function() {
     let id = $(this).attr('id');
     $('.dias-semana').prop('checked', true);
 
-    if ( id == 'agregarDirecciones' ) {
+    if ( id == 'agregarDirecciones' ) {// Nueva dirección de cliente nuevo
+        // Se remueven las opciones de poder agregar una dirección de facturación
+        let requiereFactura = $("input[name=requiereFactura]:checked").val();
+        if ( requiereFactura == 'si' ) { $('.opt-tipo-dir-fact').removeClass('d-none');  } 
+        else { $('.opt-tipo-dir-fact').addClass('d-none'); }
         $("#tipoAccionDireccion").val('lista');
         $("input[name=tipoAccionFormCliente][value=1]").prop("checked", true).trigger("change");
         $("#tipoServicioFormCliente").val(idCilindro);
         //$($(".dato-facturacion").addClass("d-none"));
         $("#tipoServicioFormCliente").trigger("change");
-    } else if ( id == 'agregarDireccion' ) {
+    } else if ( id == 'agregarDireccion' ) {// Nueva dirección de cliente existente
         $("#estadoDireccion").val("").trigger("change");
         $("#frecuenciaFormCliente").trigger("change")
         $("input[name=tipoAccionFormCliente][value=1]").prop("checked", true).trigger("change");
+        // En esta función, se colocará la lógica de mostrar campos obligatorios de la facturación
         if(customerGlobal.requiereFactura) {
             $($(".dato-facturacion").removeClass("d-none"));
         } else {
@@ -25,6 +31,19 @@ $("#agregarDirecciones, #agregarDireccion").click( function() {
         }
         $("#tipoAccionDireccion").val('guardar');
     }
+
+    // Valida si es válido agregar una dirección en caso de que no esté listo el servicio de colonias
+    if(loadColonias) {
+        infoMsg('warning', 'Aun están cargando los datos para direcciones, favor de esperar un momento');
+    } else {
+        if($("#estadoDireccion option").length == 2) {
+            $("#estadoDireccion").prop("disabled", true);
+            $("#estadoDireccion").val($($("#estadoDireccion option")[1]).val()).trigger("change");
+        } else {
+            $("#estadoDireccion").prop("disabled", false);
+        }    
+        $("#formDireccionesModal").modal("show");
+    }   
 });
 
 // Si el cliente requiere factura, se mostrarán esos campos en el form de cliente
@@ -206,7 +225,8 @@ $("#editarCliente").click(function () {
         $(".dato-facturacion").removeClass("d-none");
         $('#rfcFormCliente').val(customerGlobal.rfc);
         $('#usoCfdiFormCliente').val(customerGlobal.cdfiId);
-        
+        $('#nombreRegimenFiscalCliente').val(customerGlobal.regimeFiscal);
+        $('#tipoIndustriaFormCliente').val(customerGlobal.tipoIndustria);
     } else {
         $(".dato-facturacion").addClass("d-none");
     }
@@ -222,7 +242,7 @@ $("#editarCliente").click(function () {
     $('#telefonoAlternoFormCliente').val(customerGlobal.telefonoAlt);
     $('#correoAlternativoFormCliente').val(customerGlobal.emailAlt);
     $('#observacionesFormCliente').val(customerGlobal.notasCustomer);
-    $("#nombreFacturacionFormCliente, #rfcFormCliente, #usoCfdiFormCliente, #correoAlternativoFormCliente, #copiarDatosContacto").prop("disabled", true);
+    $("#nombreFacturacionFormCliente, #rfcFormCliente, #usoCfdiFormCliente, #correoAlternativoFormCliente, #copiarDatosContacto, #nombreRegimenFiscalCliente, #tipoIndustriaFormCliente").prop("disabled", true);
 });
 
 $("#historicoCliente").click(function () {
@@ -321,6 +341,7 @@ $('body').delegate('.delete-address', 'click', function () {
         if( resp ) {
             let address = button.closest('.address').data('address');
             //button.parent().parent().remove();
+            // Colocar aqui otro if donde compare si el num de direcciones es igual a 0
             if((address.principal || address.domFacturacion) && $('table.table-address tbody').find(".address").length > 1) {
                 button.closest('.address').remove();
                 let element = $($('table.table-address tbody').find(".address")[0]);
@@ -330,7 +351,8 @@ $('body').delegate('.delete-address', 'click', function () {
                     element.find('.check-entrega').parent().html('<i class="fa-solid fa-square-check color-primary check-entrega" style="cursor: pointer;"></i>');
                 }
                 if(address.domFacturacion) {
-                    addressAux.domFacturacion = true;
+                    // Verificar si esta linea de código es obligatoria
+                    // addressAux.domFacturacion = true;
                     element.find('.check-fact').parent().html('<i class="fa-solid fa-square-check color-primary check-fact" style="cursor: pointer;"></i>');
                 }
                 element.data('address', addressAux);              
@@ -351,10 +373,13 @@ $('body').delegate('.edit-address', 'click', function () {
     if(loadColonias) {
         infoMsg('warning', 'Aun están cargando los datos para direcciones, favor de esperar un momento');
     } else {
-        let direccion = $(this).closest('.address').data('address');
+        // let direccion = $(this).closest('.address').data('address');
+        let direccion = $(this).parent().parent().data('address');
         $("#tipoAccionDireccion").val('guardar');
-        console.log(direccion);
+        console.log('Esta es la dirección en editar:', direccion);
         if ( direccion ) {
+            $('#tipoDireccion').val(direccion.tipoDireccion ?? "").trigger('change');
+
             let requiereFactura  = ($("input[name=requiereFactura]:checked").val() == "si" ? true : false);
             if(requiereFactura) {
                 $($(".dato-facturacion").removeClass("d-none"));
@@ -425,7 +450,7 @@ $('body').delegate('.edit-address', 'click', function () {
 
             $('#fechaInicioServicio').val(direccion.startDayService ? getMomentDateFormat(direccion.startDayService) : null);
             $('#cadaFormCliente').val(direccion.cada)
-            $('#frecuenciaFormCliente').val(direccion.frecuencia);
+            $('#frecuenciaFormCliente').val(direccion.frecuencia).trigger('change');
 
             // Días de la semana
             $('#lunesFormCliente').prop('checked', direccion.lunes ? true : false);
@@ -602,18 +627,53 @@ $('body').delegate('.copy-address', 'click', function () {
 
 // Guarda la información de un cliente en Netsuite
 function saveCustomer() {
+    let idCliente        = $("input#idInternoFormCliente").val();
     let tipoRegimen      = $("input[name=tipoRegimen]:checked").val();
     let requiereFactura  = ($("input[name=requiereFactura]:checked").val() == "si" ? true : false);
+    let trAddress        = $('table.table-address tbody').children(".address");
+    let numFact          = 0;
+    let numEnt           = 0;
+    let numEntFact       = 0;
+    /**
+     * Si es un cliente nuevo:
+     * Debe existir al menos una dirección de entrega, pero si el cliente requiere factura, 
+     * debe tener tener una dirección de entrega y una de facturación al menos, 
+     * o una única dirección que sea de tipo facturación y entrega al mismo tiempo
+     */
+    if ( !idCliente ) {
+        if ( trAddress.length == 0 ) {
+            infoMsg('warning', 'Favor de colocar al menos una dirección');
+            return;
+        } else {
+            trAddress.each(function(index) {
+                let trAdd = $(this).data('address');
 
-    if ( !$("input#idInternoFormCliente").val() && $('table.table-address tbody').find(".address").length == 0 ) {
-        infoMsg('warning', 'Favor de colocar al menos una dirección')
-        return;
+                if ( trAdd.tipoDireccion == tipoDirEntFact ) { numEntFact ++; }
+                else if ( trAdd.tipoDireccion == tipoDirSoloEntrega ) { numEnt ++; }
+                else if ( trAdd.tipoDireccion == tipoDirSoloFacturacion ) { numFact ++; }
+            });
+
+            if ( requiereFactura ) {// Requiere al menos una de facturación y una de entrega
+                if ( numEntFact > 0 ) {
+                    console.log('Tiene una dirección que funge como entrega y facturación');
+                } else if ( numEntFact == 0 ) {
+                    if ( numEnt == 0 || numFact == 0 ) {
+                        infoMsg('warning', 'Favor de colocar al menos una dirección de entrega y facturación, o en su defecto, una dirección con ambas funciones.');
+                        return;
+                    }
+                }
+            } else if ( numEnt == 0 ) {// Requiere al menos una de entrega
+                infoMsg('warning', 'Favor de colocar al menos una dirección de entrega');
+                return;
+            }
+        }
     }
 
-    let idCliente    = $("input#idInternoFormCliente").val();
     let businessType = tipoRegimen != 'domestico' ? $('select#giroNegocioFormCliente').val() : "";
     let businessName = $('#nombreRazonSocialFormCliente').val();
     let cfdi         =  requiereFactura ? $('#usoCfdiFormCliente').val() : "";
+    let typeIndustry =  requiereFactura ? $('#tipoIndustriaFormCliente').val() : "";
+    let regimeFiscal =  requiereFactura ? $('#nombreRegimenFiscalCliente').val() : "";
     // let middleName      = tipoRegimen != 'domestico' ? $('select#giroNegocioFormCliente').val() : "";
     let lastName     = $('input#apellidosFormCliente').val().trim();
     let rfc          = requiereFactura ? $('input#rfcFormCliente').val() : "";
@@ -657,6 +717,8 @@ function saveCustomer() {
         lastName : lastName,
         businessName: businessName,
         cfdi: cfdi,
+        typeIndustry: typeIndustry,
+        regimeFiscal: regimeFiscal,
         rfc : rfc,
         razonSocialFact: razonSocialFact,
         regimeType : regimenId != idDomestico ? false : true,
@@ -676,7 +738,7 @@ function saveCustomer() {
         requiereFactura: requiereFactura,
         telefono: telefonoPrinc
     }
-    console.log(customer);
+    // console.log('Se envía la dirección', customer);
     // return;
     loadMsg('Guardando información...');
     // Se envía la información del cliente por ajax
@@ -689,6 +751,8 @@ function saveCustomer() {
             custentity_ptg_giro_negocio : customer['businessType'],
             companyname : customer['businessName'],
             email : customer['email'],
+            // custentity_mx_sat_industry_type : customer['typeIndustry'],
+            // custentity_mx_sat_registered_name : customer['regimeFiscal'],
             // custentity_ptg_plantarelacionada_ : customer['planta'],
             //phone : customer['telefono'],
             //altphone : customer['telefonoAlt'],

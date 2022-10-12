@@ -2,12 +2,12 @@
  * @NApiVersion 2.1
  * @NScriptType Restlet
  */
-define(['N/record', 'N/search'],
+define(['N/record', 'N/search', 'SuiteScripts/drt_custom_module/drt_mapid_cm'],
     /**
  * @param{record} record
  * @param{search} search
  */
-    (record, search) => {
+    (record, search, drt_mapid_cm) => {
         /**
          * Defines the function that is executed when a GET request is sent to a RESTlet.
          * @param {Object} requestParams - Parameters from HTTP request URL; parameters passed as an Object (for all supported
@@ -50,6 +50,7 @@ define(['N/record', 'N/search'],
                 data: null,
                 apiErrorPost: []
             }
+            const cusVars = drt_mapid_cm.getVariables();
             try {
                 var jsonPrincipal = {};
                 var arrayCaso = [];
@@ -277,13 +278,13 @@ define(['N/record', 'N/search'],
                     //     nombrePrioridad = 'Bajo'
                     // }
                     let nombreTipoServicio = '';
-                    if (category == 1) {
+                    if (category == cusVars.tipoServicioCil) {
                         nombreTipoServicio = 'Cilindro'
-                    } else if (category == 2) {
+                    } else if (category == cusVars.tipoServicioEst) {
                         nombreTipoServicio = 'Estacionario'
-                    } else if (category == 3) {
+                    } else if (category == cusVars.tipoServicioCarb) {
                         nombreTipoServicio = 'Carburación'
-                    } else if (category == 4) {
+                    } else if (category == cusVars.tipoServicioAmbos) {
                         nombreTipoServicio = 'Otros'
                     }
 

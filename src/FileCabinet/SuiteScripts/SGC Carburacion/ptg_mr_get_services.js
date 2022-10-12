@@ -59,7 +59,7 @@
                 service.plantaId = folios[index].plantaId;
             });
 
-            return services;
+            return [services[0]];
         } catch (error) {
             log.debug('Algo salió mal en el método get input data', error);
         }
@@ -139,6 +139,7 @@
             newOpp.setText({fieldId:'custbody_ptg_numero_impresiones', text: item.numero_impresiones });
             newOpp.setText({fieldId:'custbody_ptg_turno', text: item.turno });
             newOpp.setText({fieldId:'custbody_ptg_autoconsumo', text: item.autoconsumo });
+            newOpp.setText({fieldId:'custbody_ptg_fecha_hora_servicio_carb', text: moment(item.inicio_servicio).subtract(5, 'hours').format('D/M/YYYY h:mm:ss A') });
             
             // Se agrega el producto de Gas LP a nivel artículo
             newOpp.setSublistValue({

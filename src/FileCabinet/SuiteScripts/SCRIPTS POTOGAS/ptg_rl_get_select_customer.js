@@ -2,11 +2,11 @@
  * @NApiVersion 2.1
  * @NScriptType Restlet
  */
-define(['N/search', 'N/query'],
+define(['N/search', 'N/query', 'SuiteScripts/drt_custom_module/drt_mapid_cm'],
     /**
  * @param{search} search
  */
-    (search, query) => {
+    (search, query, drt_mapid_cm) => {
         /**
          * Defines the function that is executed when a GET request is sent to a RESTlet.
          * @param {Object} requestParams - Parameters from HTTP request URL; parameters passed as an Object (for all supported
@@ -46,6 +46,16 @@ define(['N/search', 'N/query'],
                 success: false,
                 data: []
             };
+
+            const customVars         = drt_mapid_cm.getVariables();
+            const subGas             = customVars.subsidiariaGas;
+            const subCorpoGas        = customVars.subsidiariaCorpoGas;
+            const subSanLuisGas      = customVars.subsidiariaSanLuisGas;
+            const subDistPotosina    = customVars.subsidiariaDistPotosi;
+            // Tipos de dirección
+            const dirEntFact         = customVars.tipoDirEntFact;
+            const dirSoloFacturacion = customVars.tipoDirSoloEntrega;
+            const dirSoloEntrega     = customVars.tipoDirSoloFacturacion;
 
             try {
                 if (requestBody.hasOwnProperty('filtro') && requestBody.filtro != "" && requestBody.filtro.trim() != "") {
@@ -149,8 +159,7 @@ define(['N/search', 'N/query'],
                         LEFT JOIN CustomerSubsidiaryRelationship on customer.id = CustomerSubsidiaryRelationship.entity
                         LEFT JOIN customerAddressbook on Customer.id = customerAddressbook.entity
                         LEFT JOIN customerAddressbookEntityAddress on customerAddressbook.addressbookaddress = customerAddressbookEntityAddress.nkey
-                        WHERE                    
-                        subsidiary in (20,23,26) AND	
+                        WHERE subsidiary in (${subGas},${subCorpoGas},${subSanLuisGas},${subDistPotosina}) AND
                         ( LOWER(altname) LIKE LOWER('${requestBody.filtro}%')
                         OR customer.id LIKE '${requestBody.filtro}%'
                         OR ( LOWER(phone) LIKE LOWER('${requestBody.filtro}%') )
@@ -164,17 +173,20 @@ define(['N/search', 'N/query'],
                         customerAddressbookEntityAddress.custrecord_ptg_street, customerAddressbookEntityAddress.custrecord_ptg_exterior_number, 
                         customerAddressbookEntityAddress.custrecord_ptg_interior_number, customerAddressbookEntityAddress.custrecord_ptg_nombre_colonia, 
                         customerAddressbookEntityAddress.custrecord_ptg_codigo_postal, customerAddressbookEntityAddress.custrecord_ptg_entrecalle_, 
-                        customerAddressbookEntityAddress.custrecord_ptg_y_entre_, customerAddressbook.internalid
+                        customerAddressbookEntityAddress.custrecord_ptg_y_entre_, customerAddressbook.internalid, custrecord_ptg_telefono_alterno, 
+                        customerAddressbookEntityAddress.custrecord_ptg_tipo_servicio, customerAddressbookEntityAddress.custrecord_ptg_tipo_direccion,
+                        customer.custentity_mx_sat_industry_type, customer.custentity_mx_sat_registered_name
                         FROM customer
                         LEFT JOIN CustomerSubsidiaryRelationship on customer.id = CustomerSubsidiaryRelationship.entity
                         LEFT JOIN customerAddressbook on Customer.id = customerAddressbook.entity
                         LEFT JOIN customerAddressbookEntityAddress on customerAddressbook.addressbookaddress = customerAddressbookEntityAddress.nkey
                         WHERE
-                            custentity_ptg_plantarelacionada_ = ${Number(requestBody.idPlanta)} AND			
-                            subsidiary in (20,23,26) AND 
+                            custentity_ptg_plantarelacionada_ = ${Number(requestBody.idPlanta)} AND 
+                            subsidiary in (${subGas},${subCorpoGas},${subSanLuisGas},${subDistPotosina}) AND 
                             (   (LOWER(altname) LIKE LOWER('%${requestBody.filtro}%')
                                 OR customer.entityid LIKE '${requestBody.filtro}%'
                                 OR ( LOWER(custrecord_ptg_telefono_principal) LIKE LOWER('%${requestBody.filtro}%') )
+                                OR ( LOWER(custrecord_ptg_telefono_alterno) LIKE LOWER('%${requestBody.filtro}%') )
                                 OR ( LOWER(
                                     CONCAT(custrecord_ptg_street, CONCAT(
                                     ' ', CONCAT(
@@ -191,7 +203,9 @@ define(['N/search', 'N/query'],
                         customerAddressbookEntityAddress.custrecord_ptg_street, customerAddressbookEntityAddress.custrecord_ptg_exterior_number, 
                         customerAddressbookEntityAddress.custrecord_ptg_interior_number, customerAddressbookEntityAddress.custrecord_ptg_nombre_colonia, 
                         customerAddressbookEntityAddress.custrecord_ptg_codigo_postal, customerAddressbookEntityAddress.custrecord_ptg_entrecalle_, 
-                        customerAddressbookEntityAddress.custrecord_ptg_y_entre_, customerAddressbook.internalid`;
+                        customerAddressbookEntityAddress.custrecord_ptg_y_entre_, customerAddressbook.internalid, custrecord_ptg_telefono_alterno, 
+                        customerAddressbookEntityAddress.custrecord_ptg_tipo_servicio, customerAddressbookEntityAddress.custrecord_ptg_tipo_direccion, 
+                        customer.custentity_mx_sat_industry_type, customer.custentity_mx_sat_registered_name`;
 
                         if(requestBody.filtro.split(" ").length > 1) {
                             sql2 = `SELECT 
@@ -199,14 +213,16 @@ define(['N/search', 'N/query'],
                             customerAddressbookEntityAddress.custrecord_ptg_street, customerAddressbookEntityAddress.custrecord_ptg_exterior_number, 
                             customerAddressbookEntityAddress.custrecord_ptg_interior_number, customerAddressbookEntityAddress.custrecord_ptg_nombre_colonia, 
                             customerAddressbookEntityAddress.custrecord_ptg_codigo_postal, customerAddressbookEntityAddress.custrecord_ptg_entrecalle_, 
-                            customerAddressbookEntityAddress.custrecord_ptg_y_entre_, customerAddressbook.internalid
+                            customerAddressbookEntityAddress.custrecord_ptg_y_entre_, customerAddressbook.internalid, custrecord_ptg_telefono_alterno, 
+                            customerAddressbookEntityAddress.custrecord_ptg_tipo_servicio, customerAddressbookEntityAddress.custrecord_ptg_tipo_direccion,
+                            customer.custentity_mx_sat_industry_type, customer.custentity_mx_sat_registered_name
                             FROM customer
                             LEFT JOIN CustomerSubsidiaryRelationship on customer.id = CustomerSubsidiaryRelationship.entity
                             LEFT JOIN customerAddressbook on Customer.id = customerAddressbook.entity
                             LEFT JOIN customerAddressbookEntityAddress on customerAddressbook.addressbookaddress = customerAddressbookEntityAddress.nkey
                             WHERE
-                                custentity_ptg_plantarelacionada_ = ${Number(requestBody.idPlanta)} AND			
-                                subsidiary in (20,23,26) AND 
+                                custentity_ptg_plantarelacionada_ = ${Number(requestBody.idPlanta)} AND
+                                subsidiary in (${subGas},${subCorpoGas},${subSanLuisGas},${subDistPotosina}) AND 
                                 (`;
                             sqlAux = "";
                             
@@ -218,6 +234,7 @@ define(['N/search', 'N/query'],
                                         (LOWER(altname) LIKE LOWER('%${element}%')
                                         OR customer.entityid LIKE '${element}%'
                                         OR ( LOWER(custrecord_ptg_telefono_principal) LIKE LOWER('%${element}%') )
+                                        OR ( LOWER(custrecord_ptg_telefono_alterno) LIKE LOWER('%${element}%') )
                                         OR ( LOWER(
                                             CONCAT(custrecord_ptg_street, CONCAT(
                                             ' ', CONCAT(
@@ -235,7 +252,9 @@ define(['N/search', 'N/query'],
                             customerAddressbookEntityAddress.custrecord_ptg_street, customerAddressbookEntityAddress.custrecord_ptg_exterior_number, 
                             customerAddressbookEntityAddress.custrecord_ptg_interior_number, customerAddressbookEntityAddress.custrecord_ptg_nombre_colonia, 
                             customerAddressbookEntityAddress.custrecord_ptg_codigo_postal, customerAddressbookEntityAddress.custrecord_ptg_entrecalle_, 
-                            customerAddressbookEntityAddress.custrecord_ptg_y_entre_, customerAddressbook.internalid`;
+                            customerAddressbookEntityAddress.custrecord_ptg_y_entre_, customerAddressbook.internalid, custrecord_ptg_telefono_alterno, 
+                            customerAddressbookEntityAddress.custrecord_ptg_tipo_servicio, customerAddressbookEntityAddress.custrecord_ptg_tipo_direccion
+                            customer.custentity_mx_sat_industry_type, customer.custentity_mx_sat_registered_name`;
                                 
                         }
 
@@ -266,11 +285,29 @@ define(['N/search', 'N/query'],
                     log.audit("resultIterator", resultIterator);
                     resultIterator.each(function (row) {
                         let obj = {};
+                        let tipoServicio  = null;
+                        let tipoDireccion = null;
+                        let tipoDirNom      = '';
+                        let tipoServicioNom = '';
                         if (!!row.value.getValue(0)) {
                             obj.id = row.value.getValue(0);
-                            if(requestBody.isApp) {
+                            if( requestBody.isApp ) {
                                 obj.text = `${row.value.getValue(1)} - ${row.value.getValue(2)} - ${row.value.getValue(3)}`;
                             } else {
+                                tipoServicio = row.value.getValue(13);
+                                tipoDireccion = row.value.getValue(14);
+
+                                // Compara el tipo de dirección
+                                if ( tipoDireccion == dirEntFact ) { tipoDirNom = 'Solo Entrega'; }
+                                else if ( tipoDireccion == dirSoloFacturacion ) { tipoDirNom = 'Solo Facturación'; }
+                                else if ( tipoDireccion == dirSoloEntrega ) { tipoDirNom = 'Entrega y Facturación'; }
+                                
+                                // Compara el tipo de servicio de la dirección
+                                if ( tipoServicio == customVars.ptgTipoServicioCil ) { tipoServicioNom = 'CIL'; }
+                                else if ( tipoServicio == customVars.ptgTipoServicioEst ) { tipoServicioNom = 'EST'; }
+                                else if ( tipoServicio == customVars.ptgTipoServicioMon ) { tipoServicioNom = 'MC'; }
+                                else if ( tipoServicio == customVars.ptgTipoServicioCar ) { tipoServicioNom = 'CARB'; }
+
                                 obj.idAux = row.value.getValue(0)+"-"+row.value.getValue(11);
                                 obj.nombre = row.value.getValue(1);
                                 obj.telefono = row.value.getValue(2);
@@ -282,6 +319,13 @@ define(['N/search', 'N/query'],
                                 obj.entre1 = row.value.getValue(9);
                                 obj.entre2 = row.value.getValue(10);
                                 obj.idAdress = row.value.getValue(11);
+                                obj.telefonoAlt = row.value.getValue(12);
+                                obj.tipoServicio = tipoServicio;
+                                obj.tipoDireccion = tipoDireccion
+                                obj.tipoDirNom = tipoDirNom;
+                                obj.tipoServicioNom = tipoServicioNom;
+                                obj.tipoIndustria = row.value.getValue(15);
+                                obj.regimeFiscal = row.value.getValue(16);
                             }
                             
                             data.push(obj);
@@ -324,7 +368,7 @@ define(['N/search', 'N/query'],
                         });
                     }*/
 
-                    log.debug('data', data)
+                    // log.debug('data', data)
                     response.success = true;
                     response.data = data;
                 }

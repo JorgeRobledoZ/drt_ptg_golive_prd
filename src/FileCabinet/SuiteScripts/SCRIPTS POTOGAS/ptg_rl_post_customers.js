@@ -167,6 +167,11 @@
                 }); // M
 
                 addressSubrecord.setValue({
+                    fieldId: "custrecord_ptg_tipo_direccion",
+                    value: address.tipoDireccion
+                }); // Guarda el tipo de dirección
+
+                addressSubrecord.setValue({
                     fieldId: "custrecord_ptg_telefono_principal",
                     value: address.telefonoPrinc
                 });
@@ -437,7 +442,8 @@
 
                 customerRecord.setValue({
                     fieldId: 'customform',
-                    value: drt_mapid_cm.customformCustomer
+                    value: mapObj.customformCustomer
+                    // value: drt_mapid_cm.customformCustomer
                 })
 
                 if (customer.nombre) {
@@ -496,6 +502,18 @@
                 customerRecord.setValue({
                     fieldId: 'custentity_disa_uso_de_cfdi_',
                     value: customer.cfdi
+                })
+
+                // Tipo de industria
+                customerRecord.setValue({
+                    fieldId: 'custentity_mx_sat_industry_type',
+                    value: customer.typeIndustry
+                })
+
+                // Nombre régimen fiscal
+                customerRecord.setValue({
+                    fieldId: 'custentity_mx_sat_registered_name',
+                    value: customer.regimeFiscal
                 })
 
                 customerRecord.setValue({
@@ -642,6 +660,8 @@
         });
         let customersList = [];
         try {
+            var mapObj=drt_mapid_cm.getVariables();
+
             request.customers.forEach((customer) => {
                 log.audit('customer', customer);
                 let customerLoad = record.load({
@@ -727,7 +747,13 @@
                                         fieldId: add,
                                         text: adress.addresses[add]
                                     });
-                                } else if(add == "custrecord_ptg_direccion_contrato") {
+                                } /*else if (add == "custrecord_ptg_direccion_contrato") {
+                                    adressLoad.setValue({
+                                        fieldId: 'custrecord_ptg_tipo_direccion',
+                                        value: adress.addresses[add]
+                                    });
+                                    custrecord_ptg_tipo_direccion
+                                } */else if(add == "custrecord_ptg_direccion_contrato") {
                                     adressLoad.setValue({
                                         fieldId: add,
                                         value: adress.addresses[add]
@@ -776,7 +802,8 @@
                             customerLoad.setCurrentSublistValue({
                                 sublistId: 'addressbook',
                                 fieldId: "defaultbilling",
-                                value: adress.domFacturacion
+                                value: (adress.tipoDireccion == mapObj.tipoDirEntFact || adress.tipoDireccion == mapObj.tipoDirSoloFacturacion)// Código patche para saber si la dirección lleva dom de facturación
+                                // value: adress.domFacturacion
                             }); // M
 
                             customerLoad.setCurrentSublistValue({
@@ -788,6 +815,10 @@
                             let addressSubrecord = customerLoad.getCurrentSublistSubrecord({
                                 sublistId: 'addressbook',
                                 fieldId: 'addressbookaddress'
+                            });
+                            addressSubrecord.setValue({
+                                fieldId: "custrecord_ptg_tipo_direccion",
+                                value: adress.tipoDireccion
                             });
                             addressSubrecord.setValue({
                                 fieldId: "city",

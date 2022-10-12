@@ -79,11 +79,22 @@ define(['N/search', 'N/record'], function (search, record) {
                 fieldId: 'custrecord_ptg_chofer_tabladeviajes_',
                 value: request.chofer
             });
+            
+            // Ayudante es un parámetro opcional
+            if ( request.ayudante ) {
+                log.debug('info', 'hay ayudante');
+                itemLoad.setValue({
+                    fieldId: 'custrecord_ptg_ayudante_tabladeviajes_',
+                    value: request.ayudante
+                });
+            } else {
+                log.debug('info', 'NO hay ayudante');
 
-            itemLoad.setValue({
-                fieldId: 'custrecord_ptg_ayudante_tabladeviajes_',
-                value: request.ayudante
-            });
+                itemLoad.setValue({
+                    fieldId: 'custrecord_ptg_ayudante_tabladeviajes_',
+                    value: ''
+                });
+            }
 
             itemLoad.setValue({
                 fieldId: 'custrecord_ptg_telefono_chofer',
