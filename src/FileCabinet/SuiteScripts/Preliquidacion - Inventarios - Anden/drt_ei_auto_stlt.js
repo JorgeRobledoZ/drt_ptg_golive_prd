@@ -15,9 +15,9 @@
 */
 
 //define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/encode', 'N/config', 'N/task', 'N/xml', 'N/email', 'N/file','../Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/PacConnectors/mysuite/signedxml-req/util'], //SBX
-define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/encode', 'N/config', 'N/task', 'N/xml', 'N/email', 'N/file','../../SuiteBundles/Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/PacConnectors/mysuite/signedxml-req/util'], //SBX
+define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/encode', 'N/config', 'N/task', 'N/xml', 'N/email', 'N/file','../../SuiteBundles/Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/PacConnectors/mysuite/signedxml-req/util', 'N/render'], //SBX
 //define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/encode', 'N/config', 'N/task', 'N/xml', 'N/email', 'N/file','../../SuiteBundles/Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/PacConnectors/mysuite/signedxml-req/util'], //PRD
- function (search, record, format, runtime, https, xml, encode, config, task, xml, email, file, util) {
+ function (search, record, format, runtime, https, xml, encode, config, task, xml, email, file, util, render) {
 
 	 const CONST_ARR_CHART = ['&', '"', '<', '>', "'", '´'];
 	 const OPERATION = 'CONVERT_NATIVE_XML';
@@ -1088,6 +1088,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						var liqViejaEspecial = invoiceObj.getValue("custbody_ptg_liq_viaje_especial");
 						log.audit("liqViejaEspecial", liqViejaEspecial);
 
+
 						var customRecFactura = record.create({
 							type: "customrecord_drt_ptg_registro_factura",
 							isDynamic: true,
@@ -1326,7 +1327,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 							 log.audit("if responseData1 fin XML", respxml);
 						 }
 						 
-						 if (responseData2) {
+						 /*if (responseData2) {
 							log.audit("if responseData2");
 							var resppdf = createFile(
 								 "PDF_"+nombreInvoice+'_'+resultGUID,
@@ -1337,7 +1338,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 								 runtime.getCurrentScript().getParameter('custscript_drt_glb_folder')
 							 ) || '';
 							 log.audit("if responseData2 fin PDF", resppdf);
-						 }
+						 }*/
 
 						 //newRecord.setValue({fieldId: 'custrecord_drt_base64_pdf', value: responseData2});
 						
@@ -1347,12 +1348,12 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 								value: respxml.data
 							});
 						}
-						 if (resppdf.success) {
+						 /*if (resppdf.success) {
 							 newRecord.setValue({
 								 fieldId: 'custrecord_drt_pdf_sat',
 								 value: resppdf.data
 							 });
-						 }
+						 }*/
 						 if (idFileXML.success) {
 							 newRecord.setValue({
 								 fieldId: 'custrecord_drt_doc_xml',
@@ -1362,8 +1363,8 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 								 email.send({
 									 //author: 1729,
 									 //author: 37276,
-									 author: ['jose.fernandez@disruptt.mx'],
-									 recipients: ['jose.fernandez@disruptt.mx'],
+									 author: 'jose.fernandez@disruptt.mx',
+									 recipients: 'jose.fernandez@disruptt.mx',
 									 subject: 'Timbrado PotoGas ' + jsonData.rfcemisor,
 									 body: 'Factura ' + resultGUID,
 									 attachments: [file.load({
@@ -1402,7 +1403,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 								 'custbody_mx_cfdi_certify_timestamp': parsedResponse.dateOfCertification,
 								 'custbody_psg_ei_certified_edoc': respxml.data,
 								 'custbody_psg_ei_generated_edoc': "",
-								 'custbody_edoc_generated_pdf': resppdf.data,
+								 //'custbody_edoc_generated_pdf': resppdf.data,
 								 //'custbody_mx_cfdi_usage': context.request.parameters.custbody_mx_cfdi_usage,
 								// 'custbody_psg_ei_template': 123,
 								// 'custbody_psg_ei_sending_method': 11,
@@ -1425,6 +1426,27 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						 });
 
 						 log.debug("Factura actualizada", idSubmit);
+
+						var transactionFile = render.transaction({
+							entityId: Number(jsonData.idinvoice),
+							printMode: render.PrintMode.PDF,
+							inCustLocale: true
+						});
+
+						log.debug("transactionFile", transactionFile);
+
+						transactionFile.name = "PDF_"+nombreInvoice+'_'+resultGUID;
+						transactionFile.folder = runtime.getCurrentScript().getParameter('custscript_drt_glb_folder');
+
+						var idPDF = transactionFile.save();
+
+						record.submitFields({
+							type: record.Type.INVOICE,
+							id: jsonData.idinvoice,
+							values: {
+								custbody_edoc_generated_pdf: idPDF,
+							}
+						});
 
 
 						 log.audit({
@@ -1502,7 +1524,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						custrecord_ptg_id_oportunidad: oportunidad,
 						custrecord_ptg_id_factura: jsonData.idinvoice,
 						custrecord_ptg_cliente_facturado: entity,
-						custrecord_ptg_pdf_generado: resppdf.data,
+						//custrecord_ptg_pdf_generado: resppdf.data,
 						custrecord_ptg_xml_generado: respxml.data,
 						custrecord_ptg_documento_xml: idFileXML.data,
 						custrecord_ptg_status: 'Success',
@@ -1660,7 +1682,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						custbody_mx_cfdi_uuid: resultGUID,
 						custbody_drt_psg_ei_generated_edoc: respxml.data, //DRT - DOCUMENTO ELECTRÓNICO GENERADO (CERTIFICADO)
 						custbody_psg_ei_certified_edoc: idFileXML.data, //DOCUMENTO ELECTRÓNICO CERTIFICADO (NO CERTIFICADO)
-						custbody_edoc_generated_pdf: resppdf.data, //PDF GENERDO
+						//custbody_edoc_generated_pdf: resppdf.data, //PDF GENERDO
 						custbody_psg_ei_status: 3, //ESTADO DEL DOCUMENTO ELECTRÓNICO (Para generación)
 						custbody_ptg_registro_facturacion: recIdSaved,
 						custbody_ptg_rfc_facturado: jsonData.rfcrecepFin,
