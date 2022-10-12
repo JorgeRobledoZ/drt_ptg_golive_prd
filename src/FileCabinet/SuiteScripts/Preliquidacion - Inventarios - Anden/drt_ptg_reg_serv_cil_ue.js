@@ -83,24 +83,10 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var numViaje = newRecord.getValue("custrecord_ptg_num_viaje_reg_serv_cil");
         var etapa = newRecord.getValue("custrecord_ptg_etapa_reg_serv_cil");
         var idRegistroDeServicios = "recmachcustrecord_ptg_id_reg_serv_cil_lin";
-        var lineasRegistro = newRecord.getLineCount(idRegistroDeServicios);
-        var lineasRegistroOld = 0;
         log.audit("etapa", etapa);
         
-        if (context.type == "edit") {
-          var etapaOld = context.oldRecord.getValue("custrecord_ptg_etapa_reg_serv_cil") || 1;
-          log.audit("etapaOld", etapaOld);
-          lineasRegistroOld = context.oldRecord.getLineCount(idRegistroDeServicios);
-          log.audit("lineasRegistro: "+ lineasRegistro,"lineasRegistroOld: " + lineasRegistroOld);
-        }
-        
         var valoresProceso = {};
-
-        if(lineasRegistro > lineasRegistroOld){
-          valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 1;
-        } else {
-          valoresProceso.custrecord_ptg_etapa_reg_serv_cil = etapaOld;
-        }
+        valoresProceso.custrecord_ptg_etapa_reg_serv_cil = 1;
         
         var estatusEtapaProcesado = 0;
         var objMap=drt_mapid_cm.drt_liquidacion();
