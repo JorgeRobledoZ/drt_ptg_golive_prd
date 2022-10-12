@@ -534,9 +534,16 @@ define(
                         formularioRecepcion: 270,
                         formularioOportunidad: 265,
                         formularioOrdenTraslado: 266,
-                        urlCilindros: 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=497&whence=&vehiculo=',
-                        urlEstacionarios: 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=495&whence=&vehiculo=',
-
+                        urlCilindros: 'https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=585&whence=&vehiculo=',
+                        urlEstacionarios: 'https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=659&whence=&vehiculo=',
+                        urlRegistroCliente: "https://5298967.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=645&planta=",
+                        formularioOrdenVenta: 266,
+                        cajaGeneralDistribuidora: 2849,
+                        cajaGeneralCorpogas: 3153,
+                        cajaGeneralSanLuis: 3151,
+                        servicioViajeEspecial: 7,
+                        listoParaEnviar: 1,
+                        
                     },
                     [runtime.EnvType.SANDBOX]: {
                         formularioCilindro: 172,
@@ -690,6 +697,13 @@ define(
                         formularioOrdenTraslado: 313,
                         urlCilindros: 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=497&whence=&vehiculo=',
                         urlEstacionarios: 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=495&whence=&vehiculo=',
+                        urlRegistroCliente: "https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1070&planta=",
+                        formularioOrdenVenta: 261,
+                        cajaGeneralDistribuidora: 2786,
+                        cajaGeneralCorpogas: 2844,
+                        cajaGeneralSanLuis: 2788,
+                        servicioViajeEspecial: 7,
+                        listoParaEnviar: 1,
                     }
                 }
                 respuesta = mapObj[runtime.envType];

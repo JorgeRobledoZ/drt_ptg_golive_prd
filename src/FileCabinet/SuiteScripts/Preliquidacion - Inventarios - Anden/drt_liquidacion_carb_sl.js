@@ -28,6 +28,8 @@
             log.audit("fechaI", fechaI);
             var fechaF = req_param.fechaF;
             log.audit("fechaF", fechaF);
+            var incremento_inicio = req_param.incremento_inicio;
+            log.audit("incremento_inicio", incremento_inicio);
             
             log.audit('Remaining Usage start proceso', runtime.getCurrentScript().getRemainingUsage());
 
@@ -203,6 +205,7 @@
                         search.createColumn({name: "total",summary: "SUM",label: "Importe (total de transacción)"})
                     ]
                 });
+                log.audit("detalleGasVentasObj", detalleGasVentasObj);
                 
                 var detalleGasVentasCount = detalleGasVentasObj.runPaged().count;
                 log.debug("detalleGasVentasCount", detalleGasVentasCount);
@@ -740,6 +743,7 @@
                     ]
                 });
                 var oppEnvasesObjCount = oppEnvasesObj.runPaged().count;
+                log.audit("oppEnvasesObjCount", oppEnvasesObjCount);
                 var oppEnvasesObjResult = oppEnvasesObj.run().getRange({
                     start: 0,
                     end: oppEnvasesObjCount,
@@ -751,22 +755,30 @@
                 }
                 log.debug("oportunidadEnvaseArray", oportunidadEnvaseArray);
 
+
                 var sumaTotal = 0;
                 for(j = 1; j < 37; j++){
                     if (j != multiple){
-                        //SS: PTG - Pagos Oportunidad Lineas SS
-                        var tipoPagoEnvaseObj = search.create({
-                            type: "customrecord_ptg_pagos_oportunidad",
-                            filters: [
-                               ["custrecord_ptg_oportunidad","anyof",oportunidadEnvaseArray], "AND", 
-                               ["custrecord_ptg_tipo_pago","anyof",j]
-                            ],
-                            columns:[
-                               search.createColumn({name: "custrecord_ptg_tipo_pago", summary: "GROUP", label: "PTG - Tipo de Pago"}),
-                               search.createColumn({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})
-                            ]
-                        });
-                        var tipoPagoEnvaseObjCount = tipoPagoEnvaseObj.runPaged().count;
+                        var tipoPagoEnvaseObjCount = 0;
+                        var tipoPagoEnvaseObj = "";
+
+                        if(oppEnvasesObjCount > 0){
+                            //SS: PTG - Pagos Oportunidad Lineas SS
+                            tipoPagoEnvaseObj = search.create({
+                                type: "customrecord_ptg_pagos_oportunidad",
+                                filters: [
+                                    ["custrecord_ptg_oportunidad","anyof",oportunidadEnvaseArray], "AND", 
+                                    ["custrecord_ptg_tipo_pago","anyof",j]
+                                ],
+                                columns:[
+                                    search.createColumn({name: "custrecord_ptg_tipo_pago", summary: "GROUP", label: "PTG - Tipo de Pago"}),
+                                    search.createColumn({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})
+                                ]
+                            });
+                            tipoPagoEnvaseObjCount = tipoPagoEnvaseObj.runPaged().count;
+                        }
+                        
+
                         var tipoPago = 0;
                         var montoPago = 0;
                          
@@ -794,7 +806,7 @@
                         recEnvasesTipoPago.setValue("custrecord_ptg_totaltipopago_", montoPago);
                         recEnvasesTipoPago.setValue("custrecord_ptg_envases_por_tipopago_", recId);
                         var recEnvasesTipoPagoIdSaved = recEnvasesTipoPago.save();
-                        log.debug({
+                        log.audit({
                             title: "ENVASES TIPO DE PAGO",
                             details: "Id Saved: " + recEnvasesTipoPagoIdSaved,
                         });

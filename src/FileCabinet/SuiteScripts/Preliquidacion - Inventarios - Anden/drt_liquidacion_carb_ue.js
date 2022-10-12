@@ -195,6 +195,12 @@
                         label: "Facturar Estaciones de Carburación",
                         functionName: "facturarOportunidad()",
                     });
+
+                    form.addButton({
+                        id: "custpage_drt_eliminar",
+                        label: "Eliminar Liquidación",
+                        functionName: "redirectToEliminar()",
+                    });
                 }
                 
                 var estacionCarburacion = customRec.getValue("custrecord_ptg_est_carb_registro_");
@@ -334,8 +340,9 @@
                         end: 2,
                     });
                     tipoPago = tipoPagoEfectivoServGasObjResult[0].getValue({name: "custrecord_ptg_tipo_pago", summary: "GROUP", label: "PTG - Tipo de Pago"});
-                    sumaEfectivo = parseFloat(tipoPagoEfectivoServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
+                    sumaEfectivo = Number(tipoPagoEfectivoServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
+                log.debug("sumaEfectivo", sumaEfectivo);
 
 
                 //SS: PTG - Pagos Oportunidad Lineas SS
@@ -358,8 +365,9 @@
                         end: 2,
                     });
                     tipoPago = tipoPagoCreditoServGasObjResult[0].getValue({name: "custrecord_ptg_tipo_pago", summary: "GROUP", label: "PTG - Tipo de Pago"});
-                    sumaCredito = parseFloat(tipoPagoCreditoServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
+                    sumaCredito = Number(tipoPagoCreditoServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
+                log.debug("sumaCredito", sumaCredito);
 
 
                 //SS: PTG - Pagos Oportunidad Lineas SS
@@ -380,10 +388,11 @@
                         start: 0,
                         end: 2,
                     });
-                    sumaOtros = parseFloat(tipoPagoOtrosServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
+                    sumaOtros = Number(tipoPagoOtrosServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
+                log.debug("sumaOtros", sumaOtros);
 
-                suma = sumaEfectivo + sumaCredito + sumaOtros;
+                suma = parseFloat(sumaEfectivo) + parseFloat(sumaCredito) + parseFloat(sumaOtros);
 
 
                 //LIQUIDACION: TOTALES CABECERA
@@ -488,7 +497,7 @@
                     sumaOtrosTS = parseFloat(tipoPagoOtrosServObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
 
-                sumaTS = sumaEfectivoTS + sumaCreditoTS + sumaOtrosTS;
+                sumaTS = parseFloat(sumaEfectivoTS) + parseFloat(sumaCreditoTS) + parseFloat(sumaOtrosTS);
                     
 
 
@@ -537,7 +546,7 @@
                     custrecord_ptg_facturas_errores_carb: facturasGeneradasErroresCount,
                 };
 
-                log.audit("objUpdateVentas", objUpdateVentas);
+                log.audit("objUpdateVentas_1", objUpdateVentas);
                 record.submitFields({
                     id: customRec.id,
                     type: customRec.type,
@@ -1060,6 +1069,7 @@
                     tipoPago = tipoPagoEfectivoServGasObjResult[0].getValue({name: "custrecord_ptg_tipo_pago", summary: "GROUP", label: "PTG - Tipo de Pago"});
                     sumaEfectivo = parseFloat(tipoPagoEfectivoServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
+                log.audit("sumaEfectivo", sumaEfectivo);
 
 
                 //SS: PTG - Pagos Oportunidad Lineas SS
@@ -1084,6 +1094,7 @@
                     tipoPago = tipoPagoCreditoServGasObjResult[0].getValue({name: "custrecord_ptg_tipo_pago", summary: "GROUP", label: "PTG - Tipo de Pago"});
                     sumaCredito = parseFloat(tipoPagoCreditoServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
                 }
+                log.audit("sumaCredito", sumaCredito);
 
 
                 //SS: PTG - Pagos Oportunidad Lineas SS
@@ -1097,15 +1108,21 @@
                        search.createColumn({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})
                     ]
                 });
+                log.audit("tipoPagoOtrosServGasObj", tipoPagoOtrosServGasObj);
                 var tipoPagoOtrosServGasObjCount = tipoPagoOtrosServGasObj.runPaged().count;
-
+                log.audit("tipoPagoOtrosServGasObjCount", tipoPagoOtrosServGasObjCount);
                 if(tipoPagoOtrosServGasObjCount > 0){
                     var tipoPagoOtrosServGasObjResult = tipoPagoOtrosServGasObj.run().getRange({
                         start: 0,
                         end: 2,
                     });
-                    sumaOtros = parseFloat(tipoPagoOtrosServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"})).toFixed(6);
+                    log.audit("tipoPagoOtrosServGasObjResult", tipoPagoOtrosServGasObjResult);
+                    sumaOtros = tipoPagoOtrosServGasObjResult[0].getValue({name: "custrecord_ptg_total", summary: "SUM", label: "PTG - Total"});
+                } else {
+                    sumaOtros = 0;
+                    log.audit("entra sumaOtros cero");
                 }
+                log.audit("sumaOtros", sumaOtros);
 
                 suma = sumaEfectivo + sumaCredito + sumaOtros;
 
@@ -1125,7 +1142,7 @@
                     custrecord_ptg_conteo_exceso_preliq_carb: conteoExceso,
                     custrecord_ptg_conteo_restri_preliq_carb: conteoRestriccion,
                 };
-                log.audit("objUpdateVentas", objUpdateVentas);
+                log.audit("objUpdateVentas_2", objUpdateVentas);
                 record.submitFields({
                     id: customRec.id,
                     type: customRec.type,

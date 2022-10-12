@@ -28,6 +28,10 @@
         log.audit("parametroVehiculo", parametroVehiculo);
         var parametroNoViaje = urlParametro.get('noviaje');
         log.audit("parametroNoViaje", parametroNoViaje);
+        var element = document.getElementById("btn_multibutton_submitter");
+        log.audit("element", element);
+
+        element.value = "Procesar";
 
           if(parametroVehiculo){
             currentRecord.setValue("custrecord_ptg_nodevehiculo_prelicil_", parametroVehiculo);
@@ -228,7 +232,7 @@
           (idRegistro = preliquidacionObjResult[0].getValue({name: "internalid", label: "Internal ID"}));
           log.emergency("preliquidacionExiste", preliquidacionExiste);
           log.emergency("idRegistro", idRegistro);
-        } 
+        }
 
         if(preliquidacionExiste && recId != idRegistro){
           var options = {
@@ -237,7 +241,7 @@
           };
           dialog.alert(options);
           //return false
-          return true
+          return false;
         }
         
         else {
@@ -756,6 +760,26 @@
 
   }
 
+  function redirectToEliminar(){
+    try {
+
+      var urlStlt = url.resolveScript({
+        scriptId: "customscript_drt_ptg_eliminar_preliq_sl",
+        deploymentId: "customdeploy_drt_ptg_eliminar_preliq_sl",
+        returnExternalUrl: false
+      });
+
+      log.audit("urlStlt", urlStlt);
+
+      https.get({
+        url: urlStlt+'&id='+currentRecord.get().id+'&custom=customrecord_ptg_preliquicilndros_'
+      });
+    
+    } catch (e) {
+      log.error("Error", "[ redirectToEliminar ] " + e);
+    }
+  };
+
     return {
         pageInit: pageInit,
         fieldChanged: fieldChanged,
@@ -767,5 +791,6 @@
         redirectToAprobar: redirectToAprobar,
         borrarDesglose: borrarDesglose,
         redirectToNuevoViaje: redirectToNuevoViaje,
+        redirectToEliminar: redirectToEliminar
     };
 });

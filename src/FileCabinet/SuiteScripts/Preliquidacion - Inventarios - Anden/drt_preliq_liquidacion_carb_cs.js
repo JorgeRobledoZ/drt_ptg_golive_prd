@@ -72,7 +72,7 @@
               log.audit("controlLitros", controlLitros);
               var litrosTotal = totalUltimoCorte1 - totalEstaCorte1;
               log.audit("litrosTotal", litrosTotal);
-              currentRecord.setValue("custrecord_ptg_control_en_lts_1", controlLitros);
+              currentRecord.setValue("custrecord_ptg_control_en_lts_1", controlLitros.toFixed(2));
               currentRecord.setValue("custrecord_ptg_lts_total_1", litrosTotal);
             }
 
@@ -82,7 +82,7 @@
               log.audit("controlLitros", controlLitros);
               var litrosTotal = totalUltimoCorte2 - totalEstaCorte2;
               log.audit("litrosTotal", litrosTotal);
-              currentRecord.setValue("custrecord_ptg_control_en_lts_2", controlLitros);
+              currentRecord.setValue("custrecord_ptg_control_en_lts_2", controlLitros.toFixed(2));
               currentRecord.setValue("custrecord_ptg_lts_total_2", litrosTotal);
             }
 
@@ -611,6 +611,26 @@
 
 };
 
+function redirectToEliminar(){
+  try {
+
+    var urlStlt = url.resolveScript({
+      scriptId: "customscript_drt_ptg_eliminar_preliq_sl",
+      deploymentId: "customdeploy_drt_ptg_eliminar_preliq_sl",
+      returnExternalUrl: false
+    });
+
+    log.audit("urlStlt", urlStlt);
+
+    https.get({
+      url: urlStlt+'&id='+currentRecord.get().id+'&custom=customrecord_ptg_preliqestcarburacion_'
+    });
+  
+  } catch (e) {
+    log.error("Error", "[ redirectToEliminar ] " + e);
+  }
+};
+
     return {
         pageInit: pageInit,
         fieldChanged: fieldChanged,
@@ -620,5 +640,6 @@
         saveRecord: saveRecord,
         borrarDesglose: borrarDesglose,
         redirectToAprobar: redirectToAprobar,
+        redirectToEliminar: redirectToEliminar
     };
 });

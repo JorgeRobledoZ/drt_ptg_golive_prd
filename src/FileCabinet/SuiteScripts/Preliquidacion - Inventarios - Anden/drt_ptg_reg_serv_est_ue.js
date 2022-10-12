@@ -19,16 +19,11 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var newRecord = context.newRecord;
         var recId = newRecord.id;
         var type_interface = runtime.executionContext;
-        log.audit("type_interface", type_interface);
         var type_event = context.type;
-        log.audit("type_event", type_event);
         var recObj = context.newRecord;
-        log.audit("recObj", recObj);
         var form = context.form;
-        log.audit("form", form);
         var userRoleId = runtime.getCurrentUser().role;
-        log.audit("userRoleId", userRoleId);
-        log.debug(["beforeLoad", "type_interface", "type_event", "recType", "recObj.id", "userRoleId",].join(" - "), [type_interface, type_event, recObj.type, recObj.id, userRoleId].join(" - "));
+        //log.debug(["beforeLoad", "type_interface", "type_event", "recType", "recObj.id", "userRoleId",].join(" - "), [type_interface, type_event, recObj.type, recObj.id, userRoleId].join(" - "));
         var objUpdate = {};
         var estatusEtapa = 0;
         var estatusProcesado = 0;
@@ -44,9 +39,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
 
         if (type_event == "view") {
           var status = newRecord.getValue("custrecord_ptg_etapa_reg_serv_est");
-          log.debug("status", status);
           var tipoServicio = newRecord.getValue("custrecord_ptg_tipo_servici_reg_serv_est");
-          log.debug("tipoServicio", tipoServicio);
+          log.debug("status: "+status, "tipoServicio: "+tipoServicio);
           if (status == estatusEtapa && tipoServicio == servicioCilindros) {
               form.title = "Carga de Servicios de Cilindros";
           } else if (status == estatusEtapa && tipoServicio == servicioEstacionarios) {
@@ -55,20 +49,20 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             form.title = "Servicios Procesados";
           }
           
-          if (status == estatusEtapa && tipoServicio == servicioCilindros) {
+          /*if (status == estatusEtapa && tipoServicio == servicioCilindros) {
               form.addButton({
                   id: "custpage_drt_to_preliq_est",
                   label: "Preliquidación Cilindros",
                   functionName: "pasarPreliquidacion()",
               });
           }
-          if (status == estatusEtapa && tipoServicio == servicioEstacionarios) {
+          if (status == estatusEtapa && tipoServicio == servicioEstacionarios) {*/
             form.addButton({
                 id: "custpage_drt_to_preliq_est",
                 label: "Preliquidación Estacionarios",
                 functionName: "pasarPreliquidacion()",
             });
-        }
+        //}
 
           form.clientScriptModulePath = "./drt_ptg_reg_serv_est_cs.js";       
 
@@ -89,21 +83,16 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var numViaje = newRecord.getValue("custrecord_ptg_num_viaje_reg_serv_est");
         var etapa = newRecord.getValue("custrecord_ptg_etapa_reg_serv_est");
         var fechaInicio = newRecord.getValue("custrecord_ptg_fecha_inicio_reg_serv_est");
-        log.audit("fechaInicio", fechaInicio);
+        var tipoServicio = newRecord.getValue("custrecord_ptg_tipo_servici_reg_serv_est");
         var fechaFin = newRecord.getValue("custrecord_ptg_fecha_fin_reg_serv_est");
-        log.audit("fechaFin", fechaFin);
+        log.audit("fechaInicio: "+fechaInicio, "fechaFin: "+fechaFin);
         var type_interface = runtime.executionContext;
-        log.audit("type_interface", type_interface);
         var type_event = context.type;
-        log.audit("type_event", type_event);
         var recObj = context.newRecord;
-        log.audit("recObj", recObj);
         var form = context.form;
-        log.audit("form", form);
         var userRoleId = runtime.getCurrentUser().role;
-        log.audit("userRoleId", userRoleId);
-        log.debug(["beforeLoad", "type_interface", "type_event", "recType", "recObj.id", "userRoleId",].join(" - "), [type_interface, type_event, recObj.type, recObj.id, userRoleId].join(" - "));
-        log.debug(["afterSubmit", "type_interface", "type_event", "recType", "recObj.id", "userRoleId",].join(" - "), [type_interface, type_event, recObj.type, recObj.id, userRoleId].join(" - "));
+        //log.debug(["beforeLoad", "type_interface", "type_event", "recType", "recObj.id", "userRoleId",].join(" - "), [type_interface, type_event, recObj.type, recObj.id, userRoleId].join(" - "));
+        //log.debug(["afterSubmit", "type_interface", "type_event", "recType", "recObj.id", "userRoleId",].join(" - "), [type_interface, type_event, recObj.type, recObj.id, userRoleId].join(" - "));
         var estatusEtapaCarga = 0;
         var estatusEtapaProcesado = 0;
         var estatusEtapaConciliado = 0;
@@ -112,7 +101,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         if (Object.keys(objMap).length>0) {
           estatusEtapaCarga = 1;
           estatusEtapaProcesado = 2;
-          estatusEtapaConciliado = 3;
+          estatusEtapaConciliado = 4;
         }
 
         if(fechaInicio && fechaFin){
@@ -127,7 +116,6 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             type: format.Type.DATE,
             timezone: tz,
           });
-          log.debug("tmInicio", tmInicio);
   
   
           var e = fechaFin;
@@ -137,13 +125,13 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             type: format.Type.DATE,
             timezone: tz,
           });
-          log.debug("tmFin", tmFin);
+          log.debug("tmInicio: "+tmInicio, "tmFin: "+tmFin);
         }
 
         
 
 
-        if(etapa == estatusEtapaConciliado){
+        if(etapa == estatusEtapaConciliado && !tipoServicio && type_interface === "USERINTERFACE"){
 
           //SS: PTG - Registro Conciliacion Esta
           var recConciliarEstaObj = search.create({
@@ -199,12 +187,12 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
 
           log.audit("registroUpd", registroUpd);
 
-  
+          var parametros = {};
           if(busquedaMayor > 0){
             log.audit("af");
             for(var i = 0; i < busquedaMayor; i++){
                 log.audit("*****Entra implementacion "+i+"*****", "*****Entra implementacion "+i+"*****");
-                var parametros = {
+                parametros = {
                     'recId': recId,
                     'vehiculo': vehiculo,
                     'fechaInicio': tmInicio,
@@ -220,12 +208,22 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                 });
                 log.audit("redirectToStl", redirectToStl);
             }            
+          } else {
+            redirect.toRecord({
+              type: 'customrecord_ptg_registro_servicios_esta',
+              id: recId,
+              isEditMode: true,
+              parameters: {
+                etapa: estatusEtapaConciliado,
+                tiposervicio: 2,
+              }
+          });
           }
         }
 
         
-        else if (etapa == estatusEtapaCarga) {
-          log.debug("pasa");
+        else if (etapa == estatusEtapaCarga && tipoServicio == 2 && type_interface === "USERINTERFACE") {
+          log.debug("Crea la tarea");
         var mrTask = task.create({
           taskType: task.TaskType.MAP_REDUCE,
           scriptId: 'customscript_drt_ptg_reg_serv_est_mr',

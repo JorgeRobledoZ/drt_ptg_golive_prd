@@ -19,10 +19,22 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             var currentRecord = context.currentRecord;
             var nombre = 'Por Asignar';
             currentRecord.setValue("name", nombre);
-            currentRecord.setValue("custrecord_ptg_etapa_reg_serv_est", 1);
+            var parametroRespuesta = window.location.search;
+            log.audit("parametroRespuesta", parametroRespuesta);
+            var urlParametro = new URLSearchParams(parametroRespuesta);
+            var parametroEtapa = urlParametro.get("etapa");
+            var parametroTipoServicio = urlParametro.get("tiposervicio");
+
+            if (parametroEtapa) {
+              currentRecord.setValue("custrecord_ptg_etapa_reg_serv_est",parametroEtapa);
+              currentRecord.setValue("custrecord_ptg_tipo_servici_reg_serv_est",parametroTipoServicio);
+            } else {
+              currentRecord.setValue("custrecord_ptg_etapa_reg_serv_est", 1);
+              currentRecord.setValue("custrecord_ptg_tipo_servici_reg_serv_est", 2);
+            }
 
         } catch (error) {
-            log.debug({
+            log.error({
                 title: "error pageInit",
                 details: JSON.stringify(error),
             });
@@ -63,7 +75,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
 
             if((fechaInicio && cabeceraFieldName === "custrecord_ptg_fecha_inicio_reg_serv_est") || (fechaFin && cabeceraFieldName === "custrecord_ptg_fecha_fin_reg_serv_est")){
               element.value = "Conciliar";
-              currentRecord.setValue("custrecord_ptg_etapa_reg_serv_est", 3);
+              currentRecord.setValue("custrecord_ptg_etapa_reg_serv_est", 4);
+              currentRecord.setValue("custrecord_ptg_tipo_servici_reg_serv_est", "");
             } else if ((!fechaInicio && cabeceraFieldName === "custrecord_ptg_fecha_inicio_reg_serv_est") && (!fechaFin && cabeceraFieldName === "custrecord_ptg_fecha_fin_reg_serv_est")){
               element.value = "Guardar";
               currentRecord.setValue("custrecord_ptg_etapa_reg_serv_est", 1);
@@ -712,7 +725,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
       
         return true;
       } catch (error) {
-        console.log({
+        log.error({
           title: "error validateDelete",
           details: JSON.stringify(error),
         });
@@ -728,6 +741,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var litrosAcumulados = currentRecord.getValue("custrecord_ptg_litros_acumu_reg_serv_est");
         var vehiculo = currentRecord.getValue("custrecord_ptg_no_vehiculo_reg_serv_est");
         var numViaje = currentRecord.getValue("custrecord_ptg_num_viaje_reg_serv_est");
+        var nombreSublistaRegistro = "recmachcustrecord_ptg_id_reg_serv_est_lin";
+        var tipoServicio = currentRecord.getValue("custrecord_ptg_tipo_servici_reg_serv_est");
 
         //SS: PTG - PreLiquidacion Estacionarios Fact SS
         var preliquidacionObj = search.create({
@@ -743,7 +758,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var preliquidacionObjCount = preliquidacionObj.runPaged().count;
 
         //Validación que bloquea si ya hay una preliquidación no permite guardar
-        if(preliquidacionObjCount > 0){
+        if(preliquidacionObjCount > 2){
           var options = {
             title: "Acción No Permitida",
             message: "Existe una preliquidación creada con el número de viaje",
@@ -751,7 +766,97 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           dialog.alert(options);
           return false;
         } else {
-          return true;
+
+          //SS: PTG - Registro Salida Pipas SS
+          var salidaPipasObj = search.create({
+            type: "customrecord_ptg_registro_salida_pipas_",
+            filters: [
+               ["custrecord_ptg_salida_pipa_","anyof",vehiculo], "AND", 
+               ["custrecord_ptg_numviaje_salida_pipa","anyof",numViaje]
+            ],
+            columns:
+            [
+              search.createColumn({name: "custrecord_ptg_lts_totalizador_salida_", label: "PTG - Litros totalizador salida"})
+            ]
+          });
+          var salidaPipasObjCount = salidaPipasObj.runPaged().count;
+
+          if(salidaPipasObjCount > 0){
+            var salidaPipasObjResults = salidaPipasObj.run().getRange({
+              start: 0,
+              end: 2,
+            });
+            litrosTotalSalida = parseFloat(salidaPipasObjResults[0].getValue({name: "custrecord_ptg_lts_totalizador_salida_", label: "PTG - Litros totalizador salida"}));
+          } else {
+            var options = {
+              title: "Error de registro",
+              message: "El vehículo no tiene registro de salida",
+            };
+            dialog.alert(options);
+            return false;
+          }
+          
+
+          var entradaPipasObj = search.create({
+            type: "customrecord_ptg_entrada_pipas_",
+            filters: [
+               ["custrecord_ptg_vehiculoentrada_","anyof",vehiculo], "AND", 
+               ["custrecord_ptg_numviaje_entradapipa_","anyof",numViaje]
+            ],
+            columns: [
+               search.createColumn({name: "custrecord_ptg_lts_totali_entrada_pipa_", label: "PTG - Litros totalizador entrada pipa"})
+            ]
+          });
+
+          var entradaPipasObjCount = entradaPipasObj.runPaged().count;
+
+          if(entradaPipasObjCount > 0){
+            var entradaPipasObjResults = entradaPipasObj.run().getRange({
+              start: 0,
+              end: 2,
+            });
+  
+            litrosTotalEntrada = parseFloat(entradaPipasObjResults[0].getValue({name: "custrecord_ptg_lts_totali_entrada_pipa_", label: "PTG - Litros totalizador entrada pipa"}));
+          } else {
+            var options = {
+              title: "Error de registro",
+              message: "El vehículo no tiene registro de entrada",
+            };
+            dialog.alert(options);
+            return false;
+          }
+
+          var diferenciaLitros = litrosTotalEntrada - litrosTotalSalida;
+
+          var numeroLineas = currentRecord.getLineCount(nombreSublistaRegistro);
+          log.debug("numeroLineas", numeroLineas);
+          var litrosTotalLineas = 0;
+          for(var j = 0; j < numeroLineas; j++){
+            log.debug("j", j);
+
+            cantidadLitrosLinea = currentRecord.getSublistValue({
+              sublistId: nombreSublistaRegistro,
+              fieldId: "custrecord_ptg_cant_old_reg_serv_est_lin",
+              line: j,
+            });
+            
+            log.audit("cantidadLitrosLinea "+j, cantidadLitrosLinea);
+            litrosTotalLineas += cantidadLitrosLinea;
+          }
+          log.audit("litrosTotalLineas: "+litrosTotalLineas, "diferenciaLitros: "+diferenciaLitros );
+
+          if(tipoServicio && litrosTotalLineas.toFixed(4) != diferenciaLitros){
+            var options = {
+              title: "Litros no coinciden",
+              message: "La cantidad de los litros reportados en la entrada y la salida ("+diferenciaLitros+") no coincide con el total de litros registrados "+litrosTotalLineas,
+            };
+            dialog.alert(options);
+            return false;
+          } else {
+            log.audit("Si pasó litrosTotalLineas.toFixed(4): "+ litrosTotalLineas.toFixed(4), "diferenciaLitros: "+diferenciaLitros);
+            return true;
+          }
+          
         }
 
         /*if (litrosAcumulados == litrosRepostadosEntrada) {
@@ -766,7 +871,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         }*/
 
       } catch (error) {
-        log.audit("error saveRecord", error);
+        log.error("error saveRecord", error);
       }
    }
 

@@ -124,6 +124,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                     envase20 = objMap.envase20;
                     envase30 = objMap.envase30;
                     envase45 = objMap.envase45;
+                    gasLP = objMap.gasLP;
                 }
 
                 var fechaI = fechaInicio;
