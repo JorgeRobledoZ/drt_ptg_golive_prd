@@ -805,11 +805,19 @@
                             sublistId: 'item'
                         });
 
+                        const macros = facturaFlete.getMacros();
+                        log.audit('macros', macros);
+                        if ('calculateTax' in macros) {
+                            facturaFlete.executeMacro({
+                                id: 'calculateTax'
+                            });
+                        }
+
                         idFactura3 = facturaFlete.save();
                         log.audit('idFacturaFlete', idFactura3);
 
                     } catch (errorF) {
-                        log.audit('errorF', errorF)
+                        log.error('errorF', errorF)
                     }
 
                     /**************Proceso de Creacion de Orden de traslado****************** */
