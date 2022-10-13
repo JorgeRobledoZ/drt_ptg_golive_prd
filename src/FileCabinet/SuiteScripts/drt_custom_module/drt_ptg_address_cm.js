@@ -107,8 +107,9 @@ define([
                         name: `${addE.addresslabeladdress || ""} ${entityName} ${addE.custrecord_ptg_streetaddress} ${addE.custrecord_ptg_exterior_numberaddress} ${addE.custrecord_ptg_interior_numberaddress} ${addE.custrecord_ptg_codigo_postaladdress} ${addE.custrecord_ptg_nombre_coloniaaddress} ${addE.custrecord_ptg_estadoaddress}`,
                         custrecord_ptg_cliente_dir: addE.id || "",
                         custrecord_ptg_direccion_dir: `${addE.custrecord_ptg_streetaddress} ${addE.custrecord_ptg_exterior_numberaddress} ${addE.custrecord_ptg_interior_numberaddress} ${addE.custrecord_ptg_codigo_postaladdress} ${addE.custrecord_ptg_nombre_coloniaaddress} ${addE.custrecord_ptg_estadoaddress}`,
-                        custrecord_ptg_direccion: addE.internalidaddress || "",
+                        custrecord_ptg_direccion: addE.addressinternalidaddress || "",
                         custrecord_ptg_zona_precios: addE.custrecord_ptg_zona_de_precioaddress || "",
+                        custrecord_ptg_id_interno_direccion: addE.internalidaddress || "",
                     };
                     arrayAddressCustomRecord.forEach((addCR) => {
                         const existObj = addCR.custrecord_ptg_cliente_dir === addE.id && addCR.custrecord_ptg_direccion === addE.internalidaddress;
