@@ -119,6 +119,12 @@
                         line: i
                     })
 
+                    var idDetalle =  currentRecord.getSublistValue({
+                        sublistId: 'recmachcustrecord_ptg_confirmacion_salida_',
+                        fieldId: 'id',
+                        line: i
+                    })
+
                     log.audit('pg', pg);
                     log.audit('cantidad', cantidad);
                     log.audit('sobrePrecioClientes', sobrePrecioClientes);
@@ -239,7 +245,8 @@
                         sobre_precio_cliente: sobrePrecioClientes,
                         rate: rateConfinrmacion,
                         provedorFlete: provedorFlete,
-                        litros: litros
+                        litros: litros,
+                        idDetalle : idDetalle
                     }
 
                     arrayPo.push(objPo);
@@ -286,7 +293,7 @@
                     log.audit('idCompra', idCompra);
 
                     /*******************Proceso de recepciones**********************/
-                    if (!arrayPo[po]['planta_desvio']) {
+                    if (arrayPo[po]['tipo_desvio'] == 3){
                         try {
                             let recepcion2 = record.transform({
                                 fromType: record.Type.PURCHASE_ORDER,
@@ -324,7 +331,7 @@
 
                                 var pgAsignado = recepcion2.getCurrentSublistText({
                                     sublistId: 'item',
-                                    fieldId: 'custcol2disp'
+                                    fieldId: 'custcol2'
                                 });
 
                                 if (pgAsignado == arrayPo[po]['pg']) {
@@ -460,7 +467,7 @@
                                     fromType: record.Type.SALES_ORDER,
                                     fromId: idSOS,
                                     toType: record.Type.ITEM_FULFILLMENT,
-                                    isDynamic: false,
+                                    isDynamic: true,
                                     defaultValues: {
                                         inventorylocation: arrayPo[po]['location']
                                     }
@@ -470,6 +477,28 @@
                                     fieldId: 'customform',
                                     value: 290
                                 });
+
+                                var lineasFulfillCliente = itemFulFill.getLineCount({
+                                    sublistId: "item"
+                                });
+                                //context.newRecord.id
+                                for(var so = 0; s < lineasFulfillCliente; s ++){
+                                    itemFulFill.selectLine({
+                                        sublistId: 'item',
+                                        line: so
+                                    });
+
+                                    itemFulFill.setCurrentSublistValue({
+                                        sublistId: 'item',
+                                        fieldId: 'custcol_ptg_registro_salida_',
+                                        value: arrayPo[po]['idDetalle'],
+                                        line: so
+                                    });
+
+                                    itemFulFill.commitLine({
+                                        sublistId: 'item'
+                                    });
+                                }
 
                                 let saveItemFull = itemFulFill.save();
                                 log.audit('saveItemFull', saveItemFull);
@@ -785,7 +814,7 @@
 
                     /**************Proceso de Creacion de Orden de traslado****************** */
 
-                    if (arrayPo[po]['planta_desvio']) {
+                    if (arrayPo[po]['planta_desvio'] || arrayPo[po]['cliente_desvio']) {
                         try {
                             let createTransferOrder = record.create({
                                 type: record.Type.TRANSFER_ORDER,
@@ -900,6 +929,28 @@
                                     value: form_full_filment
                                 });
 
+                                if (arrayPo[po]['tipo_desvio'] == 1) {
+    
+                                    fulfillment.setValue({
+                                        fieldId: 'transferlocation',
+                                        value: idAlmacenVirtual
+                                    });
+    
+                                } else if (arrayPo[po]['tipo_desvio'] == 2) {
+    
+                                    fulfillment.setValue({
+                                        fieldId: 'transferlocation',
+                                        value: idAlmacenVirtual
+                                    });
+    
+                                } else if (arrayPo[po]['tipo_desvio'] == 4) {
+    
+                                    fulfillment.setValue({
+                                        fieldId: 'transferlocation',
+                                        value: idAlmacenVirtual
+                                    });
+                                } 
+
                                 let saveItemFulfilemnt = fulfillment.save({
                                     enableSourcing: false,
                                     ignoreMandatoryFields: true
@@ -920,6 +971,43 @@
                                         value: form_item_receipt
                                     });
 
+                                    if (arrayPo[po]['tipo_desvio'] == 1) {
+                                        receiptOrder.setValue({
+                                            fieldId: 'location',
+                                            value: idAlmacenVirtual
+                                        });
+
+                                        receiptOrder.setValue({
+                                            fieldId: 'transferlocation',
+                                            value: arrayPo[po]['location']
+                                        });
+  
+                                        
+                                    } else if (arrayPo[po]['tipo_desvio'] == 2) {
+                                        receiptOrder.setValue({
+                                            fieldId: 'location',
+                                            value: idAlmacenVirtual
+                                        });
+
+                                        receiptOrder.setValue({
+                                            fieldId: 'transferlocation',
+                                            value: arrayPo[po]['location']
+                                        });
+        
+                                    } else if (arrayPo[po]['tipo_desvio'] == 4) {
+                                        receiptOrder.setValue({
+                                            fieldId: 'location',
+                                            value: ubicacion_transfer_order
+                                        });
+
+                                        receiptOrder.setValue({
+                                            fieldId: 'transferlocation',
+                                            value: arrayPo[po]['location']
+                                        });
+                                    } 
+
+                                    /*
+
                                     if (arrayPo[po]['tipo_desvio'] == 4) {
                                         receiptOrder.setValue({
                                             fieldId: 'transferlocation',
@@ -931,12 +1019,39 @@
                                             value: arrayPo[po]['planta_desvio']
                                         });
                                     }
+                                    */
 
                                     let lineasRecepcio = receiptOrder.getLineCount({
                                         sublistId: 'item'
                                     });
                                     
                                     for(var r = 0; r < lineasRecepcio; r++){
+                                        /*
+                                        if (arrayPo[po]['tipo_desvio'] == 1) {
+                                            receiptOrder.setSublistValue({
+                                                sublistId: 'item',
+                                                fieldId: 'location',
+                                                value: idAlmacenVirtual,
+                                                line: r
+                                            });
+            
+                                        } else if (arrayPo[po]['tipo_desvio'] == 2) {
+                                            receiptOrder.setSublistValue({
+                                                sublistId: 'item',
+                                                fieldId: 'location',
+                                                value: idAlmacenVirtual,
+                                                line: r
+                                            });
+            
+                                        } else if (arrayPo[po]['tipo_desvio'] == 4) {
+                                            receiptOrder.setSublistValue({
+                                                sublistId: 'item',
+                                                fieldId: 'location',
+                                                value: idAlmacenVirtual,
+                                                line: r
+                                            });
+                                        } 
+                                        
                                         if (arrayPo[po]['tipo_desvio'] == 4) {
                                             receiptOrder.setSublistValue({
                                                 sublistId: 'item',
@@ -952,6 +1067,7 @@
                                                 line: r
                                             });
                                         }
+                                        */
                                     }
 
                                     let facturaFleteLoad = record.load({
@@ -1139,6 +1255,28 @@
                                         fieldId: 'customform',
                                         value: 290
                                     });
+
+                                    var lineasFulfill = itemFulFillInter.getLineCount({
+                                        sublistId: "item"
+                                    });
+                                   
+                                    for(var s = 0; s < lineasFulfill; s ++){
+                                        itemFulFillInter.selectLine({
+                                            sublistId: 'item',
+                                            line: s
+                                        });
+
+                                        itemFulFillInter.setCurrentSublistValue({
+                                            sublistId: 'item',
+                                            fieldId: 'custcol_ptg_registro_salida_',
+                                            value: arrayPo[po]['idDetalle'],
+                                            line: s
+                                        });
+
+                                        itemFulFillInter.commitLine({
+                                            sublistId: 'item'
+                                        });
+                                    }
     
                                     let saveItemFullInter = itemFulFillInter.save();
                                     log.audit('saveItemFullInter', saveItemFullInter);
@@ -1223,12 +1361,6 @@
 
                                         billInter.setCurrentSublistValue({
                                             sublistId: "item",
-                                            fieldId: 'landedcostcategory',
-                                            value: 48
-                                        });
-
-                                        billInter.setCurrentSublistValue({
-                                            sublistId: "item",
                                             fieldId: 'quantity',
                                             value: arrayPo[po]['litros']
                                         });
@@ -1237,20 +1369,6 @@
                                             sublistId: "item",
                                             fieldId: 'rate',
                                             value: arrayPo[po]['tarifa_kilogramo'] + arrayPo[po]['tarifa_sprecio_intercompania']
-                                        });
-                                        //custpage_4601_witaxcode
-                                        //landedcostcategory
-                                        //custcol_4601_witaxapplies
-                                        billInter.setCurrentSublistValue({
-                                            sublistId: "item",
-                                            fieldId: 'mandatorytaxcode',
-                                            value: true
-                                        });
-
-                                        billInter.setCurrentSublistValue({
-                                            sublistId: "item",
-                                            fieldId: 'custcol_4601_witaxapplies',
-                                            value: true
                                         });
 
                                         let articulo = billInter.commitLine({
@@ -1294,7 +1412,7 @@
                             log.audit('idRecepcion2', idRecepcion2);
                             log.audit('idVendorBill', idVendorBill);
                             log.audit('idFactura3', idFactura3);
-                            if (!arrayPo[po]['planta_desvio'] || arrayPo[po]['cliente_desvio']) {
+                            if (arrayPo[po]['tipo_desvio'] == 3) {
                                 pO.setSublistValue({
                                     sublistId: 'item',
                                     fieldId: 'custcol_ptg_recepcion_',
@@ -1308,6 +1426,7 @@
                                 fieldId: 'custcol_ptg_fact_provgas_',
                                 value: idVendorBill,
                                 line: y
+                                
                             });
 
                             pO.setSublistValue({
@@ -1359,7 +1478,7 @@
 
 
                     /*********************seteo de cantidad en la recepcion*****************************/
-                    if (arrayPo[po]['planta_desvio']){
+                    if (arrayPo[po]['tipo_desvio'] == 1 || arrayPo[po]['tipo_desvio'] == 2 || arrayPo[po]['tipo_desvio'] == 4){
 
                         var itemreceiptSearchObj = search.create({
                             type: "itemreceipt",
@@ -1369,7 +1488,7 @@
                                "AND", 
                                ["mainline","is","F"], 
                                "AND", 
-                               ["custcol2disp","is", arrayPo[po]['pg']]
+                               ["custcol2","is", arrayPo[po]['pg']]
                             ],
                             columns:
                             [
@@ -1399,7 +1518,7 @@
                             
                             var pgRecepcion = recepcionLoad.getSublistValue({
                                 sublistId: 'item',
-                                fieldId: 'custcol2disp',
+                                fieldId: 'custcol2',
                                 line: r
                             });
 
