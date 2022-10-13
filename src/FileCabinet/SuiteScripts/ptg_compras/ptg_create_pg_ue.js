@@ -284,7 +284,145 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search"], 
         }
     }
 
+    const beforeSubmit = (context) => {
+        try {
+            log.audit('beforeSubmit', `${context.type} ${context.newRecord.type} ${context.newRecord.id}`);
+            const currentRecord = context.newRecord;
+            const customform = currentRecord.getValue({
+                fieldId: 'customform',
+            });
+            if (
+                (
+                    context.type == context.UserEventType.CREATE ||
+                    context.type == context.UserEventType.ORDERITEMS
+                ) &&
+                (
+                    customform == 450 ||
+                    customform == 276
+                )
+            ) {
+
+
+                var lineas = currentRecord.getLineCount({
+                    sublistId: 'item'
+                }) || "";
+
+                const cantidad = currentRecord.getSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'quantity',
+                    line: lineas - 1
+                }) || "";
+
+                const articulo = currentRecord.getSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'item',
+                    line: lineas - 1
+                }) || "";
+
+                const precio = currentRecord.getSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'rate',
+                    line: lineas - 1
+                }) || "";
+
+                const creadoDesde = currentRecord.getSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'createdfrom',
+                    line: lineas - 1
+                }) || "";
+
+                const custcol2 = currentRecord.getSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'custcol2',
+                    line: lineas - 1
+                }) || "";
+
+                var limite = 44000;
+
+                const objLineDefecto = {
+                    quantity: limite,
+                };
+
+                const objDefectoNewLine = {
+                    item: articulo,
+                    rate: precio,
+                    quantity: limite,
+                    createdfrom: creadoDesde,
+                    custcol_drt_desvio_plant_cli_nin: 3,
+                    custcol_ptg_centro_e_destino_: 2027,
+                    custcol_ptg_centroembarcador_: 204,
+                }
+                if (
+                    customform == 450
+                ) {
+                    currentRecord.setValue({
+                        fieldId: 'customform',
+                        value: 276
+                    });
+                }
+                if (
+                    context.type == context.UserEventType.ORDERITEMS||
+                    customform == 450
+                ) {
+                    objLineDefecto.custcol_drt_desvio_plant_cli_nin = 3;
+                    objLineDefecto.custcol_ptg_centro_e_destino_ = 2027;
+                    objLineDefecto.custcol_ptg_centroembarcador_ = 204;
+                    objLineDefecto.custcol2 = 'DEFAULT';
+                    objDefectoNewLine.custcol2 = 'DEFAULT';
+                } else {
+                    objLineDefecto.custcol_ptg_orden_directa_ = true;
+                    objDefectoNewLine.custcol2 = custcol2;
+                }
+                log.audit('valor de linea', `lineas: ${lineas} cantidad: ${cantidad} articulo: ${articulo} precio: ${precio} creadoDesde: ${creadoDesde} `);
+                log.audit('objLineDefecto', objLineDefecto);
+                log.audit('objDefectoNewLine', objDefectoNewLine);
+
+                var numeroLineas = cantidad / limite;
+
+                var formatLineas = Math.ceil(numeroLineas);
+
+                log.audit('formatLineas', formatLineas)
+
+                var lineas_final = formatLineas - 1;
+                log.audit('lineas_final', lineas_final);
+
+                for (let fieldId in objLineDefecto) {
+                    currentRecord.setSublistValue({
+                        sublistId: 'item',
+                        fieldId: fieldId,
+                        value: objLineDefecto[fieldId],
+                        line: 0,
+                    });
+                }
+
+                if (lineas_final > 0) {
+                    for (var j = 0; j < lineas_final; j++) {
+
+                        currentRecord.insertLine({
+                            sublistId: 'item',
+                            line: j + 1
+                        });
+
+                        for (let fieldId2 in objDefectoNewLine) {
+                            log.audit(`fieldId ${fieldId2}`, objDefectoNewLine[fieldId2]);
+                            currentRecord.setSublistValue({
+                                sublistId: 'item',
+                                fieldId: fieldId2,
+                                value: objDefectoNewLine[fieldId2],
+                                line: j + 1
+                            });
+                        }
+                    }
+                }
+
+            }
+        } catch (e) {
+            log.error(`error beforeSubmit`, e);
+        }
+    }
+
     return {
+        beforeSubmit,
         afterSubmit: afterSubmit
     }
 });
