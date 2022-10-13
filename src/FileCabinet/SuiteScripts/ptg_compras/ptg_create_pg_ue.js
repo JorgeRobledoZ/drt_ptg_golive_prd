@@ -23,6 +23,10 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm","N/record", "N/search"], f
                     ubicacion_desvio_planta_receipt = objMap.ubicacion_desvio_planta_receipt;
                 }
 
+                var location = currentRecord2.getValue({
+                    fieldId: 'location'
+                })
+
                 for (var i = 0; i < lineas; i++) {
                     var pg_asignado = currentRecord2.getSublistValue({
                         sublistId: 'item',
@@ -156,10 +160,30 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm","N/record", "N/search"], f
                         });
     
                         log.audit('recepcionDesvio', recepcionDesvio)
+
+                        var customrecord_ptg_mapeo_almacenes_virt_SearchObj = search.create({
+                            type: "customrecord_ptg_mapeo_almacenes_virt_",
+                            filters:
+                            [
+                               ["custrecord_ptg_planta_mapeo_","anyof", location]
+                            ],
+                            columns:
+                            [
+                               search.createColumn({name: "custrecord_ptg_almacen_virtual_", label: "PTG - Almacén Virtual"})
+                            ]
+                         });
+                         var searchMaperoAlmacen = customrecord_ptg_mapeo_almacenes_virt_SearchObj.run().getRange(0, 1);
+                         log.audit('centroE', searchMaperoAlmacen.length);
+                         if (searchMaperoAlmacen.length > 0) {
+                               var idAlmacenVirtual = searchMaperoAlmacen[0].getValue({
+                                 name: 'custrecord_ptg_almacen_virtual_'
+                               })
+                            }
+                          log.audit('idAlmacenVirtual', idAlmacenVirtual)
     
                         recepcionDesvio.setValue({
                             fieldId: 'location', 
-                            value: ubicacion_desvio_planta_receipt
+                            value: idAlmacenVirtual
                         })
     
                         var lineasRecepcion = recepcionDesvio.getLineCount({
@@ -174,7 +198,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm","N/record", "N/search"], f
     
                             var pgAsignado = recepcionDesvio.getCurrentSublistValue({
                                 sublistId: 'item',
-                                fieldId: 'custcol2'
+                                fieldId: 'custcol2disp'
                             });
     
                             if(pgAsignado == arrayRecepcion[r]['pg_asignado']){
@@ -182,7 +206,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm","N/record", "N/search"], f
                                 recepcionDesvio.setCurrentSublistValue({
                                     sublistId: 'item',
                                     fieldId: 'location',
-                                    value: 1525,
+                                    value: idAlmacenVirtual,
                                     line: t
                                 });
     
