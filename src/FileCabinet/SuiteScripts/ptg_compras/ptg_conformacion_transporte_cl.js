@@ -14,7 +14,7 @@ define(["N/search"], function (search) {
             }) || '';
 
             var Temp = 131;
-
+            /*
             if (sublistFieldName === 'custrecord_ptg_noviaje_csa_') {
                 debugger;
 
@@ -43,6 +43,10 @@ define(["N/search"], function (search) {
                         search.createColumn({
                             name: "internalid",
                             label: "ID interno"
+                        }),
+                        search.createColumn({
+                            name: "custrecord_ptg_litros_2",
+                            label: "litros"
                         })
                     ]
                 });
@@ -197,7 +201,7 @@ define(["N/search"], function (search) {
                 }
 
             }
-
+            */
             if (sublistName === 'recmachcustrecord_ptg_confirmacion_salida_' && sublistFieldName === 'custrecord_ptg_numembarqueprogra_confirm') {
 
                 var embarqueP = currentRecord.getCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_numembarqueprogra_confirm') || '';
@@ -312,6 +316,10 @@ define(["N/search"], function (search) {
                         search.createColumn({
                             name: "custrecord_ptg_precio_salida_",
                             label: "PTG - Precio"
+                        }),
+                        search.createColumn({
+                            name: "custrecord_ptg_litros_2",
+                            label: "PTG-litros Salida"
                         }),
                         //
                     ]
@@ -482,6 +490,10 @@ define(["N/search"], function (search) {
                         name: 'custrecord_ptg_precio_salida_'
                     })
 
+                    var litros = searchResultCount[0].getValue({
+                        name: 'custrecord_ptg_litros_2'
+                    })
+
                     log.audit('centroEmbarcadorText', centroEmbarcadorText);
 
 
@@ -591,6 +603,7 @@ define(["N/search"], function (search) {
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_pesofinal_confirmacion_', pesoSalida);
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_pesoinicial_confirmacion_', pesoEntrada);
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_precion_confirmacion', precioSalida)
+                    currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_litros_confirm', litros)
                 }
             }
         } catch (error) {
