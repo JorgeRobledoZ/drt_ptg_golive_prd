@@ -23,6 +23,8 @@
                 name: 'custscript_drt_ptg_id_registro_serv_est'
             }) || '';
             log.debug("idRegistro", idRegistro);
+
+            var valoresProceso = {};
              
             var arrayColumns = [
                 search.createColumn({name: "custrecord_ptg_cliente_reg_serv_est_lin", label: "PTG - Cliente"}),
@@ -74,13 +76,22 @@
                 filters: arrayFilters
             });
 
+            valoresProceso.custrecord_ptg_etapa_reg_serv_est = 1;
 
         } catch (error) {
+            valoresProceso.custrecord_ptg_etapa_reg_serv_est = 3;
             log.audit({
                 title: 'error getInputData',
                 details: JSON.stringify(error)
             });
         } finally {
+            var registroEstacionarios = record.submitFields({
+                type: "customrecord_ptg_registro_servicios_esta",
+                id: idRegistro,
+                values: valoresProceso
+            });
+            log.debug("registroEstacionarios", registroEstacionarios);
+
             log.audit({
                 title: 'respuesta getInputData Finally',
                 details: JSON.stringify(respuesta)
@@ -95,6 +106,13 @@
                 title: 'context map',
                 details: JSON.stringify(context)
             });
+
+            var idRegistro = runtime.getCurrentScript().getParameter({
+                name: 'custscript_drt_ptg_id_registro_serv_est'
+            }) || '';
+            log.debug("idRegistro", idRegistro);
+
+            var valoresProceso = {};
 
             var objValue = JSON.parse(context.value);
             var idRegistroCilindroLinea = objValue.id;
@@ -184,7 +202,7 @@
             var descuentoSinIVA = descuentoPeso / 1.16;
             var descuentoUnitario = (cantidad * descuentoSinIVA) * -1;
             log.audit("Cliente: "+ cliente, "RFC ", rfc);
-            var nombreClienteAFacturar = clienteObj.getValue("custentity_razon_social_para_facturar");
+            var nombreClienteAFacturar = clienteObj.getValue("custentity_mx_sat_registered_name");
             if((rfc != rfcGenerico) || (rfc != rfcPublicoGeneral)){
                 log.audit("Solicita factura");
                 solicitaFactura = true;
@@ -197,7 +215,6 @@
             var vehiculo = runtime.getCurrentScript().getParameter({
                 name: 'custscript_drt_ptg_vehiculo_serv_est'
             }) || '';
-
             if(rutaConciliar){
                 log.debug('INFO', 'Es un registro a conciliar');
                 objPagos = {
@@ -416,6 +433,7 @@
                                 ]
                             });
                             var searchResultCount = opportunitySearchObj.runPaged().count;
+                            log.debug('INFO', 'Cantidad de registros encontrados: '+searchResultCount);
 
                             if (searchResultCount > 0) {
                                 try {
@@ -519,7 +537,8 @@
                                     log.error("Error loading record: ", error);
                                 }
                             } else {
-                                log.audit('No se encontró oportunidad para el servicio:', servicio_id);
+                                //log.audit('No se encontró oportunidad para el servicio:', servicio_id);
+                                log.audit('No se encontró oportunidad para el servicio');
                             }
                         }
                     } else {
@@ -970,22 +989,27 @@
     
                     }
                 }
-            }
-
-            
-            
+            }      
 
             context.write({
                 key: recOportunidadIdSaved,
                 value: recOportunidadIdSaved
             });
+            valoresProceso.custrecord_ptg_etapa_reg_serv_est = 2;
                
         } catch (error) {
-            log.debug('Error en el map', error);
+            valoresProceso.custrecord_ptg_etapa_reg_serv_est = 3;
             log.error({
                 title: 'error map',
                 details: JSON.stringify(error)
             });
+        } finally {
+            var registroEstacionarios = record.submitFields({
+                type: "customrecord_ptg_registro_servicios_esta",
+                id: idRegistro,
+                values: valoresProceso
+            });
+            log.debug("registroEstacionarios", registroEstacionarios);
         }
     }
 

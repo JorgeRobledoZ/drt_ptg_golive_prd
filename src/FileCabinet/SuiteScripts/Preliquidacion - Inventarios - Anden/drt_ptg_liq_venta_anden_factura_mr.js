@@ -20,6 +20,7 @@
             var respuesta = '';
             var id_search = runtime.getCurrentScript().getParameter({name: 'custscript_drt_venta_anden_a_facturar'}) || '';
             log.audit("id_search 1", id_search);
+            var etapaObj = {};
 
             var arrayColumns = [
                 search.createColumn({ name: "custrecord_ptg_oportunidad_liq_anden", summary: "GROUP", label: "PTG - Oportunidad"})
@@ -37,12 +38,20 @@
             var respuestaResultCount = respuesta.runPaged().count;
             log.debug("respuestaResultCount", respuestaResultCount);
 
+            etapaObj.custrecord_ptg_etapa_liq_anden = 1;
         } catch (error) {
+            etapaObj.custrecord_ptg_etapa_liq_anden = 3;
             log.audit({
                 title: 'error getInputData',
                 details: JSON.stringify(error)
             });
         } finally {
+            var liquidacionAnden = record.submitFields({
+                type: "customrecord_ptg_liquidacion_venta_anden",
+                id: id_search,
+                values: etapaObj,
+            });
+            log.audit("Liquidacion Anden Actualizada getInputData", liquidacionAnden);
             log.audit({
                 title: 'respuesta getInputData Finally',
                 details: JSON.stringify(respuesta)
@@ -53,6 +62,10 @@
 
     function map(context) {
         try {
+            var id_search = runtime.getCurrentScript().getParameter({name: 'custscript_drt_venta_anden_a_facturar'}) || '';
+            log.audit("id_search 1", id_search);
+            var etapaObj = {};
+
             log.audit({
                 title: 'context map',
                 details: JSON.stringify(context)
@@ -80,7 +93,7 @@
                 type: search.Type.CUSTOMER,
                 id: cliente
             });
-            var clienteAFacturar = clienteObj.getValue("custentity_razon_social_para_facturar");
+            var clienteAFacturar = clienteObj.getValue("custentity_mx_sat_registered_name");
             nombreClienteAFacturar = clienteAFacturar;
 
             var articuloArray = [];
@@ -366,6 +379,7 @@
                         recordFactura.setCurrentSublistValue("item", "custcol_ptg_cantidad_litros", cantidadArray[j]);
                         recordFactura.setCurrentSublistValue("item", "custcol_ptg_precio_unitario", rateArray[j]);
                         recordFactura.setCurrentSublistValue("item", "location", ubicacionAnden);
+                        recordFactura.setCurrentSublistValue("item", "custcol_mx_txn_line_sat_tax_object", 2);
                         recordFactura.commitLine("item");
                         x += 1;
                     }
@@ -412,17 +426,28 @@
             });
 
             log.audit("Actualiza venta", registro);
+
+            etapaObj.custrecord_ptg_etapa_liq_anden = 1;
     
             context.write({
                 key: idRecordFactura,
                 value: idRecordFactura
             });
+
                
         } catch (error) {
+            etapaObj.custrecord_ptg_etapa_liq_anden = 3;
             log.error({
                 title: 'error map',
                 details: JSON.stringify(error)
             });
+        } finally {
+            var liquidacionAnden = record.submitFields({
+                type: "customrecord_ptg_liquidacion_venta_anden",
+                id: id_search,
+                values: etapaObj,
+            });
+            log.audit("Liquidacion Anden Actualizada map", liquidacionAnden);
         }
     }
 
@@ -432,6 +457,11 @@
                 title: 'context reduce',
                 details: JSON.stringify(context)
             });
+
+            var id_search = runtime.getCurrentScript().getParameter({name: 'custscript_drt_venta_anden_a_facturar'}) || '';
+            log.audit("id_search 1", id_search);
+            var etapaObj = {};
+
             var idFactura = JSON.parse(context.key);
             log.audit("idFactura", idFactura);
 
@@ -555,18 +585,47 @@
                     ignoreMandatoryFields: true
                 });
                 log.debug("Nota de credito Creado con: "+formaPagoFacturar, creditMemoID);
-            }            
+            }
+            
+            etapaObj.custrecord_ptg_etapa_liq_anden = 1;
 			
         } catch (error) {
+            etapaObj.custrecord_ptg_etapa_liq_anden = 3;
             log.error({
                 title: 'error reduce',
                 details: JSON.stringify(error)
             });
+        } finally {
+            var liquidacionAnden = record.submitFields({
+                type: "customrecord_ptg_liquidacion_venta_anden",
+                id: id_search,
+                values: etapaObj,
+            });
+            log.audit("Liquidacion Anden Actualizada reduce", liquidacionAnden);
         }
     }
 
     function summarize(summary) {
+        try {
+            var id_search = runtime.getCurrentScript().getParameter({name: 'custscript_drt_venta_anden_a_facturar'}) || '';
+            log.audit("id_search 1", id_search);
+            var etapaObj = {};
+            etapaObj.custrecord_ptg_etapa_liq_anden = 2;
 
+        } catch (error) {
+            etapaObj.custrecord_ptg_etapa_liq_anden = 3;
+            log.error({
+                title: 'error summarize',
+                details: JSON.stringify(error)
+            });
+        } finally {
+            var liquidacionAnden = record.submitFields({
+                type: "customrecord_ptg_liquidacion_venta_anden",
+                id: id_search,
+                values: etapaObj,
+            });
+            log.audit("Liquidacion Anden Actualizada summarize", liquidacionAnden);
+        }
     }
 
 
@@ -575,10 +634,10 @@
             var cuentaDefault = 0;
             var objMap=drt_mapid_cm.drt_liquidacion();
             if (Object.keys(objMap).length>0) {
-                cuentaDefault : objMap.cuentaDefault;
-                subsidiariaCorpoGas : objMap.subsidiariaCorpoGas;
-                subsidiariaDistribuidora : objMap.subsidiariaDistribuidora;
-                subsidiariaSanLuis : objMap.subsidiariaSanLuis;
+                cuentaDefault = objMap.cuentaDefault;
+                subsidiariaCorpoGas = objMap.subsidiariaCorpoGas;
+                subsidiariaDistribuidora = objMap.subsidiariaDistribuidora;
+                subsidiariaSanLuis = objMap.subsidiariaSanLuis;
             }
 
           //SS: PTG - Mapeo Formas de pago y cuentas SS

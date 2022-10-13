@@ -12,14 +12,15 @@
  * @NApiVersion 2.1
  * @NScriptType UserEventScript
  */
-define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https'], function (drt_mapid_cm, runtime, search, record, email, error, url, https) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https', 'N/task'], function (drt_mapid_cm, runtime, search, record, email, error, url, https, task) {
   function afterSubmit(context) {
     try {
       var newRecord = context.newRecord;
       var recId = newRecord.id;
       var nombreSublista = "recmachcustrecord_ptg_vta_esp_";
       var lineCount = newRecord.getLineCount({ sublistId: nombreSublista }) || 0;
-      var factura = newRecord.getValue("custrecord_ptg_factura_vta_especial_");
+      var transaccion = newRecord.getValue("custrecord_ptg_factura_vta_especial_");
+      var factura = transaccion[0];
       var planta = newRecord.getValue("custrecord_ptg_planta_vta_especial_");
       var localizacionAlmacen = newRecord.getValue("custrecord_ptg_loc_almacen_");
       var gasLP = 0;
@@ -34,6 +35,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
       var importe = [];
       var impuesto = [];
       var total = [];
+      var idTransaccionArray = [];
       var efectivoId = 0;
       var prepagoBanorteId = 0;
       var valeId = 0;
@@ -71,49 +73,54 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
       var tarjetaDebitoBancomerId = 0;
       var tarjetaDebitoHSBCId = 0;
       var servicioViajeEspecial = 0;
+      var formularioOrdenVenta = 0;
 
 
       var objMap=drt_mapid_cm.drt_liquidacion();
       if (Object.keys(objMap).length>0) {
-        efectivoId : objMap.efectivoId;
-        prepagoBanorteId : objMap.prepagoBanorteId;
-        valeId : objMap.valeId;
-        cortesiaId : objMap.cortesiaId;
-        tarjetaCreditoId : objMap.tarjetaCreditoId;
-        tarjetaDebitoId : objMap.tarjetaDebitoId;
-        multipleId : objMap.multipleId;
-        prepagoTransferenciaId : objMap.prepagoTransferenciaId;
-        creditoClienteId : objMap.creditoClienteId;
-        reposicionId : objMap.reposicionId;
-        saldoAFavorId : objMap.saldoAFavorId;
-        consumoInternoId : objMap.consumoInternoId;
-        prepagoBancomerId : objMap.prepagoBancomerId;
-        prepagoHSBCId : objMap.prepagoHSBCId;
-        prepagoBanamexId : objMap.prepagoBanamexId;
-        prepagoSantanderId : objMap.prepagoSantanderId;
-        prepagoScotianId : objMap.prepagoScotianId;
-        bonificacionId : objMap.bonificacionId;
-        ticketCardId : objMap.ticketCardId;
-        chequeBancomerId : objMap.chequeBancomerId;
-        recirculacionId : objMap.recirculacionId;
-        canceladoId : objMap.canceladoId;
-        rellenoId : objMap.rellenoId;
-        transferenciaId : objMap.transferenciaId;
-        traspasoId : objMap.traspasoId;
-        chequeSantanderId : objMap.chequeSantanderId;
-        chequeScotianId : objMap.chequeScotianId;
-        chequeHSBCId : objMap.chequeHSBCId;
-        chequeBanamexId : objMap.chequeBanamexId;
-        chequeBanorteId : objMap.chequeBanorteId;
-        tarjetaCreditoBancomerId : objMap.tarjetaCreditoBancomerId;
-        tarjetaCreditoHSBCId : objMap.tarjetaCreditoHSBCId;
-        tarjetaCreditoBanamexId : objMap.tarjetaCreditoBanamexId;
-        tarjetaDebitoBanamexId : objMap.tarjetaDebitoBanamexId;
-        tarjetaDebitoBancomerId : objMap.tarjetaDebitoBancomerId;
-        tarjetaDebitoHSBCId : objMap.tarjetaDebitoHSBCId;
-        formulario : objMap.formulario;
-        gasLP : objMap.gasLP;
-        servicioViajeEspecial : objMap.servicioViajeEspecial;
+        efectivoId = objMap.efectivoId;
+        prepagoBanorteId = objMap.prepagoBanorteId;
+        valeId = objMap.valeId;
+        cortesiaId = objMap.cortesiaId;
+        tarjetaCreditoId = objMap.tarjetaCreditoId;
+        tarjetaDebitoId = objMap.tarjetaDebitoId;
+        multipleId = objMap.multipleId;
+        prepagoTransferenciaId = objMap.prepagoTransferenciaId;
+        creditoClienteId = objMap.creditoClienteId;
+        reposicionId = objMap.reposicionId;
+        saldoAFavorId = objMap.saldoAFavorId;
+        consumoInternoId = objMap.consumoInternoId;
+        prepagoBancomerId = objMap.prepagoBancomerId;
+        prepagoHSBCId = objMap.prepagoHSBCId;
+        prepagoBanamexId = objMap.prepagoBanamexId;
+        prepagoSantanderId = objMap.prepagoSantanderId;
+        prepagoScotianId = objMap.prepagoScotianId;
+        bonificacionId = objMap.bonificacionId;
+        ticketCardId = objMap.ticketCardId;
+        chequeBancomerId = objMap.chequeBancomerId;
+        recirculacionId = objMap.recirculacionId;
+        canceladoId = objMap.canceladoId;
+        rellenoId = objMap.rellenoId;
+        transferenciaId = objMap.transferenciaId;
+        traspasoId = objMap.traspasoId;
+        chequeSantanderId = objMap.chequeSantanderId;
+        chequeScotianId = objMap.chequeScotianId;
+        chequeHSBCId = objMap.chequeHSBCId;
+        chequeBanamexId = objMap.chequeBanamexId;
+        chequeBanorteId = objMap.chequeBanorteId;
+        tarjetaCreditoBancomerId = objMap.tarjetaCreditoBancomerId;
+        tarjetaCreditoHSBCId = objMap.tarjetaCreditoHSBCId;
+        tarjetaCreditoBanamexId = objMap.tarjetaCreditoBanamexId;
+        tarjetaDebitoBanamexId = objMap.tarjetaDebitoBanamexId;
+        tarjetaDebitoBancomerId = objMap.tarjetaDebitoBancomerId;
+        tarjetaDebitoHSBCId = objMap.tarjetaDebitoHSBCId;
+        formulario = objMap.formulario;
+        gasLP = objMap.gasLP;
+        servicioViajeEspecial = objMap.servicioViajeEspecial;
+        formularioOrdenVenta = objMap.formularioOrdenVenta;
+        plantillaDocumentoElectronico = objMap.plantillaDocumentoElectronico;
+        metodoDeEnvio = objMap.metodoDeEnvio;
+        formularioFacturaPTG = objMap.formularioFacturaPTG;
       }
 
       if (!factura) {
@@ -188,7 +195,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
         var cfdiCliente = entityObj.getValue("custentity_disa_uso_de_cfdi_") || 3;
         log.audit("cfdiCliente solicita", cfdiCliente);
         var clienteTXT = entityObj.getValue("altname");
-        var clienteAFacturar = entityObj.getValue("custentity_razon_social_para_facturar");
+        var clienteAFacturar = entityObj.getValue("custentity_mx_sat_registered_name");
         var nombreClienteAFacturar = "";
         nombreClienteAFacturar = clienteAFacturar;
 
@@ -202,90 +209,167 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
         log.audit("subsidiaria", subsidiaria);
 
 
-        var recordFactura = record.create({
-          type: record.Type.INVOICE,
+        var recordSalesOrder = record.create({
+          type: record.Type.SALES_ORDER,
           isDynamic: true,
         });
-        recordFactura.setValue("customform", formularioFacturaPTG);
-        recordFactura.setValue("entity", cliente);
-        recordFactura.setValue("location", localizacionAlmacen);
-        recordFactura.setValue("memo", notaLinea);
-        recordFactura.setValue("custbody_ptg_tipo_servicio", servicioViajeEspecial);
-        recordFactura.setValue("custbody_ptg_opcion_pago", formaPago);
-        recordFactura.setValue("custbody_ptg_liq_viaje_especial", recId);
-        recordFactura.setValue("custbody_psg_ei_status", 3); //ESTADO DEL DOCUMENTO ELECTRÓNICO
-        recordFactura.setValue("custbody_mx_cfdi_usage", cfdiCliente);
-        recordFactura.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
-        //recordFactura.setValue("custbody_psg_ei_template", 123); //PLANTILLA DEL DOCUMENTO ELECTRÓNICO
-        //recordFactura.setValue("custbody_psg_ei_sending_method", 11); //MÉTODO DE ENVÍO DE DOCUMENTOS ELECTRÓNICOS
+        recordSalesOrder.setValue("customform", formularioOrdenVenta);
+        recordSalesOrder.setValue("entity", cliente);
+        recordSalesOrder.setValue("location", localizacionAlmacen);
+        //recordSalesOrder.setValue("inventorylocation", localizacionAlmacen);
+        recordSalesOrder.setValue("memo", notaLinea);
+        recordSalesOrder.setValue("custbody_ptg_tipo_servicio", servicioViajeEspecial);
+        recordSalesOrder.setValue("custbody_ptg_opcion_pago", formaPago);
+        recordSalesOrder.setValue("custbody_ptg_liq_viaje_especial", recId);
+        recordSalesOrder.setValue("orderstatus", "B");
+        recordSalesOrder.setValue("origstatus", "B");
+        recordSalesOrder.setValue("salesrep", 14296);
+        recordSalesOrder.setValue("custbody_disa_pm_apro_directo", true);
+        recordSalesOrder.setValue("custbody_psg_ei_status", 3); //ESTADO DEL DOCUMENTO ELECTRÓNICO
+        //recordSalesOrder.setValue("custbody_mx_cfdi_usage", cfdiCliente);
+        //recordSalesOrder.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
+        //recordSalesOrder.setValue("custbody_psg_ei_template", 123); //PLANTILLA DEL DOCUMENTO ELECTRÓNICO
+        //recordSalesOrder.setValue("custbody_psg_ei_sending_method", 11); //MÉTODO DE ENVÍO DE DOCUMENTOS ELECTRÓNICOS
 
         var formaPagoSAT = searchFormaPagoSAT(subsidiaria, formaPago);
         log.emergency("formaPagoSAT", formaPagoSAT);
-        recordFactura.setValue("custbody_mx_txn_sat_payment_method", formaPagoSAT);
+        recordSalesOrder.setValue("custbody_mx_txn_sat_payment_method", formaPagoSAT);
 
         if(formaPago == efectivoId){ //EFECTIVO
-          //recordFactura.setValue("custbody_mx_txn_sat_payment_method", 1); //01 - Efectivo
-          recordFactura.setValue("custbody_mx_txn_sat_payment_term", 3); //PUE - Pago en una Sola Exhibición
+          recordSalesOrder.setValue("custbody_mx_txn_sat_payment_term", 3); //PUE - Pago en una Sola Exhibición
         } 
         else if(formaPago == prepagoBanorteId || formaPago == prepagoTransferenciaId || formaPago == prepagoBancomerId || formaPago == prepagoHSBCId || formaPago == prepagoBanamexId || formaPago == prepagoSantanderId || formaPago == prepagoScotianId){ //PREPAGO
-          //recordFactura.setValue("custbody_mx_txn_sat_payment_method", 23); //28 - Tarjeta de Débito
-          recordFactura.setValue("custbody_mx_txn_sat_payment_term", 4); //PPD - Pago en Parcialidades o Diferido
+          recordSalesOrder.setValue("custbody_mx_txn_sat_payment_term", 4); //PPD - Pago en Parcialidades o Diferido
         }
         else if(formaPago == cortesiaId){ //CORTESIA
-          //recordFactura.setValue("custbody_mx_txn_sat_payment_method", 28); //99 - Por Definir
-          recordFactura.setValue("custbody_mx_txn_sat_payment_term", 4); //PPD - Pago en Parcialidades o Diferido
+          recordSalesOrder.setValue("custbody_mx_txn_sat_payment_term", 4); //PPD - Pago en Parcialidades o Diferido
         }
         else if(formaPago == tarjetaCreditoId || formaPago == tarjetaCreditoBancomerId || formaPago == tarjetaCreditoHSBCId || formaPago == tarjetaCreditoBanamexId){ //TARJETA CREDITO
-          //recordFactura.setValue("custbody_mx_txn_sat_payment_method", 4); //04 - Tarjeta de Crédito
-          recordFactura.setValue("custbody_mx_txn_sat_payment_term", 3); //PUE - Pago en una Sola Exhibición
+          recordSalesOrder.setValue("custbody_mx_txn_sat_payment_term", 3); //PUE - Pago en una Sola Exhibición
         }
         else if(formaPago == tarjetaDebitoId || formaPago == tarjetaDebitoBanamexId || formaPago == tarjetaDebitoBancomerId || formaPago == tarjetaDebitoHSBCId){ //TARJETA DEBITO
-          //recordFactura.setValue("custbody_mx_txn_sat_payment_method", 23); //28 - Tarjeta de Débito
-          recordFactura.setValue("custbody_mx_txn_sat_payment_term", 3); //PUE - Pago en una Sola Exhibición
+          recordSalesOrder.setValue("custbody_mx_txn_sat_payment_term", 3); //PUE - Pago en una Sola Exhibición
         } 
         else if(formaPago == creditoClienteId){ //CREDITO CLIENTE
-          //recordFactura.setValue("custbody_mx_txn_sat_payment_method", 28); //99 - Por Definir
-          recordFactura.setValue("custbody_mx_txn_sat_payment_term", 4); //PPD - Pago en Parcialidades o Diferido
+          recordSalesOrder.setValue("custbody_mx_txn_sat_payment_term", 4); //PPD - Pago en Parcialidades o Diferido
         }
         else if(formaPago == reposicionId){ //REPOSICION
-          //recordFactura.setValue("custbody_mx_txn_sat_payment_method", 28); //99 - Por Definir
-          recordFactura.setValue("custbody_mx_txn_sat_payment_term", 4); //PPD - Pago en Parcialidades o Diferido
+          recordSalesOrder.setValue("custbody_mx_txn_sat_payment_term", 4); //PPD - Pago en Parcialidades o Diferido
         }
         else if(formaPago == bonificacionId){ //BONIFICACION
-          //recordFactura.setValue("custbody_mx_txn_sat_payment_method", 28); //99 - Por Definir
-          recordFactura.setValue("custbody_mx_txn_sat_payment_term", 4); //PPD - Pago en Parcialidades o Diferido
+          recordSalesOrder.setValue("custbody_mx_txn_sat_payment_term", 4); //PPD - Pago en Parcialidades o Diferido
         }
         else if(formaPago == chequeBancomerId || formaPago == chequeSantanderId || formaPago == chequeScotianId || formaPago == chequeHSBCId || formaPago == chequeBanamexId || formaPago == chequeBanorteId){ //CHEQUE
-          //recordFactura.setValue("custbody_mx_txn_sat_payment_method", 2); //02 - CHEQUE NOMINATIVO
-          recordFactura.setValue("custbody_mx_txn_sat_payment_term", 3); //PUE - Pago en una Sola ExhibiciónrateArray
+          recordSalesOrder.setValue("custbody_mx_txn_sat_payment_term", 3); //PUE - Pago en una Sola ExhibiciónrateArray
         }
         else {
-          //recordFactura.setValue("custbody_mx_txn_sat_payment_method", 28); //99 - Por Definir
-          recordFactura.setValue("custbody_mx_txn_sat_payment_term", 4); //PPD - Pago en Parcialidades o Diferido
+          recordSalesOrder.setValue("custbody_mx_txn_sat_payment_term", 4); //PPD - Pago en Parcialidades o Diferido
         }
 
         for (var j = 0; j < lineCount; j++) {
-          recordFactura.selectLine("item", j);
-          recordFactura.setCurrentSublistValue("item", "item", gasLP);
-          recordFactura.setCurrentSublistValue("item", "location", localizacionAlmacen);
-          recordFactura.setCurrentSublistValue("item", "quantity", litrosVendidos[j]);
-          recordFactura.setCurrentSublistValue("item", "rate", precioUnitario[j]);
-          recordFactura.setCurrentSublistValue("item", "custcol_ptg_cantidad_litros", litrosVendidos[j]);
-          recordFactura.setCurrentSublistValue("item", "custcol_ptg_precio_unitario", precioUnitario[j]);
-          recordFactura.commitLine("item");
+          recordSalesOrder.selectLine("item", j);
+          recordSalesOrder.setCurrentSublistValue("item", "item", gasLP);
+          recordSalesOrder.setCurrentSublistValue("item", "inventorylocation", localizacionAlmacen);
+          recordSalesOrder.setCurrentSublistValue("item", "quantity", litrosVendidos[j]);
+          recordSalesOrder.setCurrentSublistValue("item", "rate", precioUnitario[j]);
+          recordSalesOrder.setCurrentSublistValue("item", "custcol_ptg_cantidad_litros", litrosVendidos[j]);
+          recordSalesOrder.setCurrentSublistValue("item", "custcol_ptg_precio_unitario", precioUnitario[j]);
+          recordSalesOrder.commitLine("item");
         }
 
-        var idRecordFactura = recordFactura.save({
+        var idrecordSalesOrder = recordSalesOrder.save({
           ignoreMandatoryFields: true
         });
 
         log.debug({
-          title: "Factura Creada",
-          details: "Id Saved: " + idRecordFactura,
+          title: "Orden de Venta Creada",
+          details: "Id Saved: " + idrecordSalesOrder,
         });
 
+        /*var mrTask = task.create({
+          taskType: task.TaskType.MAP_REDUCE,
+          scriptId: 'customscript_drt_ptg_load_save_mr',
+          params: {
+            custscript_drt_ptg_transaccion: idrecordSalesOrder,
+          }
+        });
+        var mrTaskId = mrTask.submit();
+        var taskStatus = task.checkStatus(mrTaskId);
+        log.audit({title: 'taskStatus', details: JSON.stringify(taskStatus)});*/
+
+
+        idTransaccionArray.push(idrecordSalesOrder);
+
+        if(idrecordSalesOrder){
+          log.audit("Entra ItemF");
+          var newRecordItemFulfillment = record.transform({
+            fromType: record.Type.SALES_ORDER,
+            fromId: idrecordSalesOrder,
+            toType: record.Type.ITEM_FULFILLMENT,
+            isDynamic: false,
+            defaultValues: {
+              customform: 291,
+              inventorylocation: localizacionAlmacen
+            }
+          });
+
+          var lineCount = newRecordItemFulfillment.getLineCount('item');
+          for (var i = 0; i < lineCount; i++) {
+            newRecordItemFulfillment.setSublistValue('item', 'location', i, localizacionAlmacen);
+          }
+          newRecordItemFulfillment.setValue("shipstatus", "C");
+          newRecordItemFulfillment.setValue("custbody_psg_ei_template", plantillaDocumentoElectronico);
+          newRecordItemFulfillment.setValue("custbody_psg_ei_sending_method", metodoDeEnvio);
+  
+          var idItemFulfillment = newRecordItemFulfillment.save({
+            enableSourcing: true,
+            ignoreMandatoryFields: false,
+          }) || "";
+
+          log.debug({
+            title: "Ejecución Creada",
+            details: "Id Saved: " + idItemFulfillment,
+          });
+  
+          idTransaccionArray.push(idItemFulfillment);
+        }
+
+        if(idItemFulfillment){
+          var recordFactura = record.transform({
+            fromType: record.Type.SALES_ORDER,
+            fromId: idrecordSalesOrder,
+            toType: record.Type.INVOICE,
+            isDynamic: true,
+          });
+
+          recordFactura.setValue("customform", formularioFacturaPTG);
+          recordFactura.setValue("custbody_mx_cfdi_usage", cfdiCliente);
+          recordFactura.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
+
+          var itemCount = recordFactura.getLineCount('item');
+          log.audit("itemCount", itemCount);
+
+          for (var i = 0; i < itemCount; i++) {
+            recordFactura.setSublistValue("item", "custcol_mx_txn_line_sat_tax_object", i, 2);
+            log.audit("i", i);
+          }
+
+          var idRecordFactura = recordFactura.save({
+            enableSourcing: false,
+            ignoreMandatoryFields: true,
+          }) || "";
+
+          log.debug({
+            title: "Factura Creada",
+            details: "Id Saved: " + idRecordFactura,
+          });
+
+          idTransaccionArray.push(idRecordFactura);
+
+        }
+
         var objUpdate = {
-          custrecord_ptg_factura_vta_especial_: idRecordFactura,
+          custrecord_ptg_factura_vta_especial_: idTransaccionArray,
         };
 
         var registroUpd = record.submitFields({
@@ -296,20 +380,22 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
 
         log.debug("Registro Actualizado con factura", registroUpd);
 
-        //SE HACE EL PROCESO DE GENERAR DOCUMENTO Y TIMBRADO
-        var urlStlt = url.resolveScript({
-          scriptId: "customscript_drt_ei_auto_stlt",
-          deploymentId: "customdeploy_drt_global_invoice_suitelet",
-          returnExternalUrl: true,
-          params: {
-            id_factura: idRecordFactura
-          }
-        });
-        log.audit("urlStlt", urlStlt);
-        var link = https.get({
-          url: urlStlt
-        });
-        log.audit("link", link);
+        if(idRecordFactura){
+          //SE HACE EL PROCESO DE GENERAR DOCUMENTO Y TIMBRADO
+          var urlStlt = url.resolveScript({
+            scriptId: "customscript_drt_ei_auto_stlt",
+            deploymentId: "customdeploy_drt_global_invoice_suitelet",
+            returnExternalUrl: true,
+            params: {
+              id_factura: idRecordFactura
+            }
+          });
+          log.audit("urlStlt", urlStlt);
+          var link = https.get({
+            url: urlStlt
+          });
+          log.audit("link", link);
+        }
 
         if(idRecordFactura && (formaPago == efectivoId || formaPago == tarjetaCreditoId || formaPago == tarjetaDebitoId || formaPago == chequeBancomerId || formaPago == chequeSantanderId || formaPago == chequeScotianId || formaPago == chequeHSBCId || formaPago == chequeBanamexId || formaPago == chequeBanorteId || formaPago == tarjetaCreditoBancomerId || formaPago == tarjetaCreditoHSBCId || formaPago == tarjetaCreditoBanamexId || formaPago == tarjetaDebitoBanamexId || formaPago == tarjetaDebitoBancomerId || formaPago == tarjetaDebitoHSBCId)){
           var pagoObj = record.transform({
@@ -359,6 +445,54 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 
       });
     }
   }
+
+  function searchFormaPagoSAT(idSubsidiaria, idTipoPago) {
+    try {
+        var formaDePagoDefault = 0;
+        var objMap=drt_mapid_cm.drt_liquidacion();
+        if (Object.keys(objMap).length>0) {
+            formaDePagoDefault = objMap.formaDePagoDefault;
+        }
+
+        //SS: PTG - Mapeo Formas de pago y cuentas SS
+        var mapeoCuentaObj = search.create({
+            type: "customrecord_mapeo_formasdepago_cuentas",
+            filters: [
+                ["custrecord_ptg_formadepago_subsidiaria", "anyof", idSubsidiaria], "AND",
+                ["custrecord_ptg_forma_pago", "anyof", idTipoPago],
+            ],
+            columns: [
+                search.createColumn({
+                    name: "custrecord_ptg_forma_pago_sat",
+                    label: "PTG - FORMA DE PAGO SAT",
+                }),
+            ],
+        });
+
+        var mapeoCuentaObjCount = mapeoCuentaObj.runPaged().count;
+        var mapeoCuentaObjResult = mapeoCuentaObj.run().getRange({
+            start: 0,
+            end: mapeoCuentaObjCount,
+        });
+        if (mapeoCuentaObjCount > 0) {
+            idFormaPago = mapeoCuentaObjResult[0].getValue({
+                name: "custrecord_ptg_forma_pago_sat",
+                label: "PTG - FORMA DE PAGO SAT",
+            });
+            log.debug("idFormaPago", idFormaPago);
+        } else {
+            idFormaPago = formaDePagoDefault;
+            log.debug("forma de pago no encontrada", idFormaPago);
+        }
+
+        return idFormaPago;
+    } catch (error) {
+        log.error({
+            title: "error searchFormaPagoSAT",
+            details: JSON.stringify(error),
+        });
+    }
+}
 
   return {
     afterSubmit: afterSubmit,

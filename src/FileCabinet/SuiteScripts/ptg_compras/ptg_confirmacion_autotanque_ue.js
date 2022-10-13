@@ -2,14 +2,18 @@
  *@NApiVersion 2.1
  *@NScriptType UserEventScript
  */
-define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "N/runtime"], function (drt_mapid_cm, record, search, runtime) {
+ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "N/runtime"], function (drt_mapid_cm, record, search, runtime) {
 
     function afterSubmit(context) {
         try {
-            var currentRecord = context.newRecord;
+            //var currentRecord = context.newRecord;
             var statusOrden = 4;
             if (context.type == context.UserEventType.CREATE || context.type == context.UserEventType.EDIT) {
-
+				var currentRecord = record.load({
+                    type: context.newRecord.type,
+                    id: context.newRecord.id,
+                    isDynamic: true
+                });
                 let objPo = {};
                 let arrayPo = [];
                 let idVendorBill = '';
@@ -61,7 +65,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                 for (var i = 0; i < lineas; i++) {
                     var pg = currentRecord.getSublistText({
                         sublistId: 'recmachcustrecord_ptg_confirmacion_salida_',
-                        fieldId: 'custrecord_ptg_numembarqueprogra_confirm',
+                        fieldId: 'custrecord_ptg_numembarqueprogra_confirm_display',
                         line: i
                     });
 
@@ -101,6 +105,18 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                         sublistId: 'recmachcustrecord_ptg_confirmacion_salida_',
                         fieldId: 'custrecord_ptg_precion_confirmacion',
                         line: i
+                    });
+
+                    var provedorFlete = currentRecord.getSublistValue({
+                        sublistId: 'recmachcustrecord_ptg_confirmacion_salida_',
+                        fieldId: 'custrecord_ptg_prov_transportista_confir',
+                        line: i
+                    })
+
+                    var litros = currentRecord.getSublistValue({
+                        sublistId: 'recmachcustrecord_ptg_confirmacion_salida_',
+                        fieldId: 'custrecord_ptg_litros_confirm',
+                        line: i
                     })
 
                     log.audit('pg', pg);
@@ -110,6 +126,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                     log.audit('tarifaViajeSencillo', tarifaViajeSencillo);
                     log.audit('precioTarifaKilogramo', precioTarifaKilogramo);
                     log.audit('rateConfinrmacion', rateConfinrmacion);
+                    log.audit('litros', litros)
 
 
                     var purchaseorderSearchObj = search.create({
@@ -220,7 +237,9 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                         tarifa_v_senciillo: tarifaViajeSencillo,
                         tarifa_sprecio_intercompania: tarifaSobrePrecioIntercompania,
                         sobre_precio_cliente: sobrePrecioClientes,
-                        rate: rateConfinrmacion
+                        rate: rateConfinrmacion,
+                        provedorFlete: provedorFlete,
+                        litros: litros
                     }
 
                     arrayPo.push(objPo);
@@ -228,6 +247,29 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                 log.audit('arrayPo', arrayPo)
 
                 for (let po in arrayPo) {
+                    //Busqueda de Almacen Visrual
+
+                    var customrecord_ptg_mapeo_almacenes_virt_SearchObj = search.create({
+                        type: "customrecord_ptg_mapeo_almacenes_virt_",
+                        filters:
+                        [
+                           ["custrecord_ptg_planta_mapeo_","anyof", arrayPo[po]['location']]
+                        ],
+                        columns:
+                        [
+                           search.createColumn({name: "custrecord_ptg_almacen_virtual_", label: "PTG - Almacén Virtual"})
+                        ]
+                     });
+                     var searchMaperoAlmacen = customrecord_ptg_mapeo_almacenes_virt_SearchObj.run().getRange(0, 1);
+                     log.audit('centroE', searchMaperoAlmacen.length);
+                     if (searchMaperoAlmacen.length > 0) {
+                           var idAlmacenVirtual = searchMaperoAlmacen[0].getValue({
+                             name: 'custrecord_ptg_almacen_virtual_'
+                           })
+                        }
+                      log.audit('idAlmacenVirtual', idAlmacenVirtual)
+                     
+
                     /********Cambio de estatus de orden de compra**********/
                     var compraLoad = record.load({
                         type: record.Type.PURCHASE_ORDER,
@@ -257,6 +299,17 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                                 sublistId: 'item'
                             });
                             //si el campo de planta desvio tiene valor cambiar ubicacaion por almacen vistrual
+                             //descomentar caundo se tengan los registros
+                            if( 
+                                arrayPo[po]['tipo_desvio'] == 2 || 
+                                arrayPo[po]['tipo_desvio'] == 4
+                                ){
+                                recepcion2.setValue({
+                                    fieldId: 'location',
+                                    value: idAlmacenVirtual
+                                });  
+                            }
+                            
 
                             for (var k = 0; k < lineas2; k++) {
                                 recepcion2.selectLine({
@@ -269,18 +322,30 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                                     fieldId: 'custcol_ptg_pg_en_uso_'
                                 })
 
-                                let pgAsignado = recepcion2.getCurrentSublistValue({
+                                var pgAsignado = recepcion2.getCurrentSublistText({
                                     sublistId: 'item',
-                                    fieldId: 'custcol2'
+                                    fieldId: 'custcol2disp'
                                 });
 
-                                log.audit('pgAsignado', pgAsignado)
-
                                 if (pgAsignado == arrayPo[po]['pg']) {
+                                    // descoemtar en cuanto tengamos los registros
+                                    if(
+                                        arrayPo[po]['tipo_desvio'] == 2 || 
+                                        arrayPo[po]['tipo_desvio'] == 4
+                                        ){
+
+                                        recepcion2.setCurrentSublistValue({
+                                            sublistId: 'item',
+                                            fieldId: 'location',
+                                            value: idAlmacenVirtual,
+                                            line: k
+                                        }); 
+                                    }
+
                                     recepcion2.setCurrentSublistValue({
                                         sublistId: 'item',
                                         fieldId: 'quantity',
-                                        value: arrayPo[po]['cantidad'],
+                                        value: arrayPo[po]['litros'],
                                         line: k
                                     });
                                 } else {
@@ -346,7 +411,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                             createSalesOrder.setCurrentSublistValue({
                                 sublistId: "item",
                                 fieldId: "quantity",
-                                value: arrayPo[po]['cantidad']
+                                value: arrayPo[po]['litros']
                             });
 
                             createSalesOrder.setCurrentSublistValue({
@@ -357,7 +422,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
 
                             createSalesOrder.setCurrentSublistValue({
                                 sublistId: "item",
-                                fieldId: "location",
+                                fieldId: "inventorylocation",
                                 value: arrayPo[po]['location']
                             });
 
@@ -370,11 +435,40 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                             log.audit('saveinvoice', saveinvoice);
 
                             if(saveinvoice){
+
+                                var loadSo = record.load({
+                                    type: 'salesorder',
+                                    id: saveinvoice ,
+                                    isDynamic: false
+                                });
+                    
+                                var lineas = loadSo.getLineCount('item');
+                    
+                                for (var j = 0; j < lineas; j++) {
+                                    loadSo.setSublistValue({
+                                        sublistId: 'item',
+                                        fieldId: 'inventorylocation',
+                                        value: arrayPo[po]['location'],
+                                        line: j
+                                    });
+                                }
+                    
+                                let idSOS = loadSo.save();
+                                log.audit('ordenVenta', idSOS);
+
                                 let itemFulFill = record.transform({
                                     fromType: record.Type.SALES_ORDER,
-                                    fromId: saveinvoice,
+                                    fromId: idSOS,
                                     toType: record.Type.ITEM_FULFILLMENT,
-                                    isDynamic: true,
+                                    isDynamic: false,
+                                    defaultValues: {
+                                        inventorylocation: arrayPo[po]['location']
+                                    }
+                                });
+
+                                itemFulFill.setValue({
+                                    fieldId: 'customform',
+                                    value: 290
                                 });
 
                                 let saveItemFull = itemFulFill.save();
@@ -442,13 +536,15 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                         vendorBill.setCurrentSublistValue({
                             sublistId: 'item',
                             fieldId: 'quantity',
-                            value: arrayPo[po]['cantidad']
+                            value: arrayPo[po]['litros']
                         });
-
+                        var rateB = parseFloat(arrayPo[po]['rate'])
+                        rateB = rateB.toFixed(6)
+                        log.audit('rateB', rateB)
                         vendorBill.setCurrentSublistValue({
                             sublistId: 'item',
                             fieldId: 'rate',
-                            value: arrayPo[po]['rate']
+                            value: rateB
                         });
 
                         /*
@@ -593,7 +689,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
 
                         facturaFlete.setValue({
                             fieldId: 'entity',
-                            value: provedorCE
+                            value: arrayPo[po]['provedorFlete']
                         });
 
                         facturaFlete.setValue({
@@ -653,11 +749,13 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                             fieldId: 'quantity',
                             value: 1
                         });
+                        var rateCalculado = arrayPo[po]['litros'] * arrayPo[po]['tarifa_v_senciillo']
+                        log.audit('rateCalculado', rateCalculado);
 
                         facturaFlete.setCurrentSublistValue({
                             sublistId: "item",
                             fieldId: 'rate',
-                            value: arrayPo[po]['cantidad'] * arrayPo[po]['tarifa_v_senciillo']
+                            value: rateCalculado.toFixed(6)
                         });
                         //custpage_4601_witaxcode
                         //landedcostcategory
@@ -704,23 +802,52 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                                 value: arrayPo[po]['subsidiaria']
                             });
 
-                            createTransferOrder.setValue({
-                                fieldId: 'location',
-                                value: ubicacion_transfer_order
-                            });
+                            if (arrayPo[po]['tipo_desvio'] == 1) {
+                                createTransferOrder.setValue({
+                                    fieldId: 'location',
+                                    value: idAlmacenVirtual
+                                });
 
-                            if (arrayPo[po]['tipo_desvio'] == 4) {
+                                createTransferOrder.setValue({
+                                    fieldId: 'transferlocation',
+                                    value: arrayPo[po]['planta_desvio']
+                                });
+
+                            } else if (arrayPo[po]['tipo_desvio'] == 2) {
+                                createTransferOrder.setValue({
+                                    fieldId: 'location',
+                                    value: idAlmacenVirtual
+                                });
+
                                 createTransferOrder.setValue({
                                     fieldId: 'transferlocation',
                                     value: arrayPo[po]['location']
                                 });
-                            } else {
+
+                            } else if (arrayPo[po]['tipo_desvio'] == 4) {
+                                createTransferOrder.setValue({
+                                    fieldId: 'location',
+                                    value: ubicacion_transfer_order
+                                });
+
+                                createTransferOrder.setValue({
+                                    fieldId: 'transferlocation',
+                                    value: arrayPo[po]['location']
+                                });
+                            } 
+                            /*else {
+                                createTransferOrder.setValue({
+                                    fieldId: 'location',
+                                    value: ubicacion_transfer_order
+                                });
+
                                 createTransferOrder.setValue({
                                     fieldId: 'transferlocation',
                                     value: arrayPo[po]['planta_desvio']
                                 });
 
                             }
+                            */
 
                             createTransferOrder.setValue({
                                 fieldId: 'memo',
@@ -740,7 +867,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                             createTransferOrder.setCurrentSublistValue({
                                 sublistId: "item",
                                 fieldId: "quantity",
-                                value: arrayPo[po]['cantidad']
+                                value: arrayPo[po]['litros']
                             });
                             /*
                             createTransferOrder.setCurrentSublistValue({
@@ -793,23 +920,38 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                                         value: form_item_receipt
                                     });
 
-                                    receiptOrder.setValue({
-                                        fieldId: 'location',
-                                        value: arrayPo[po]['location']
-                                    });
-    
-                                    
+                                    if (arrayPo[po]['tipo_desvio'] == 4) {
+                                        receiptOrder.setValue({
+                                            fieldId: 'transferlocation',
+                                            value: arrayPo[po]['location']
+                                        });
+                                    } else {
+                                        receiptOrder.setValue({
+                                            fieldId: 'transferlocation',
+                                            value: arrayPo[po]['planta_desvio']
+                                        });
+                                    }
+
                                     let lineasRecepcio = receiptOrder.getLineCount({
                                         sublistId: 'item'
                                     });
                                     
                                     for(var r = 0; r < lineasRecepcio; r++){
-                                        receiptOrder.setSublistValue({
-                                            sublistId: 'item',
-                                            fieldId: 'location',
-                                            value: arrayPo[po]['location'],
-                                            line: r
-                                        });
+                                        if (arrayPo[po]['tipo_desvio'] == 4) {
+                                            receiptOrder.setSublistValue({
+                                                sublistId: 'item',
+                                                fieldId: 'location',
+                                                value: arrayPo[po]['location'],
+                                                line: r
+                                            });
+                                        } else {
+                                            receiptOrder.setSublistValue({
+                                                sublistId: 'item',
+                                                fieldId: 'location',
+                                                value: arrayPo[po]['planta_desvio'],
+                                                line: r
+                                            });
+                                        }
                                     }
 
                                     let facturaFleteLoad = record.load({
@@ -934,23 +1076,12 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                                 invoiceInter.setCurrentSublistValue({
                                     sublistId: "item",
                                     fieldId: "quantity",
-                                    value: arrayPo[po]['cantidad']
+                                    value: arrayPo[po]['litros']
                                 });
 
-                                if (arrayPo[po]['tipo_desvio'] == 4) {
-                                    invoiceInter.setCurrentSublistValue({
-                                        sublistId: "item",
-                                        fieldId: "location",
-                                        value: arrayPo[po]['location']
-                                    });
-                                } else {
-                                    invoiceInter.setCurrentSublistValue({
-                                        sublistId: "item",
-                                        fieldId: "location",
-                                        value: ubicacion_intercompany_invoice
-                                    });
-
-                                }
+                                log.audit('ubicacion', ubicacion_intercompany_invoice);
+                                log.audit('su')
+                                
 
                                 invoiceInter.setCurrentSublistValue({
                                     sublistId: "item",
@@ -966,11 +1097,47 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                                 log.audit('saveinvoice', saveinvoice)
 
                                 if(saveinvoice){
+
+                                    var loadSo = record.load({
+                                        type: 'salesorder',
+                                        id: saveinvoice ,
+                                        isDynamic: false
+                                    });
+                        
+                                    var lineas = loadSo.getLineCount('item');
+                                    var ubicacion_linea = 0;
+                                    if (arrayPo[po]['tipo_desvio'] == 4) {
+                                        ubicacion_linea =  arrayPo[po]['location'];
+                                    } else {
+                                        ubicacion_linea =  ubicacion_intercompany_invoice
+                                    }
+
+                                    for (var j = 0; j < lineas; j++) {
+                                        loadSo.setSublistValue({
+                                            sublistId: 'item',
+                                            fieldId: 'inventorylocation',
+                                            value: ubicacion_linea,
+                                            line: j
+                                        });
+                                    }
+                        
+                                    let idSOS = loadSo.save();
+                                    log.audit('ordenVenta', idSOS);
+
+
                                     let itemFulFillInter = record.transform({
                                         fromType: record.Type.SALES_ORDER,
-                                        fromId: saveinvoice,
+                                        fromId: idSOS,
                                         toType: record.Type.ITEM_FULFILLMENT,
                                         isDynamic: true,
+                                        defaultValues: {
+                                            inventorylocation: ubicacion_linea
+                                        }
+                                    });
+
+                                    itemFulFillInter.setValue({
+                                        fieldId: 'customform',
+                                        value: 290
                                     });
     
                                     let saveItemFullInter = itemFulFillInter.save();
@@ -988,11 +1155,14 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                                         value: form_desvio_cliente_invoice
                                     });
     
-                                    let saveInvoiceInter = invoiceInter.save();
+                                    let saveInvoiceInter = invoiceInter.save({
+                                        enableSourcing: false,
+                                        ignoreMandatoryFields: true
+                                    });
                                     log.audit('saveInvoice', saveInvoiceInter);
                                 }
                                 //creacion de factura de provedor intercompañia
-                                /*
+                                
                                 if (saveinvoice) {
                                     try {
                                         let billInter = record.create({
@@ -1060,7 +1230,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                                         billInter.setCurrentSublistValue({
                                             sublistId: "item",
                                             fieldId: 'quantity',
-                                            value: arrayPo[po]['cantidad']
+                                            value: arrayPo[po]['litros']
                                         });
 
                                         billInter.setCurrentSublistValue({
@@ -1093,7 +1263,6 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                                         log.audit('error_factura_proveedor_interco', error_factura_proveedor_interco)
                                     }
                                 }
-                            */
                             }
 
                         }
@@ -1187,6 +1356,73 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
 
                     let idPoCammbio = pO.save();
                     log.audit('idPoCammbio', idPoCammbio)
+
+
+                    /*********************seteo de cantidad en la recepcion*****************************/
+                    if (arrayPo[po]['planta_desvio']){
+
+                        var itemreceiptSearchObj = search.create({
+                            type: "itemreceipt",
+                            filters:
+                            [
+                               ["type","anyof","ItemRcpt"], 
+                               "AND", 
+                               ["mainline","is","F"], 
+                               "AND", 
+                               ["custcol2disp","is", arrayPo[po]['pg']]
+                            ],
+                            columns:
+                            [
+                               search.createColumn({name: "internalid", label: "Internal ID"}),
+                               search.createColumn({name: "quantity", label: "Quantity"})
+                            ]
+                         });
+    
+                        var busquedaRecepcion = itemreceiptSearchObj.run().getRange(0, 1);
+                        log.audit('busquedaRecepcion', busquedaRecepcion.length);
+                        if (busquedaRecepcion.length > 0) {
+    
+                            var idRecepcion = busquedaRecepcion[0].getValue({
+                                name: 'internalid'
+                            });
+                        }
+
+                        let recepcionLoad = record.load({
+                            type: record.Type.ITEM_RECEIPT,
+                            id: idRecepcion,
+                            isDynamic: false,
+                        });
+
+                        let lineasRe = recepcionLoad.getLineCount('item');
+
+                        for(var r = 0; r < lineasRe; r++){
+                            
+                            var pgRecepcion = recepcionLoad.getSublistValue({
+                                sublistId: 'item',
+                                fieldId: 'custcol2disp',
+                                line: r
+                            });
+
+                            log.audit('pgRec', pgRecepcion);
+
+                            if(pgRecepcion == arrayPo[po]['pg']){
+                                recepcionLoad.setSublistValue({
+                                    sublistId: 'item',
+                                    fieldId: 'quantity',
+                                    value: arrayPo[po]['litros'],
+                                    line: r
+                                })
+                            }
+    
+                        }
+
+                        var idRecepcionSave = recepcionLoad.save();
+
+                        log.debug('idRecepcionSave', idRecepcionSave)
+
+
+                    }
+                     
                 }
 
             }

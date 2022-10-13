@@ -24,7 +24,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             var estatusViajeEnCurso = 0;
             var objMap=drt_mapid_cm.drt_liquidacion();
             if (Object.keys(objMap).length>0) {
-                estatusViajeEnCurso = objMap.estatusViajeEnCurso;
+                estatusViajeEnCurso = objMap.estatusViejeEnCurso;
             }
 
             //BÚSQUEDA GUARDADA: PTG - Viaje activo SS
@@ -117,8 +117,24 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           var vehiculo = currentRecord.getText("custrecord_ptg_vehiculo_salida_camion_");
           var numViaje = currentRecord.getValue("custrecord_ptg_noviaje_salidacomion_");
 
+          var numViajeObj = record.load({
+            type: "customrecord_ptg_tabladeviaje_enc2_",
+            id: numViaje
+          });
+          var transacciones = numViajeObj.getValue("custrecord_drt_ptg_transferencia_tv");
+          var transaccion = transacciones[2];
+
           if(numViaje){
-            return true;
+            if(transaccion){
+                return true;
+            } else {
+                var options = {
+                    title: "Viaje sin transacción",
+                    message: "No hay transacción generada para el vehículo "+vehiculo,
+                };
+                dialog.alert(options);
+            }
+            
           } else {
             var options = {
               title: "Vehículo sin número de viaje.",

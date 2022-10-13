@@ -16,7 +16,7 @@
  define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime"], function (drt_mapid_cm, record, search, runtime) {
     function afterSubmit(context) {
       try {
-        if (context.type == "create") {
+  //      if (context.type == "create") {
           var customRec = context.newRecord;
           var recId = customRec.id;
           var recType = customRec.type;
@@ -216,7 +216,7 @@
           }
           log.audit("FIN");
           
-        }
+       // }
         
       } catch (e) {
         log.error({ title: e.name, details: e.message });

@@ -22,6 +22,7 @@
                 name: 'custscript_drt_oportunidad_a_factura'
             }) || '';
             log.audit("id_search 1", id_search);
+            var valoresProceso = {};
              
              var arrayColumns = [
                  search.createColumn({ name: "custrecord_ptg_id_oportunidad_fact", label: "PTG - Id Oportunidad a Facturar" }),
@@ -31,20 +32,32 @@
             var arrayFilters = [
                 ["custrecord_ptg_preliq_cilindros","anyof",id_search],"AND", 
                 ["isinactive","is","F"]
-             ];
+            ];
             
-                respuesta = search.create({
-                    type: 'customrecord_ptg_oportunidad_facturar',
-                    columns: arrayColumns,
-                    filters: arrayFilters
-                });
+            respuesta = search.create({
+                type: 'customrecord_ptg_oportunidad_facturar',
+                columns: arrayColumns,
+                filters: arrayFilters
+            });
+
+            valoresProceso.custrecord_ptg_plc_etapa = 1;
+
 
         } catch (error) {
+            valoresProceso.custrecord_ptg_plc_etapa = 3;
             log.audit({
                 title: 'error getInputData',
                 details: JSON.stringify(error)
             });
         } finally {
+
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_preliquicilndros_",
+                id: id_search,
+                values: valoresProceso
+            });
+            log.debug("registroCilindros", registroCilindros);
+
             log.audit({
                 title: 'respuesta getInputData Finally',
                 details: JSON.stringify(respuesta)
@@ -69,6 +82,10 @@
 
             var idOportunidad = objValue2.value;
             log.audit("idOportunidadM", idOportunidad);
+
+            var valoresProceso = {};
+
+            var objSumbitError = {};
 
             var objUpdate = {
                 custrecord_ptg_terminado_cilindros: false,
@@ -176,6 +193,7 @@
                 tarjetaDebitoBanamexId = objMap.tarjetaDebitoBanamexId;
                 tarjetaDebitoBancomerId = objMap.tarjetaDebitoBancomerId;
                 tarjetaDebitoHSBCId = objMap.tarjetaDebitoHSBCId;
+                terminoContado = objMap.terminoContado;
             }
 
             var tipoPagoAFacturar = 0;
@@ -222,6 +240,7 @@
             var idRegistroPagos = oportunidadObj.getValue("custbody_ptg_registro_pagos");
             var subsidiariaOportunidad = oportunidadObj.getValue("subsidiary");
             var cliente = oportunidadObj.getValue("entity");
+            var fecha = oportunidadObj.getValue("createddate");
             var razonSocial = oportunidadObj.getValue("custbody_razon_social_para_facturar");
             var nombreClienteAFacturar = "";
             var zonaPrecioID = oportunidadObj.getValue("custbody_ptg_zonadeprecioop_");
@@ -229,13 +248,27 @@
                 type: "customrecord_ptg_zonasdeprecio_",
                 id: zonaPrecioID,
             });
+
+            objSumbitError.custrecord_ptg_id_oportunidad = idOportunidad;
+            objSumbitError.custrecord_ptg_cliente_facturado = cliente;
+            objSumbitError.custrecord_ptg_fecha_creacion = fecha;
+            objSumbitError.custrecord_ptg_tipos_pagos = tipoPago;
+            objSumbitError.custrecord_ptg_num_viaje_fac_ = objValue3;
+            
             var precioPorLitro = zonaPrecioObj.getValue("custrecord_ptg_precio_");
             var clienteObj = record.load({
                 type: search.Type.CUSTOMER,
                 id: cliente
             });
-            var clienteAFacturar = clienteObj.getValue("custentity_razon_social_para_facturar");
+            var clienteAFacturar = clienteObj.getValue("custentity_mx_sat_registered_name");
             nombreClienteAFacturar = clienteAFacturar;
+            var terminosCliente = clienteObj.getValue("terms");
+            var terminos = 0;
+            if(tipoPago != creditoClienteId){
+                terminos = terminoContado;
+            } else {
+                terminos = terminosCliente;
+            }
             
 
             var rutaObj = record.load({
@@ -387,6 +420,7 @@
             //facturaObj.setValue("custbody_psg_ei_sending_method", 11); //MÉTODO DE ENVÍO DE DOCUMENTOS ELECTRÓNICOS
             facturaObj.setValue("custbody_mx_cfdi_usage", cfdiCliente);
             facturaObj.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
+            facturaObj.setValue("terms", terminos);
 
             var formaPagoSAT = searchFormaPagoSAT(subsidiariaOportunidad, tipoPago);
             log.emergency("formaPagoSAT", formaPagoSAT);
@@ -460,6 +494,7 @@
                     facturaObj.setSublistValue("item", "custcol_ptg_precio_unitario", i, rateArray[i]);
                 }
                 facturaObj.setSublistValue("item", "location", i, ubicacion);
+                facturaObj.setSublistValue("item", "custcol_mx_txn_line_sat_tax_object", i, 2);
             }
 
             var recObjID = facturaObj.save({
@@ -499,6 +534,8 @@
                 key: recObjID,
                 value: recObjID
             });
+
+            objUpdate.custrecord_ptg_plc_etapa = 1;
                
         } catch (error) {
             log.error({
@@ -506,8 +543,30 @@
                 details: JSON.stringify(error)
             });
             objUpdate.custrecord_ptg_error_cilindro = error.message || '';
+            objSumbitError.custrecord_ptg_status = error.message;
+
+            var customRecFactura = record.create({
+                type: "customrecord_drt_ptg_registro_factura",
+                isDynamic: true,
+            });
+            var recIdSaved = customRecFactura.save();
+            log.debug({
+                title: "Registro de facturacion con error creado",
+                details: "Id Saved: " + recIdSaved,
+            });
+
+            record.submitFields({
+                id: recIdSaved,
+                type: "customrecord_drt_ptg_registro_factura",
+                values: objSumbitError,
+            })
         } finally {
-        submitField("customrecord_ptg_preliquicilndros_", objValue3, objUpdate);
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_preliquicilndros_",
+                id: objValue3,
+                values: objUpdate
+            });
+            log.debug("registroCilindros", registroCilindros);
     }
     }
 
@@ -764,7 +823,13 @@
             });
             objUpdate.custrecord_ptg_error_cilindro = error.message || '';
         } finally {
-            submitField("customrecord_ptg_preliquicilndros_", id_search, objUpdate);
+            objUpdate.custrecord_ptg_plc_etapa = 2;
+            var registroCilindros = record.submitFields({
+                type: "customrecord_ptg_preliquicilndros_",
+                id: id_search,
+                values: objUpdate
+            });
+            log.debug("registroCilindros", registroCilindros);
         }
     }
 
@@ -781,6 +846,9 @@
                 subsidiariaCorpoGas = objMap.subsidiariaCorpoGas;
                 subsidiariaDistribuidora = objMap.subsidiariaDistribuidora;
                 subsidiariaSanLuis = objMap.subsidiariaSanLuis;
+                cajaGeneralDistribuidora = objMap.cajaGeneralDistribuidora;
+                cajaGeneralCorpogas = objMap.cajaGeneralCorpogas;
+                cajaGeneralSanLuis = objMap.cajaGeneralSanLuis;
             }
 
           //SS: PTG - Mapeo Formas de pago y cuentas SS
@@ -811,11 +879,11 @@
             log.debug("idCuenta", idCuenta);
           } else {
             if(idSubsidiaria == subsidiariaCorpoGas){
-                idCuenta = 3153;
+                idCuenta = cajaGeneralCorpogas;
             } else if(idSubsidiaria == subsidiariaDistribuidora){
-                idCuenta = 2849;
+                idCuenta = cajaGeneralDistribuidora;
             } else if(idSubsidiaria == subsidiariaSanLuis){
-                idCuenta = 3151;
+                idCuenta = cajaGeneralSanLuis;
             }
               log.debug("cuenta no encontrada", idCuenta);
           }

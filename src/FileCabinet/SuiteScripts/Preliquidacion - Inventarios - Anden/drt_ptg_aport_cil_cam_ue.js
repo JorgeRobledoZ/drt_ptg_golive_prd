@@ -77,6 +77,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var articuloArray = [];
         var cantidadArray = [];
         var idTransaccionArray = [];
+        var sublistName = "recmachcustrecord_ptg_detalle_aportacion_a_cam_";
         log.audit("estacion", estacion);
         log.audit("vehiculo", vehiculo);
         log.audit("numViaje", numViaje);
@@ -88,6 +89,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var objMap=drt_mapid_cm.drt_liquidacion();
         if (Object.keys(objMap).length>0) {
           formularioTrasladoCarburacion = objMap.formularioTrasladoCarburacion;
+          estatusViajeConcluido = objMap.estatusViajeConcluido;
         }
 
         if(!transferenciaCreadaCero){
@@ -104,19 +106,26 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           });
           var ubicacionDestino = equipoObj.getValue("custrecord_ptg_ubicacionruta_");
           log.audit("ubicacionDestino", ubicacionDestino);
+
+          var viajeObj = record.load({
+            type: 'customrecord_ptg_tabladeviaje_enc2_',
+            id: numViaje,
+          });
+          var viajeEspecial = viajeObj.getValue("custrecord_ptg_tv_viaje_especial");
+          log.audit("viajeEspecial", viajeEspecial);
   
-          var lineDetalleAportacion = newRecord.getLineCount({sublistId: "recmachcustrecord_ptg_detalle_aportacion_a_cam_",});
+          var lineDetalleAportacion = newRecord.getLineCount({sublistId: sublistName,});
   
           for (var i = 0; i < lineDetalleAportacion; i++) {
             articuloArray[i] = newRecord.getSublistValue({
-              sublistId: "recmachcustrecord_ptg_detalle_aportacion_a_cam_",
+              sublistId: sublistName,
               fieldId: "custrecord_ptg_tipoenvase_aportacionacam",
               line: i,
             });
             log.audit("articuloArray "+i, articuloArray[i]);
   
             cantidadArray[i] = newRecord.getSublistValue({
-              sublistId: "recmachcustrecord_ptg_detalle_aportacion_a_cam_",
+              sublistId: sublistName,
               fieldId: "custrecord_ptg_cantidad_a_",
               line: i,
             });
@@ -164,7 +173,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
               idTransaccionArray.push(ejecucionPedidoObjID);
             }
   
-            if (ejecucionPedidoObjID) {
+            /*if (ejecucionPedidoObjID) {
               var newRecordItemReceipt = record.transform({
                 fromType: record.Type.TRANSFER_ORDER,
                 fromId: idOrdenTraslado,
@@ -183,6 +192,19 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
               log.debug("idItemReceipt", idItemReceipt);
   
               idTransaccionArray.push(idItemReceipt);
+            }*/
+
+
+            if(ejecucionPedidoObjID && viajeEspecial){
+              var viajeUpd = {};
+              viajeUpd.custrecord_ptg_estatus_tabladeviajes_ = estatusViajeConcluido;
+
+              var recViaje = record.submitFields({
+                type: "customrecord_ptg_tabladeviaje_enc2_",
+                id: numViaje,
+                values: viajeUpd
+              });
+              log.audit("Registro de viaje actualizado", recViaje);
             }
   
             log.audit({
