@@ -180,7 +180,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/log', 'SuiteScripts/SC
 
                 opportunityRecord.setValue({
                     fieldId: 'custbody_ptg_id_direccion_envio',
-                    value: opportunity.idAddress
+                    value: opportunity.idAddressShip
+                    // value: opportunity.idAddress
                 })
 
                 opportunityRecord.setValue({

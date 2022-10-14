@@ -561,7 +561,8 @@
                         search.createColumn({name: "custevent_ptg_estado", label: "PTG - ESTADO"}),
                         search.createColumn({name: "custevent_ptg_colonia", label: "PTG - COLONIA"}),
                         search.createColumn({name: "custevent_ptg_codigo_postal", label: "PTG - CODIGO POSTAL"}),       
-                        search.createColumn({name: "custevent_ptg_segunda_llamada_casos", label: " PTG - SEGUNDA LLAMADA PARA CASOS"}),                        
+                        search.createColumn({name: "custevent_ptg_segunda_llamada_casos", label: " PTG - SEGUNDA LLAMADA PARA CASOS"}),
+                        search.createColumn({name: "custevent_ptg_agente_call_center", label: "PTG - AGENTE CALL CENTER"}),
                         //search.createColumn({ name: "incomingmessage", label : "MESSAGE"}),
                     ]
             });
@@ -611,6 +612,7 @@
                 var coloniaDireccion = results[i].getValue(columnas[29]);
                 var codigoPostal = results[i].getValue(columnas[30]);
                 var isSecondCall = results[i].getValue(columnas[31]);
+                var agenteCallCenterId = results[i].getValue(columnas[32]);
 
                 var caseDate = results[i].getValue(columnas[5]);
                 var fieldCustomerLookUp = search.lookupFields({
@@ -621,6 +623,7 @@
 
                 var caseCliente = fieldCustomerLookUp.entityid + ' ' + fieldCustomerLookUp.altname
                 var casetelefono = fieldCustomerLookUp.phone;
+                var nombreAgenteCaso = '';
                 var fieldEmployeeLookUp = '';
                 var nombreEstado = '';
                 var nombrePrioridad = '';
@@ -634,6 +637,17 @@
                     fieldEmployeeLookUp = nombreEmpleado
                 } else {
                     fieldEmployeeLookUp = ""
+                }
+
+                if (agenteCallCenterId) {
+                    var empleadoCasoLookUp = search.lookupFields({
+                        type: search.Type.EMPLOYEE,
+                        id: agenteCallCenterId,
+                        columns: ['entityid']
+                    });
+                    nombreAgenteCaso = empleadoCasoLookUp.entityid
+                } else {
+                    nombreAgenteCaso = ""
                 }
 
                 var caseAsignado = fieldEmployeeLookUp
@@ -687,6 +701,7 @@
                     asunto: caseAsunto,
                     cliente: caseCliente,
                     asiganado: caseAsignado,
+                    agenteCallCenter:nombreAgenteCaso,
                     telefono: casetelefono,
                     estatus: nombreEstado,
                     prioridad: nombrePrioridad,

@@ -72,6 +72,12 @@ $('#guardarFugaQueja').on('click', function () {
         return;
     }
 
+    // Si es de tipo solo facturación, no puede continuar con el pedido
+    if ( addressObj.tipoDireccionId == tipoDirSoloFacturacion ) {
+        infoMsg('error', 'No puede realizar guardar una caso con una dirección de sólo facturación');
+        return;
+    }
+
     let casos = [];
     let notas = [];
     $('#notasAdicionales tbody').children('tr.notasAdicionalesItem').each(function( index ) {
@@ -104,7 +110,7 @@ $('#guardarFugaQueja').on('click', function () {
         "nameStreet"    : addressObj.nameStreet,
         "nExterior"     : addressObj.numExterno,
         "nInterior"     : addressObj.numInterno,
-        "idAddress"     : addressObj.idAdress,
+        "idAddress"     : addressObj.idAddressLine,
         "entreCalle"    : addressObj.entreCalle,
         "entreYCalle"   : addressObj.entreYCalle,
         "description"   : $('#descripcionCasoFugaQueja').val(),

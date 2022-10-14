@@ -315,12 +315,13 @@ $('#guardarMetodoPagoForm').on('click', function () {
     $('.productosMetodoPago').parent().parent().removeClass('d-none');
     
     let metodoObj    = {
-        metodo_txt   : metodoTxt,
-        tipo_pago    : metodoId,
-        tipo_cuenta  : tipoCuenta,
-        tipo_tarjeta : tipoTarjeta,
-        monto        : Number(total).toFixed(6),
-        folio        : folioAut,
+        metodo_txt    : metodoTxt,
+        tipo_pago     : metodoId,
+        tipo_cuenta   : tipoCuenta,
+        tipo_tarjeta  : tipoTarjeta,
+        monto_inicial : Number(total).toFixed(6),
+        monto         : Number(total).toFixed(6),
+        folio         : folioAut,
     };
 
     if($("#formMetodoPagosModal").data("tipo") == "add") {
