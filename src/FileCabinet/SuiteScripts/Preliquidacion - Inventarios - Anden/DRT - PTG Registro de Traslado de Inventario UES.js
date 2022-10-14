@@ -12,7 +12,7 @@
  * @NApiVersion 2.1
  * @NScriptType UserEventScript
  */
-define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'SuiteScripts/drt_custom_module/drt_update_record_cm', "N/record", "N/search", 'N/config', 'N/format', "N/runtime"], function (drt_mapid_cm, drt_update_record_cm, record, search, config, format, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'SuiteScripts/drt_custom_module/drt_update_record_cm', "N/record", "N/search", 'N/config', 'N/format', "N/runtime", "N/url"], function (drt_mapid_cm, drt_update_record_cm, record, search, config, format, runtime, url) {
   function afterSubmit(context) {
     try {
       var objUpdate = {};
@@ -293,7 +293,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'SuiteScripts/drt_custom_
 
             log.debug("idItemFulfillment", idItemFulfillment);
 
-            drt_update_record_cm.requestSuitelet("itemfulfillment",idItemFulfillment);
+            drt_update_record_cm.requestSuitelet("itemfulfillment",idItemFulfillment, newRecord.type, newRecord.id);
 
             if(transacciones0){
               idTransaccionArray.push(transacciones0);

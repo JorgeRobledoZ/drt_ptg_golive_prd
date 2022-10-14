@@ -187,6 +187,7 @@
                 idPublicoGeneral = objMap.publicoGeneral;
                 idArticuloDescuento = objMap.idArticuloDescuento;
                 formularioOportunidad = objMap.formularioOportunidad;
+                gasLP = objMap.gasLP;
             }
 
 
@@ -576,7 +577,7 @@
                     var currency = 1;
                     var tipo_servicio = 2;
                     var entity_status = 13;
-                    var gaslp = 4216;
+                    var gaslp = gasLP;
                     var custbody_ptg_tipo_sgc = 2;
                     var oportunidadId = null;
                     // Busca un registro de viaje activo
