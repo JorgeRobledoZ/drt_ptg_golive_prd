@@ -1172,7 +1172,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
 
                                 invoiceInter.setValue({
                                     fieldId: 'subsidiary',
-                                    value: subcidiary_intercompany_invoice
+                                    value: arrayPo[po]['subsidiaria']
                                 });
 
                                 if (arrayPo[po]['tipo_desvio'] == 4) {
