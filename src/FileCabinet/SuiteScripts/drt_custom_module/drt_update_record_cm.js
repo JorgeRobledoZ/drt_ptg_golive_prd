@@ -25,6 +25,10 @@ define([
                     !!param_id &&
                     !!param_type
                 ) {
+                    const scheme = 'https://';
+                    const host = url.resolveDomain({
+                        hostType: url.HostType.APPLICATION
+                    });
                     const suitletURL = url.resolveScript({
                         scriptId: 'customscript_drt_update_record_sl',
                         deploymentId: 'customdeploy_drt_update_record_sl',
@@ -32,7 +36,7 @@ define([
                     });
 
                     respuesta = https.post({
-                        url: suitletURL,
+                        url: `${scheme}${host}${suitletURL}`,
                         headers: {},
                         body: {
                             custscript_drt_update_record_sl_type: param_type,
@@ -64,6 +68,7 @@ define([
                         isDynamic: true,
                     });
 
+                    /*
                     const macros = objRecord.getMacros();
                     log.debug('macros', macros);
                     for (let macroDisponible in macros) {
@@ -76,6 +81,7 @@ define([
                             log.error(`error executeMacro ${macros[macroDisponible].id}`, e.message);
                         }
                     }
+                    */
 
                     respuesta = objRecord.save({
                         enablesourcing: false,
