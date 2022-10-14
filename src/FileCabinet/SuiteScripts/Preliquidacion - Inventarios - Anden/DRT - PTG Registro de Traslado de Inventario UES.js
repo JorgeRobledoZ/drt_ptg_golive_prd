@@ -12,7 +12,7 @@
  * @NApiVersion 2.1
  * @NScriptType UserEventScript
  */
-define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", 'N/config', 'N/format', "N/runtime"], function (drt_mapid_cm, record, search, config, format, runtime) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'SuiteScripts/drt_custom_module/drt_update_record_cm', "N/record", "N/search", 'N/config', 'N/format', "N/runtime"], function (drt_mapid_cm, drt_update_record_cm, record, search, config, format, runtime) {
   function afterSubmit(context) {
     try {
       var objUpdate = {};
@@ -80,7 +80,6 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
 
 
       var objMap=drt_mapid_cm.drt_liquidacion();
-      log.audit("objMap", objMap);
       if (Object.keys(objMap).length>0) {
           plantillaDocumentoElectronico = objMap.plantillaDocumentoElectronico;
           metodoDeEnvio = objMap.metodoDeEnvio;
@@ -94,6 +93,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
           estatusEnCurso = objMap.estatusEnCurso;
           formularioTrasladoCarburacion = objMap.formularioTrasladoCarburacion;
           gasLPUnidades = objMap.gasLPUnidades;
+          paraGeneracion = objMap.paraGeneracion;
         }
 
         var parent = 0;
@@ -282,6 +282,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
 
             newRecordItemFulfillment.setValue("custbody_ptg_numero_viaje_destino", recId);
             newRecordItemFulfillment.setValue("shipstatus", "C");
+            newRecordItemFulfillment.setValue("custbody_psg_ei_status", paraGeneracion);
             newRecordItemFulfillment.setValue("custbody_psg_ei_template", plantillaDocumentoElectronico);
             newRecordItemFulfillment.setValue("custbody_psg_ei_sending_method", metodoDeEnvio);
 
@@ -291,6 +292,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", '
             }) || "";
 
             log.debug("idItemFulfillment", idItemFulfillment);
+
+            drt_update_record_cm.requestSuitelet("itemfulfillment",idItemFulfillment);
 
             if(transacciones0){
               idTransaccionArray.push(transacciones0);
