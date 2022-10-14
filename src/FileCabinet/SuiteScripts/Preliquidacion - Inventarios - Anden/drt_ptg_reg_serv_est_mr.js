@@ -184,8 +184,9 @@
                 formularioRecepcion = objMap.formularioRecepcion;
                 formularioOportunidad = objMap.formularioOportunidad;
                 formularioOrdenTraslado = objMap.formularioOrdenTraslado;
-                idPublicoGeneral = objMap.idPublicoGeneral;
+                idPublicoGeneral = objMap.publicoGeneral;
                 idArticuloDescuento = objMap.idArticuloDescuento;
+                formularioOportunidad = objMap.formularioOportunidad;
             }
 
 
@@ -555,7 +556,7 @@
                     log.debug('totalPorLitro', totalPorLitro );
                     log.debug('totalCalculado', totalCalculado );
                     // log.debug('Fecha inicio SGC value', sinConciliar.getValue({fieldId:'custrecord_ptg_fechainicio_sgc'}) );
-                    var customform = 265;
+                    var customform = formularioOportunidad;
                     var cliente = cliente;
                     var cantidad = cantidad;
                     var total = precio;
@@ -759,7 +760,7 @@
                                 value: descuentoUnitario ?? 0
                             });
                         }
-            
+                        
                         oportunidadId = newOportunidad.save();
             
                         log.audit('oportunidadId', oportunidadId);

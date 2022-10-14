@@ -19,7 +19,6 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             var currentRecord = context.currentRecord;
             var nombre = 'Por Asignar';
             currentRecord.setValue("name", nombre);
-
         } catch (error) {
             log.error({
                 title: "error pageInit",
