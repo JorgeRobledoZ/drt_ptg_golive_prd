@@ -50,7 +50,7 @@ define(["N/search", 'N/ui/dialog'], function (search, dialog) {
                             filters: [
                                 ["type", "anyof", "PurchOrd"],
                                 "AND",
-                                ["custcol2", "is", pgLinea],
+                                ["custcol2", "is", pgLineaText],
                                 "AND",
                                 ["mainline", "is", "F"],
                                 "AND",
@@ -90,10 +90,16 @@ define(["N/search", 'N/ui/dialog'], function (search, dialog) {
                                 name: "custcol_ptg_centro_e_destino_"
                             });
 
+                            var embarque = searchResultCount[0].getValue({
+                                name: "tranid"
+                            });
+
+
 
                             currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_det_entradatranspo_', 'custrecord_ptg_plantaoriginal_', ubicacion);
                             currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_det_entradatranspo_', 'custrecord_ptg_plantadestino_', planta_destino);
-                            currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_det_entradatranspo_', 'custrecord_ptg_centroembarcador_enttrans', centroEmbarcador)
+                            currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_det_entradatranspo_', 'custrecord_ptg_centroembarcador_enttrans', centroEmbarcador);
+                            currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_det_entradatranspo_', 'custrecord_ptg_embarque_', embarque);
                         }
 
                     }
