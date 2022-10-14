@@ -827,6 +827,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           }
 
           var diferenciaLitros = litrosTotalEntrada - litrosTotalSalida;
+          //var diferenciaLitros = 10 - 15;
 
           var numeroLineas = currentRecord.getLineCount(nombreSublistaRegistro);
           log.debug("numeroLineas", numeroLineas);
