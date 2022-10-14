@@ -50,6 +50,10 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                     id: context.newRecord.id,
                     isDynamic: true
                 });
+
+                var folio = currentRecord.getValue({
+                    fieldId: 'custrecord_ptg_folio_consectivo_confirm'
+                });
                 let objPo = {};
                 let arrayPo = [];
                 let idVendorBill = '';
@@ -292,7 +296,8 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                         litros: litros,
                         idDetalle: idDetalle,
                         precioConfirmacion: precioConfirmacion,
-                        procesar: procesar
+                        procesar: procesar,
+                        folio: folio
                     }
 
                     arrayPo.push(objPo);
@@ -492,6 +497,12 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                     sublistId: "item",
                                     fieldId: "custcol_ptg_registro_salida_",
                                     value: arrayPo[po]['idDetalle']
+                                });
+
+                                createSalesOrder.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: "custcol_ptg_fl_",
+                                    value: arrayPo[po]['folio']
                                 });
 
                                 let idArticle = createSalesOrder.commitLine({
@@ -1251,6 +1262,12 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                         sublistId: "item",
                                         fieldId: "custcol_ptg_registro_salida_",
                                         value: arrayPo[po]['idDetalle']
+                                    });
+
+                                    invoiceInter.setCurrentSublistValue({
+                                        sublistId: "item",
+                                        fieldId: "custcol_ptg_fl_",
+                                        value: arrayPo[po]['folio']
                                     });
 
                                     invoiceInter.commitLine({
