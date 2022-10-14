@@ -207,7 +207,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                     parameters: parametros
                 });
                 log.audit("redirectToStl", redirectToStl);
-            }            
+            }
           } else {
             redirect.toRecord({
               type: 'customrecord_ptg_registro_servicios_esta',
