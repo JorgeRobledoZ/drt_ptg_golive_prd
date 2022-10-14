@@ -723,33 +723,29 @@ define(
                 const mapObj = {
                     [runtime.EnvType.PRODUCTION]:{
                         ubicacion_desvio_planta_receipt: 1525,
-                        form_desvio_cliente_invoice: 308,
-                        form_vendor_bill: 309,
-                        item_vendor_bill_flete: 4114,
-                        form_transfer_order: 57,
                         ubicacion_transfer_order: 1525,
-                        form_full_filment: 40,
-                        form_item_receipt: 303,
-                        form_intercompany_invoice: 308,
                         subcidiary_intercompany_invoice: 25,
                         ubicacion_intercompany_invoice: 762,
-                        form_sales_order: 261,
-                        form_full_filment_so: 290
+                        form_vendor_bill: 300,
+                        form_transfer_order: 451,
+                        form_item_receipt: 268,
+                        form_intercompany_invoice: 286,
+                        form_sales_order: 453,
+                        form_full_filment_: 452,
+                        form_invoice: 454,
                     },
                     [runtime.EnvType.SANDBOX]: {
                         ubicacion_desvio_planta_receipt: 1525,
-                        form_desvio_cliente_invoice: 286,
-                        form_vendor_bill: 300,
-                        item_vendor_bill_flete: 4114,
-                        form_transfer_order: 57,
                         ubicacion_transfer_order: 1525,
-                        form_full_filment: 40,
-                        form_item_receipt: 268,
-                        form_intercompany_invoice: 286,
                         subcidiary_intercompany_invoice: 25,
                         ubicacion_intercompany_invoice: 762,
-                        form_sales_order: 261,
-                        form_full_filment_so: 290
+                        form_vendor_bill: 300,
+                        form_transfer_order: 451,
+                        form_item_receipt: 268,
+                        form_intercompany_invoice: 286,
+                        form_sales_order: 453,
+                        form_full_filment_: 452,
+                        form_invoice: 454,
                     }
                 }
                 respuesta = mapObj[runtime.envType];
