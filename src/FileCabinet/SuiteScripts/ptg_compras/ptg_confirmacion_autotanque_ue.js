@@ -344,7 +344,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                     var idCompra = compraLoad.save();
                     log.audit('idCompra', idCompra);
 
-                    if (arrayPo[po]['procesar'] == true || arrayPo[po]['procesar'] == "True" || arrayPo[po]['procesar'] == "T") {
+                    if (arrayPo[po]['procesar'] == false || arrayPo[po]['procesar'] == "False" || arrayPo[po]['procesar'] == "F") {
                         /*******************Proceso de recepciones**********************/
                         if (arrayPo[po]['tipo_desvio'] == 3) {
                             try {
