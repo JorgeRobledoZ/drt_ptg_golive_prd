@@ -192,6 +192,7 @@ function setCustomerInfo(customer, idAddress = null) {
     $('#notasCliente').text(customer.notasCustomer ? customer.notasCustomer : 'Sin notas');
     $('#tipoCliente').text(customer.typeCustomer);
     $('#razonSocialPedido').val(customer.razonSocialFact);
+    $('#razonSocialPedido').data('title',customer.razonSocialFact);
     $('#rfcPedido').val(customer.rfc);
     $("#requiereFacturaPedido").prop("checked", false).trigger("change");
     // Campos del formulario quejas y fugas

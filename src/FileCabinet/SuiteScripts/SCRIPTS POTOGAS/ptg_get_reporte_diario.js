@@ -2,7 +2,7 @@
  *@NApiVersion 2.1
  *@NScriptType Restlet
  */
-define(['N/search', 'N/query'], function (search, query) {
+define(['N/search', 'N/query', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (search, query, drt_mapid_cm) {
 
     const responseData = {
         success: false,
@@ -14,6 +14,7 @@ define(['N/search', 'N/query'], function (search, query) {
     function _get(request) {
 
         try {
+            let customVars = drt_mapid_cm.getVariables();
             let sql = ` SELECT
                             TR.id,
                             TR.closedate,
@@ -80,6 +81,10 @@ define(['N/search', 'N/query'], function (search, query) {
                 sql += ` AND TR.custbody_ptg_tipo_servicio = ${request.tipo_producto} `;
             }
 
+            if(request.sinPublicoGeneral) {
+                sql += ` AND TR.entity != ${customVars.publicoGeneralId} `;
+            }
+
             if(request.planta) {
                 sql += ` AND TR.custbody_ptg_planta_relacionada = '${request.planta}' `;
             }
@@ -130,6 +135,8 @@ define(['N/search', 'N/query'], function (search, query) {
             resultIterator.each(function (page) {
                 let pageIterator = page.value.data.iterator();
                 pageIterator.each(function (row) {
+                    let balance = Number(row.value.getValue(28) ?? 0);
+                    let limite_credito = Number(row.value.getValue(27) ?? 0);
                     let data = {
                         id: row.value.getValue(0),
                         fecha_cierre: row.value.getValue(1),
@@ -158,12 +165,18 @@ define(['N/search', 'N/query'], function (search, query) {
                         observaciones: row.value.getValue(24),
                         alianzaId: row.value.getValue(25),
                         alianza: row.value.getValue(26),
+                        balance: balance,
+                        limite_credito: limite_credito,
                         credito_disponible: row.value.getValue(27) - row.value.getValue(28),
                         programado: row.value.getValue(29),
                         aviso: row.value.getValue(30),
                         ruta: row.value.getValue(31),
                         ultimo_servicio: row.value.getValue(32),
-                        status: row.value.getValue(33)
+                        status: row.value.getValue(33),
+                        saldoDisponible : (balance < 0 ? limite_credito : limite_credito - balance).toFixed(2)
+                    }
+                    if (data.balance){
+
                     }
                     arrayData.push(data);
 

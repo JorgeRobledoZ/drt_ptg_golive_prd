@@ -398,13 +398,14 @@ define(['N/search', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (se
                 transactionSearchObj.filters.push(fechaSolicitud);
             }
 
-            if (rangoSolicitud1 || rangoSolicitud2) {
-                var fechaSolicitud = search.createFilter({
-                    name: "trandate",
-                    operator: "within",
-                    values: arrayFechasSolicitud
+            if ( request.sinPublicoGeneral ) {
+                // ["entity","noneof","14508"]
+                var filtroPublicoGeneral = search.createFilter({
+                    name: "entity",
+                    operator: "noneof",
+                    values: customVars.publicoGeneralId
                 })
-                transactionSearchObj.filters.push(fechaSolicitud);
+                transactionSearchObj.filters.push(filtroPublicoGeneral);
             }
             //["expectedclosedate","within","10/1/2022","10/1/2022"]
             var arrayFechaPrometida = [];

@@ -521,7 +521,9 @@ function getFiltPedidos() {
                 }
             } 
         }
-    }    
+    }
+
+    filt.sinPublicoGeneral = true;
 
     return filt;
 }

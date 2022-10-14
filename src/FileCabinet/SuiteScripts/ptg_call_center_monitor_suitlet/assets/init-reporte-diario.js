@@ -416,6 +416,8 @@ function getFiltPedidos() {
         filt.programado = true;
     }
 
+    filt.sinPublicoGeneral = true;
+
     return filt;
 }
 
@@ -643,7 +645,7 @@ function getRowTable(pedido) {
                         trAux +=      '<strong>'+(pedido.alianza ? pedido.alianza : '')+'</strong></td>'+// Aquí falta el litraje/kgs surtidos relacionados al producto
                         '<td class="text-center">' + 
                             ( pedido.usuario_pedido_solicitud ? pedido.usuario_pedido_solicitud : '' ) + '<br>'+// Aquí va la persona que atendió
-                            ( '$'+(pedido.credito_disponible ? getCorrectFormat(pedido.credito_disponible) : '0.00') ) + //Aquí va el crédito restante del cliente
+                            ( '$'+(pedido.saldoDisponible ? getCorrectFormat(Number(pedido.saldoDisponible)) : '0.00') ) + //Aquí va el crédito restante del cliente
                         '</td>'+
                         '<td class="text-center">'+(pedido.status == 1 ? 'No surtido' : (pedido.status == 2 ? 'Asignado' : (pedido.status == 3 ? 'Surtido' : (pedido.status == 4 ? 'Por reprogramar' : (pedido.status == 5 ? 'Cancelado' : 'Por confirmar')))))+' <br> '+((!pedido.aviso || pedido.aviso == 'F') && (!pedido.programado || pedido.programado == 'F') ? 'TELEFÓNICO' : (pedido.aviso && pedido.aviso == 'T') ? 'AVISO' : 'PROGRAMADO')+'</td>'+
                         '<td class="text-center">'+(pedido.ultimo_servicio ? pedido.ultimo_servicio : 'Primer pedido')+'</td>'+
