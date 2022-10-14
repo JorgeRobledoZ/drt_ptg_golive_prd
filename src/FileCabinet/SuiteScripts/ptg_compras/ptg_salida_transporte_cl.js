@@ -123,9 +123,11 @@ define(["N/search", 'N/ui/message', 'N/ui/dialog', 'N/error'], function (search,
                         search.createColumn({
                             name: "custrecord_ptg_densidad",
                             label: "DEnsidad"
+                        }),
+                        search.createColumn({
+                            name: "custrecord_ptg_embarque_",
+                            label: "#Embaruqe"
                         })
-
-                        //custrecord_ptg_embarque_
                     ]
                 });
                 var searchResultCount = customrecord_ptg_detalleentradatranspo_SearchObj.run().getRange(0, 1);
@@ -213,6 +215,10 @@ define(["N/search", 'N/ui/message', 'N/ui/dialog', 'N/error'], function (search,
                         name:"internalid"
                     });
 
+                    var numEntrega = searchResultCount[0].getValue({
+                        name: "custrecord_ptg_embarque_"
+                    })
+
 
                     //
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_detallesalida_', 'custrecord_ptg_plantaoriginal_salida_', plantaO);
@@ -236,6 +242,7 @@ define(["N/search", 'N/ui/message', 'N/ui/dialog', 'N/error'], function (search,
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_detallesalida_', 'custrecord_ptg_precio_salida_', precio);
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_detallesalida_', 'custrecord_ptg_densidad_salida_', dencidad);
                     //currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_detallesalida_', 'custrecord_ptg_detallesalida_', idEntrada);
+                    currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_detallesalida_', 'custrecord_ptg_embarque_salida_', numEntrega)
                 }
 
 
