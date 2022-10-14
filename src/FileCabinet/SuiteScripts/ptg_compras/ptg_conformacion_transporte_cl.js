@@ -324,6 +324,10 @@ define(["N/search"], function (search) {
                         search.createColumn({
                             name: "custrecord_ptg_embarque_salida_",
                             label: "#embauque"
+                        }),
+                        search.createColumn({
+                            name: "custrecord_ptg_densidad_salida_",
+                            label: "densidad"
                         })
                         //
                     ]
@@ -422,6 +426,10 @@ define(["N/search"], function (search) {
 
                     var nEmbarque = searchResultCount[0].getValue({
                         name: 'custrecord_ptg_embarque_salida_'
+                    });
+
+                    var densidad = searchResultCount[0].getValue({
+                        name: 'custrecord_ptg_densidad_salida_'
                     })
 
                     log.audit('centroEmbarcadorText', centroEmbarcadorText);
@@ -534,7 +542,8 @@ define(["N/search"], function (search) {
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_pesoinicial_confirmacion_', pesoEntrada);
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_precion_confirmacion', precioSalida)
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_litros_confirm', litros)
-                    currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_embarque_confirmacion_', nEmbarque)
+                    currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_embarque_confirmacion_', nEmbarque);
+                    currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_densidad_confir_salida_', densidad)
                 }
             }
         } catch (error) {
