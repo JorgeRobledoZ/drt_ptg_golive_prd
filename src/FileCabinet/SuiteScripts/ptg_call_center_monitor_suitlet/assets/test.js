@@ -275,7 +275,7 @@ function setCustomerInfo(customer, idAddress = null) {
 function getRealHistoric() {
     let dataObtenerPedido = {
         "cliente" : customerGlobal.id,
-        "idAddress" : $("#direccionCliente option:selected").data("address").idAdress
+        "idAddress" : $("#direccionCliente option:selected").data("address").idAddressLine
     };
 
     let settings = {
@@ -688,10 +688,10 @@ function setSelectArticulos(items) {
 
 // Método para llenar el select de método de pago
 function setSelectMetodosPago(items) {
-    $('select#metodoPagoPedido').children('option').remove();
+    $('select#metodoPagoPedido, select#metodoPagoDescuento').children('option').remove();
     if ( items.length ) {
         metodosPago = items;
-        $("select#metodoPagoPedido").append('<option value="">Seleccione una opción</option>')
+        $("select#metodoPagoPedido, select#metodoPagoDescuento").append('<option value="">Seleccione una opción</option>')
         for ( var key in items ) {
             if ( items.hasOwnProperty( key ) ) {
                 let metodo = items[key];
@@ -702,7 +702,7 @@ function setSelectMetodosPago(items) {
                 else { classMethod = 'opt-method-normal'; } // Es método de pago normal
 
                 if ( metodoId != metodoMultiple ) {// Si es diferente a método de pago múltiple, se añade al select
-                    $("select#metodoPagoPedido").append(
+                    $("select#metodoPagoPedido, select#metodoPagoDescuento").append(
                         '<option class="'+classMethod+'" value='+metodo.id+'>'+metodo.method+'</option>'
                     );
                 }
@@ -807,7 +807,7 @@ function getCasosOportunidades(showPend = true) {
     clearTable();
     let dataObtenerPedido = {
         "id" : customerGlobal.id,
-        "idAddress" : $("#direccionCliente option:selected").data("address").idAdress
+        "idAddress" : $("#direccionCliente option:selected").data("address").idAddressLine
     };
 
     let settings = {
@@ -1170,12 +1170,13 @@ function setDefaultItem() {
         $('#sinMetodosPago').addClass('d-none');
         $('.productosMetodoPago').parent().parent().removeClass('d-none');
         let metodoObj    = {
-            metodo_txt   : 'Efectivo',
-            tipo_pago    : 1,
-            tipo_cuenta  : null,
-            tipo_tarjeta : null,
-            monto        : totalProducto,
-            folio        : "",
+            metodo_txt    : 'Efectivo',
+            tipo_pago     : 1,
+            tipo_cuenta   : null,
+            tipo_tarjeta  : null,
+            monto_inicial : Number(totalProducto).toFixed(6),
+            monto         : Number(totalProducto).toFixed(6),
+            folio         : "",
         };
         agregarMetodoPago(metodoObj);
         setTotalMetodoPago( $(".productosMetodoPago") );
@@ -1384,6 +1385,8 @@ function verDetalles($this) {
         $(".casos-servicio-asociado").html(pedido.numeroCaso ? pedido.numeroCaso : 'Sin asignar');
         $(".casos-caso-asociado").html(pedido.casoAsociado ? pedido.casoAsociado : 'Sin asignar');
         $(".casos-descripcion").html(pedido.descripcion ? pedido.descripcion : 'N/A');
+        $(".casos-agente-call-center").html(pedido.agenteCallCenter ? pedido.agenteCallCenter : 'N/A');
+        $(".casos-tecnico-asignado").html(pedido.asiganado ? pedido.asiganado : 'N/A');
         // $(".casos-notas-adicionales").html(pedido.nota ? pedido.nota : 'Sin asignar');
         
         $('.campos-casos').removeClass('d-none');
@@ -1604,18 +1607,23 @@ function setMetodosPago(pedido, tipo) {
             let metodo = metodosPago.find( metodo => parseInt( metodo.id ) === parseInt(items[key].tipo_pago) );
             
             $('table.table-desgloce-metodos-pago tbody').append(
-                '<tr>'+
+                '<tr data-item=' + "'" + JSON.stringify(items[key]) + "'" + '>'+
                     '<td class="">'+( metodo ? metodo.method : 'N/A' )+'</td>'+
                     '<td class="text-center">'+( items[key].folio ? items[key].folio : 'N/A' ) +'</td>'+
                     '<td style="text-align: right;">$'+parseFloat(monto).toFixed(2)+'</td>'+
                 '</tr>'
             )
+
+            // Bloque de código para mostrar los métodos de pago acorde a los que están en el objeto de método de pagos
+            $('#metodoPagoDescuento').children('option').addClass('d-none');
+            $('#metodoPagoDescuento option[value="'+items[key].tipo_pago+'"]').removeClass('d-none');
         }
 
         $('table.table-desgloce-metodos-pago tfoot').find('.total-metodos-pago-detalle').text('$'+parseFloat(totalFinal).toFixed(2));
 
         $('.campos-metodos-pago').removeClass('d-none');
     }
+    $('#metodoPagoDescuento option[value=""]').removeClass('d-none');
 
     console.log(obj);
 }

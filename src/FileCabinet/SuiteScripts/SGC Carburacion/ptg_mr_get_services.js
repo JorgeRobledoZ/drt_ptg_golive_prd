@@ -249,6 +249,7 @@
                 "tipo_cuenta":null,
                 "tipo_tarjeta":null,
                 "monto":monto,
+                "monto_inicial":monto,
                 "folio":"",
             }
         ];

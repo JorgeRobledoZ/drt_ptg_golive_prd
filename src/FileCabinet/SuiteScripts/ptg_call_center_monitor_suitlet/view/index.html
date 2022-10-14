@@ -1168,6 +1168,15 @@
                                 <input name="inputAgregarDescuento" id="inputAgregarDescuento" title="Agregar descuento" placeholder="0.00" type="text" class="form-ptg form-ptg-primary validate required" oninput="onlyNumbers(this.value, '#inputAgregarDescuento')">
                             </div>
                         </div>
+                        <div class="col-12">
+                            <div class="content-input content-input-primary">
+                                <label for="metodoPagoDescuento">Método*</label>
+                                <br>
+                                <select id="metodoPagoDescuento" title="Tipo método de pago" class="form-ptg form-ptg-primary validate required">
+                                    <option value="">Seleccione una opción</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1803,6 +1812,14 @@
                         <div class="row p-3">
                             <div class="col-3 title">Concepto</div>
                             <div class="col-9 resp casos-concepto"></div>
+                        </div>
+                        <div class="row p-3">
+                            <div class="col-3 title">Agente call center</div>
+                            <div class="col-9 resp casos-agente-call-center"></div>
+                        </div>
+                        <div class="row p-3">
+                            <div class="col-3 title">Técnico asignado</div>
+                            <div class="col-9 resp casos-tecnico-asignado"></div>
                         </div>
                         <div class="row p-3">
                             <div class="col-3 title">Fecha visita</div>

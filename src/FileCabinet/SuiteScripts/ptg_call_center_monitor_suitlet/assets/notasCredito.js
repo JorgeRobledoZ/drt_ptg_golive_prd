@@ -191,21 +191,93 @@ function verNotasAgregarDescuento($this) {
 
 }
 
+// Retorna los métodos de pago
+function setObjetoMetodosPago(metodosArray) {
+    let prepaymentArr = [];
+    let pagosArr      = [];
+    let pagosObj      = {pago : null};
+
+    for (let a = 0; a < metodosArray.length; a++) {
+        const metodoObj = metodosArray[a];
+        
+        let metodoId  = parseInt(metodoObj.tipo_pago);
+        metodoObj.monto = parseFloat(Number(metodoObj.monto).toFixed(6));
+        
+        // Si el método de pago es transferencia o prepago, se enviará una orden de prepago después de guardar el pedido
+        if ( metodosPagoPrepago.includes( metodoId ) || metodoId == metodoTransferencia ) {
+            prepaymentArr.push({
+                customer : customerGlobal.id,
+                account  : metodoObj.tipo_cuenta,
+                amount   : metodoObj.monto,
+                isCredit : metodosPagoPrepago.includes( metodoId ) ? (metodoObj.tipo_tarjeta == "2" ? true : false) : false,
+                isDebit  : metodosPagoPrepago.includes( metodoId ) ? (metodoObj.tipo_tarjeta == "1" ? true : false) : false,
+                numRef   : metodosPagoPrepago.includes( metodoId ) ? metodoObj.folio : null,
+                planta   : $("#plantas").val()
+            });
+        }
+        // console.log(metodoObj);
+        pagosArr.push( metodoObj );
+    }
+    pagosObj.pago = pagosArr;
+
+    return {objPagos : pagosObj, metodosPrepago : prepaymentArr};
+}
+
 // Valida si se agrega un descuento y/o nota al servicio
 function guardarDescuentoNota() {
     let pedido      = $("div#formAgregarDescuentoModal").data("item");
     let nota        = $('#formAgregarDescuentoModal textarea.nuevaNotaAdicional').val();
+    let metodoVal   = $('#metodoPagoDescuento').val();
     let descuento   = $('#formAgregarDescuentoModal input[name=inputAgregarDescuento]').val();
     let nuevo       = $('div#formAgregarDescuentoModal table.table-desgloce-art tbody').children('tr.descuento').length > 0 ? false : true;
+    let metodosArr  = [];
+    let montoValido = true;
+    
     if(validateForm($("#formAgregarDescuentoModal"))) {
         return;
     }
+
+    $('#formAgregarDescuentoModal .campos-metodos-pago table.table-desgloce-metodos-pago tbody').children('tr').each(function(e) {
+        let metodo = $(this).data('item');
+
+        if ( metodo ) {
+            if ( metodo.tipo_pago == metodoVal ) {
+                let resta = parseFloat(Number(metodo.monto_inicial) - Number(descuento)).toFixed(6);
+                console.log('Resta:',resta);
+                if ( resta > 0) {
+                    console.log('El monto es válido y debe procesarse');
+                    metodo.monto = resta;
+                } else {
+                    console.log('El monto es negativo y NO es válido');
+                    montoValido = false;
+                }
+            }
+
+            console.log(metodo);
+            metodosArr.push(metodo);
+        }
+    });
+
+    // Se valida que la resta no sea negativa o igual a 0
+    if (! montoValido ) {
+        infoMsg('error', 'El descuento no puede ser mayor al monto del método de pago proporcionado');
+        return;
+    }
+
+    // console.log('metodosArr antes de la función',metodosArr);
+
+    let objeto = setObjetoMetodosPago(metodosArr);
+
+    // console.log('Objeto de métodos de pago', objeto);
+
+    // return;
 
     let dataDescuento = {
         "opportunitiesUpdate": [
             {
                 "id": pedido.id_Transaccion,
                 "bodyFields": {
+                    "custbody_ptg_opcion_pago_obj": JSON.stringify(objeto.objPagos),
                 },
                 "lines": [
                     {
