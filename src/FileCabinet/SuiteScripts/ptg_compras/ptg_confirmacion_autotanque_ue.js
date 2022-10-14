@@ -121,6 +121,12 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                         sublistId: 'recmachcustrecord_ptg_confirmacion_salida_',
                         fieldId: 'id',
                         line: i
+                    });
+
+                    var precioConfirmacion = currentRecord.getSublistValue({
+                        sublistId: 'recmachcustrecord_ptg_confirmacion_salida_',
+                        fieldId: 'custrecord_ptg_precion_confirmacion',
+                        line: i
                     })
 
                     log.audit('pg', pg);
@@ -244,7 +250,8 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                         rate: rateConfinrmacion,
                         provedorFlete: provedorFlete,
                         litros: litros,
-                        idDetalle: idDetalle
+                        idDetalle: idDetalle,
+                        precioConfirmacion : precioConfirmacion
                     }
 
                     arrayPo.push(objPo);
@@ -419,11 +426,15 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                                 fieldId: "quantity",
                                 value: arrayPo[po]['litros']
                             });
+                             var precioC = parseFloat(arrayPo[po]['precioConfirmacion']);
+                             var precioCliente = parseFloat(arrayPo[po]['sobre_precio_cliente']) ;
+                             var rateC = precioC + precioCliente;
+                             log.audit('rateC',rateC)
 
                             createSalesOrder.setCurrentSublistValue({
                                 sublistId: "item",
                                 fieldId: "rate",
-                                value: arrayPo[po]['tarifa_kilogramo'] + arrayPo[po]['sobre_precio_cliente']
+                                value: rateC.toFixed(6)
                             });
 
                             createSalesOrder.setCurrentSublistValue({
@@ -565,7 +576,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                             fieldId: 'quantity',
                             value: arrayPo[po]['litros']
                         });
-                        var rateB = parseFloat(arrayPo[po]['rate'])
+                        var rateB = parseFloat(arrayPo[po]['precioConfirmacion'])
                         rateB = rateB.toFixed(6)
                         log.audit('rateB', rateB)
                         vendorBill.setCurrentSublistValue({
@@ -724,9 +735,15 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                             value: arrayPo[po]['subsidiaria_linea'] ? arrayPo[po]['subsidiaria_linea'] : arrayPo[po]['subsidiaria']
                         });
 
+                        var fleteUbicacion = 0;
+                        if(arrayPo[po]['tipo_desvio'] == 4){
+                            fleteUbicacion = arrayPo[po]['planta_desvio']
+                        } else {
+                            fleteUbicacion =  arrayPo[po]['location']
+                        }
                         facturaFlete.setValue({
                             fieldId: 'location',
-                            value: arrayPo[po]['planta_desvio'] ? arrayPo[po]['planta_desvio'] : arrayPo[po]['location']
+                            value: fleteUbicacion
                         });
 
                         facturaFlete.setValue({
@@ -849,7 +866,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                             } else if (arrayPo[po]['tipo_desvio'] == 4) {
                                 createTransferOrder.setValue({
                                     fieldId: 'location',
-                                    value: ubicacion_transfer_order
+                                    value: idAlmacenVirtual
                                 });
 
                                 createTransferOrder.setValue({
@@ -1209,7 +1226,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                                 invoiceInter.setCurrentSublistValue({
                                     sublistId: "item",
                                     fieldId: "rate",
-                                    value: arrayPo[po]['tarifa_kilogramo'] + arrayPo[po]['tarifa_sprecio_intercompania']
+                                    value: arrayPo[po]['precioConfirmacion'] + arrayPo[po]['tarifa_sprecio_intercompania']
                                 });
 
                                 invoiceInter.commitLine({
@@ -1375,7 +1392,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search", "
                                         billInter.setCurrentSublistValue({
                                             sublistId: "item",
                                             fieldId: 'rate',
-                                            value: arrayPo[po]['tarifa_kilogramo'] + arrayPo[po]['tarifa_sprecio_intercompania']
+                                            value: arrayPo[po]['precioConfirmacion'] + arrayPo[po]['tarifa_sprecio_intercompania']
                                         });
 
                                         let articulo = billInter.commitLine({
