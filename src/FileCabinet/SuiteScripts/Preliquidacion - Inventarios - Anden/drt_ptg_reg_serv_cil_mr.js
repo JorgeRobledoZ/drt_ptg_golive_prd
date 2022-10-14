@@ -725,7 +725,7 @@
               log.audit("unidad: ", unidad);
 
             
-            var solicitaFactura = false;
+            var solicitaFactura = true;
             var clienteObj = record.load({
                 type: search.Type.CUSTOMER,
                 id: cliente
