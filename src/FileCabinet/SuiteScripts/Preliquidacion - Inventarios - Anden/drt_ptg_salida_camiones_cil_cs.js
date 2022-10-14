@@ -13,6 +13,37 @@
  *@NScriptType ClientScript
  */
 define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/currentRecord", 'N/ui/dialog', "N/runtime"], function (drt_mapid_cm, record, search, error, currentRecord, dialog, runtime) {
+    function pageInit(context) {
+        try {
+          var currentRecord = context.currentRecord;
+
+            var nombreSublistaDotacion = "recmachcustrecord_no_viaje_salida_camion_dot_";
+            var numeroLineas = currentRecord.getLineCount(nombreSublistaDotacion);
+            for(var j = 0; j < numeroLineas; j++){
+              dotacion = currentRecord.getSublistField({
+                sublistId: nombreSublistaDotacion,
+                fieldId: 'custrecord_ptg_dotacion_cilindros',
+                line: j
+              });
+                 
+              articulo = currentRecord.getSublistField({
+                sublistId: nombreSublistaDotacion,
+                fieldId: 'custrecord_ptg_cilindro_dotacion_',
+                line: j
+              });
+    
+              dotacion.isDisabled = true;
+              articulo.isDisabled = true;
+            }
+    
+        } catch (error) {
+          console.log({
+            title: "error pageInit",
+            details: JSON.stringify(error),
+          });
+        }
+      }
+
     function fieldChanged(context) {
         try {
             debugger;
@@ -100,6 +131,25 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                     });
                     currentRecord.commitLine({sublistId: "recmachcustrecord_no_viaje_salida_camion_dot_", });
                 }
+
+                var nombreSublistaDotacion = "recmachcustrecord_no_viaje_salida_camion_dot_";
+                var numeroLineas = currentRecord.getLineCount(nombreSublistaDotacion);
+                for(var j = 0; j < numeroLineas; j++){
+                    dotacion = currentRecord.getSublistField({
+                      sublistId: nombreSublistaDotacion,
+                      fieldId: 'custrecord_ptg_dotacion_cilindros',
+                      line: j
+                    });
+                       
+                    articulo = currentRecord.getSublistField({
+                      sublistId: nombreSublistaDotacion,
+                      fieldId: 'custrecord_ptg_cilindro_dotacion_',
+                      line: j
+                    });
+          
+                    dotacion.isDisabled = true;
+                    articulo.isDisabled = true;
+                }
             }
 
             
@@ -155,5 +205,6 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
     return {
         fieldChanged: fieldChanged,
         saveRecord: saveRecord,
+        pageInit: pageInit,
     };
 });
