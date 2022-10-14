@@ -14,9 +14,10 @@
 *@NModuleScope Public
 */
 
-//define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/encode', 'N/config', 'N/task', 'N/xml', 'N/email', 'N/file','../Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/PacConnectors/mysuite/signedxml-req/util'], SBX
-define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/encode', 'N/config', 'N/task', 'N/xml', 'N/email', 'N/file','../../SuiteBundles/Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/PacConnectors/mysuite/signedxml-req/util'],
- function (search, record, format, runtime, https, xml, encode, config, task, xml, email, file, util) {
+//define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/encode', 'N/config', 'N/task', 'N/xml', 'N/email', 'N/file','../Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/PacConnectors/mysuite/signedxml-req/util'], //SBX
+define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/encode', 'N/config', 'N/task', 'N/xml', 'N/email', 'N/file','../../SuiteBundles/Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/PacConnectors/mysuite/signedxml-req/util', 'N/render'], //SBX
+//define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/encode', 'N/config', 'N/task', 'N/xml', 'N/email', 'N/file','../../SuiteBundles/Bundle 373485/com.netsuite.mexicocompliance/src/electronicInvoicing/PacConnectors/mysuite/signedxml-req/util'], //PRD
+ function (search, record, format, runtime, https, xml, encode, config, task, xml, email, file, util, render) {
 
 	 const CONST_ARR_CHART = ['&', '"', '<', '>', "'", '´'];
 	 const OPERATION = 'CONVERT_NATIVE_XML';
@@ -110,8 +111,9 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 
 			 result = {
 				 rfcemisor: subsidiary.getValue('federalidnumber') || 'XAXX010101000',
-				 regfiscal: subsidiary.getText('custrecord_mx_sat_industry_type').split('-')[0] || '',
-				 razonsoc: subsidiary.getValue('name')
+				 regfiscal: subsidiary.getText('custrecord_mx_sat_industry_type').split('-')[0].trim() || '',
+				 razonsoc: subsidiary.getValue('name'),
+				 codigoPostalEmisor: subsidiary.getText('mainaddress_text').split('_')[1].trim() || '',
 			 };
 
 		 } else if (!SUBSIDIARIES) {
@@ -123,8 +125,9 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 
 			 result = {
 				 rfcemisor: configRecObj.getValue('employerid') || '',
-				 regfiscal: configRecObj.getText('custrecord_mx_sat_industry_type').split('-')[0] || '',
-				 razonsoc: configRecObj.getValue('legalname')
+				 regfiscal: configRecObj.getText('custrecord_mx_sat_industry_type').split('-')[0].trim() || '',
+				 razonsoc: configRecObj.getValue('legalname'),
+				 codigoPostalEmisor: configRecObj.getText('mainaddress_text').split('_')[1].trim() || '',
 			 };
 		 }
 		 return result;
@@ -168,27 +171,41 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 			 log.audit("idsetfol", idsetfol);
 		 }
 
+		/*var clienteObj = record.load({
+			type: search.Type.CUSTOMER,
+			id: jsonData.entityID
+		});
+		var clienteEspecial = clienteObj.getValue("custentity_ptg_cliente_especial");
+		if(clienteEspecial){
+			log.debug("cliente especial", clienteEspecial);
+			jsonData.rfcrecep = "XAXX010101000";
+			jsonData.entity = "Público en General";
+		}*/
+
 
 		 var xmlDoc = '';
 		 xmlDoc += '<?xml version="1.0" encoding="UTF-8"?>';
 		 xmlDoc += '<fx:FactDocMX ';
 		 xmlDoc += 'xmlns:fx="http://www.fact.com.mx/schema/fx" ';
 		 xmlDoc += 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ';
-		 xmlDoc += 'xsi:schemaLocation="http://www.fact.com.mx/schema/fx http://www.mysuitemex.com/fact/schema/fx_2010_f.xsd">';
-		 xmlDoc += '  <fx:Version>7</fx:Version>';
+		 xmlDoc += 'xsi:schemaLocation="http://www.fact.com.mx/schema/fx http://www.mysuitemex.com/fact/schema/fx_2010_g.xsd">';
+		 xmlDoc += '  <fx:Version>8</fx:Version>';
 		 xmlDoc += '  <fx:Identificacion>';
 		 xmlDoc += '    <fx:CdgPaisEmisor>MX</fx:CdgPaisEmisor>';
 		 xmlDoc += '    <fx:TipoDeComprobante>FACTURA</fx:TipoDeComprobante>';
 		 xmlDoc += '    <fx:RFCEmisor>' + jsonData.rfcemisor + '</fx:RFCEmisor>';
 		  //xmlDoc += '    <fx:RFCEmisor>XAXX010101000</fx:RFCEmisor>';
-		 xmlDoc += '    <fx:RazonSocialEmisor>' + jsonData.razonsoc + '</fx:RazonSocialEmisor>';
+		 //xmlDoc += '    <fx:RazonSocialEmisor>' + jsonData.razonsoc + '</fx:RazonSocialEmisor>'; //Este es el que estaba originalmente se comenta por pruebas
+		 xmlDoc += '    <fx:RazonSocialEmisor>JIMENEZ ESTRADA SALAS A A</fx:RazonSocialEmisor>';
 		 xmlDoc += '    <fx:Usuario>' + userName + '</fx:Usuario>';
 		 xmlDoc += '    <fx:AsignacionSolicitada>';
 		 xmlDoc += '      <fx:Serie>' + jsonData.tranid.substring(0,1) + '</fx:Serie>';
 		 xmlDoc += '      <fx:Folio>' + jsonData.tranid.substring(1) + '</fx:Folio>';
 		 xmlDoc += '      <fx:TiempoDeEmision>' + jsonData.today + '</fx:TiempoDeEmision>'; // 2020-11-11T00:00:00
 		 xmlDoc += '    </fx:AsignacionSolicitada>';
-		 xmlDoc += '    <fx:LugarExpedicion>64780</fx:LugarExpedicion>';
+		 //xmlDoc += '	<fx:Exportacion>'+ jsonData.exportacion +'</fx:Exportacion>'
+		 xmlDoc += '	<fx:Exportacion>01</fx:Exportacion>'
+		 xmlDoc += '    <fx:LugarExpedicion>'+ jsonData.codigoPostalEmisor+ '</fx:LugarExpedicion>';
 		 xmlDoc += '  </fx:Identificacion>';
 		 xmlDoc += '  <fx:Emisor>';
 		 xmlDoc += '    <fx:RegimenFiscal>';
@@ -197,15 +214,19 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 		 xmlDoc += '  </fx:Emisor>';
 		 xmlDoc += '  <fx:Receptor>';
 		 xmlDoc += '    <fx:CdgPaisReceptor>MX</fx:CdgPaisReceptor>';
-		 xmlDoc += '    <fx:RFCReceptor>' + jsonData.rfcrecep + '</fx:RFCReceptor>';
-		 //xmlDoc += '    <fx:NombreReceptor>' + jsonData.entity.replace("2 ", "").replace("1 ", "") + '</fx:NombreReceptor>';
-		 xmlDoc += '    <fx:NombreReceptor>' + jsonData.entity + '</fx:NombreReceptor>';
-		 // xmlDoc += '    <fx:NombreReceptor>PUBLICO EN GENERAL</fx:NombreReceptor>';
+		 xmlDoc += '    <fx:RFCReceptor>' + jsonData.rfcrecepFin + '</fx:RFCReceptor>';
+		 xmlDoc += '    <fx:NombreReceptor>' + jsonData.entityFin + '</fx:NombreReceptor>';
+		 xmlDoc += '	<fx:DomicilioFiscalReceptor>'+jsonData.codigoPostalReceptor+'</fx:DomicilioFiscalReceptor>';
+		 //xmlDoc += '	<fx:DomicilioFiscalReceptor>78139</fx:DomicilioFiscalReceptor>'; //Este es el que estaba originalmente se comenta por pruebas
+		 //xmlDoc += '	<fx:DomicilioFiscalReceptor>01030</fx:DomicilioFiscalReceptor>'; //Estaba en pruebas pero se debe quitar
+		 //xmlDoc += '	<fx:RegimenFiscalReceptor>'+ jsonData.regimenFiscalReceptor +'</fx:RegimenFiscalReceptor>';
+		 xmlDoc += '	<fx:RegimenFiscalReceptor>' + jsonData.tipoIndustria + '</fx:RegimenFiscalReceptor>';
 		 xmlDoc += '    <fx:UsoCFDI>' + jsonData.cfdi.split('-')[0].trim() + '</fx:UsoCFDI>'; //P01
 		 xmlDoc += '  </fx:Receptor>';
 		 xmlDoc += '  <fx:Conceptos>';
 
 		 var totTaxAmount = 0;
+		 var totBase = 0;
 		 for (var i = 0; i < jsonData.items.length; i++) {
 
 			 var codeItem = jsonData.items[i].itemid;
@@ -229,35 +250,50 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 				 }
 			 }
 
-			 var liquidacion = "";
-			 var descripcionArticulo = "";
-			 var oportunidadRec = record.load({
-				type: search.Type.OPPORTUNITY,
-				id: jsonData.oportunidadID,
-			});
-			var folioEstacionario = "";
-			var folioSGC = oportunidadRec.getValue("custbody_ptg_folio_sgc_");
-			if(!folioSGC){
-				folioEstacionario = jsonData.oportunidad.substring(1);
-			} else {
-				folioEstacionario = folioSGC;
-			}
+			var liquidacion = "";
+			var descripcionArticulo = "";
+			 if(jsonData.oportunidadID){
+				liquidacion = "";
+				descripcionArticulo = "";
+				var oportunidadRec = record.load({
+				   type: search.Type.OPPORTUNITY,
+				   id: jsonData.oportunidadID,
+			   });
+			   var folioEstacionario = "";
+			   var folioSGC = oportunidadRec.getValue("custbody_ptg_folio_sgc_");
+			   if(!folioSGC){
+				   folioEstacionario = jsonData.oportunidad.substring(1);
+			   } else {
+				   folioEstacionario = folioSGC;
+			   }
+			 }
+
+			 
 			 if(jsonData.preliqCilind){
+				log.audit("Cilindros");
 				liquidacion = jsonData.preliqCilind;
 				descripcionArticulo = nameItem + " Nota: " + jsonData.oportunidad.substring(1) + " - Liquidación.: " + liquidacion;
 			 } else if(jsonData.preliqEstaci){
+				log.audit("Estacionarios");
 				liquidacion = jsonData.preliqEstaci;
 				descripcionArticulo = nameItem + " Nota: " + folioEstacionario + " - Liquidación.: " + liquidacion;
-			 } else if(jsonData.preLiqCarbur){
+			 } else if(jsonData.preliqCarbur){
+				log.audit("Carburacion");
 				liquidacion = jsonData.preliqCarbur;
 				descripcionArticulo = nameItem + " Nota: " + jsonData.oportunidad.substring(1) + " - Liquidación.: " + liquidacion;
 			 } else if(jsonData.preliqVenAnd){
+				log.audit("Anden");
 				liquidacion = jsonData.preliqVenAnd;
 				descripcionArticulo = nameItem + " Nota: " + jsonData.oportunidad.substring(1) + " - Liquidación.: " + liquidacion;
 			 } else if(jsonData.preliqViaEsp){
+				log.audit("Especial");
 				liquidacion = jsonData.preliqViaEsp;
-				descripcionArticulo = nameItem + " Nota: " + jsonData.oportunidad.substring(1) + " - Liquidación.: " + liquidacion;
+				descripcionArticulo = nameItem + " Nota: " + jsonData.creadoDesde.substring(1) + " - Liquidación.: " + liquidacion;
+			 } else {
+				log.audit("No entro en nunguno");
 			 }
+			 log.audit("liquidacion", liquidacion);
+			 log.audit("descripcionArticulo", descripcionArticulo);
 
 			 xmlDoc += '    <fx:Concepto>';
 			 //xmlDoc += '      <fx:NoIdentificacion>' + jsonData.permiso + '</fx:NoIdentificacion>';
@@ -272,6 +308,8 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 			 xmlDoc += '      <fx:ValorUnitario>' + jsonData.items[i].rate + '</fx:ValorUnitario>';
 			 xmlDoc += '      <fx:Importe>' + jsonData.items[i].amount + '</fx:Importe>';
 			 xmlDoc += '      <fx:Descuento>' + jsonData.items[i].discount + '</fx:Descuento>';
+			 xmlDoc += '	  <fx:ObjetoImp>' + jsonData.items[i].objetoImp + '</fx:ObjetoImp>';
+			 //xmlDoc += '	  <fx:ObjetoImp>02</fx:ObjetoImp>';
 			 //xmlDoc += '      <fx:Descuento>11.60</fx:Descuento>';
 			 xmlDoc += '      <fx:ImpuestosSAT>';
 			 xmlDoc += '        <fx:Traslados>';
@@ -284,12 +322,14 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 			 xmlDoc += '      </fx:ImpuestosSAT>';
 			 xmlDoc += '    </fx:Concepto>';
 			 totTaxAmount += parseFloat(jsonData.items[i].taxamt);
+			 totBase += parseFloat(jsonData.items[i].amount);
 		 }
 
 		 xmlDoc += '  </fx:Conceptos>';
 		 xmlDoc += '  <fx:ImpuestosSAT TotalImpuestosTrasladados="' + totTaxAmount.toFixed(2) + '">';
 		 xmlDoc += '    <fx:Traslados>';
-		 xmlDoc += '      <fx:Traslado Importe="' + totTaxAmount.toFixed(2) + '" Impuesto="002" TasaOCuota="' + jsonData.items[0].taxrate + '" TipoFactor="Tasa" />';
+		 xmlDoc += '      <fx:Traslado Base="' + totBase.toFixed(2) + '" Importe="' + totTaxAmount.toFixed(2) + '" Impuesto="002" TasaOCuota="' + jsonData.items[0].taxrate + '" TipoFactor="Tasa" />';
+		 //xmlDoc += '      <fx:Traslado Importe="' + totTaxAmount.toFixed(2) + '" Impuesto="002" TasaOCuota="' + jsonData.items[0].taxrate + '" TipoFactor="Tasa" />';
 		 xmlDoc += '    </fx:Traslados>';
 		 xmlDoc += '  </fx:ImpuestosSAT>';
 		 xmlDoc += '  <fx:Totales>';
@@ -368,9 +408,9 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 				fieldId: 'units_display',
 				line: j
 			 });
-			if(nameArray == "GAS LP TEST UNIDAD GAS LP TEST UNIDAD" || nameArray == "GAS LP - PI GAS LP - PI" || nameArray == "GAS LP - PI" || nameArray == "GAS LP GAS LP" || nameArray == "GAS LP"){
+			/*if(nameArray == "GAS LP TEST UNIDAD GAS LP TEST UNIDAD" || nameArray == "GAS LP - PI GAS LP - PI" || nameArray == "GAS LP - PI" || nameArray == "GAS LP GAS LP" || nameArray == "GAS LP"){
 				unitArray = "LTS"
-			}
+			}*/ //Revisar si así quedará, se comenta por pruebas
 			var taxcodeidArray = rec.getSublistValue({
 				sublistId: 'item', 
 				fieldId: 'taxcode',
@@ -426,10 +466,16 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 				line: j
 			 }) || " ").split(' ')[0];
 
-			 if(nameArray != "Descuentos, bonificaciones y devoluciones"){
+			 var objetoImpArray = (rec.getSublistText({
+				sublistId: 'item', 
+				fieldId: 'custcol_mx_txn_line_sat_tax_object',
+				line: j
+			 }) || " ").split(' ')[0];
+
+			 if(nameArray != "Descuentos, bonificaciones y devoluciones" && nameArray != "PTG - Descuentos, bonificaciones y devoluciones"){
 
 				objItems = {line: lineaArray, itemid: itemidArray, name: nameArray, quantity: quantityArray, unit: unitArray, taxcodeid: taxcodeidArray, taxcode: taxcodeArray, taxrate: taxrateArray, rate: rateArray,
-					taxamt: taxamtArray, amount: amountArray, discount: discouArray, idinvo: idinvoArray, type: typeArray, ClaveUnidad: ClaveUArray, ClaveProdServ: ClavePArray}
+					taxamt: taxamtArray, amount: amountArray, discount: discouArray, idinvo: idinvoArray, type: typeArray, ClaveUnidad: ClaveUArray, ClaveProdServ: ClavePArray, objetoImp: objetoImpArray}
 
 				lineaSubtotales = amountArray * 1;
 				subtotales += lineaSubtotales;
@@ -533,7 +579,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						 subsidiary: rec.getValue('subsidiary'),
 						 trandate: rec.getValue('trandate'),
 						 tranid: rec.getValue('tranid'),
-						 //entity: rec.getText('entity'),
+						 entityID: rec.getValue('entity'),
 						 entity: rec.getText('custbody_razon_social_para_facturar'),
 						 // rfcrecep: 'XAXX010101000', 
 						 rfcrecep: rec.getValue('custbody_mx_customer_rfc'),
@@ -556,6 +602,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						 //paymeth: '',
 						 paymeth: rec.getText("custbody_mx_txn_sat_payment_term").split(' ')[0],//PPD
 						 oportunidad: rec.getText("opportunity").split(' ')[1],
+						 creadoDesde: rec.getText("createdfrom").split(' ')[1],
 						 oportunidadID: rec.getValue("opportunity"),
 						 preliqCilind: rec.getText("custbody_ptg_registro_pre_liq"),
 						 preliqEstaci: rec.getText("custbody_ptg_registro_pre_liq_esta"),
@@ -636,6 +683,29 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						 },]*/
 					 };
 					 isentry = false;
+					var clienteObj = record.load({
+						type: search.Type.CUSTOMER,
+						id: jsonData.entityID
+					});
+					var clienteEspecial = clienteObj.getValue("custentity_ptg_cliente_especial");
+					var tipoDeIndustria = clienteObj.getText('custentity_mx_sat_industry_type').split(' ')[0] || '';
+					var codigoPostalCliente = clienteObj.getValue('billzip');
+					if(clienteEspecial){
+						log.debug("cliente especial", clienteEspecial);
+						//jsonData.rfcrecepFin = "XAXX010101000"; //Este es el que estaba originalmente se comenta por pruebas
+						jsonData.rfcrecepFin = "JES900109Q90";
+						//jsonData.entityFin = "Público en General"; //Este es el que estaba originalmente se comenta por pruebas
+						jsonData.entityFin = "JIMENEZ ESTRADA SALAS A A";
+						jsonData.tipoIndustria = "601";
+						jsonData.codigoPostalReceptor = "01030";
+					} else {
+
+						jsonData.rfcrecepFin = jsonData.rfcrecep;
+						jsonData.entityFin = jsonData.entity;
+						jsonData.tipoIndustria = tipoDeIndustria;
+						jsonData.codigoPostalReceptor = codigoPostalCliente;
+
+					}
 					 log.audit("jsonData", jsonData);
 					//log.audit("jsonData.items.length", jsonData.items.length);
 
@@ -845,14 +915,15 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 				 jsonData.rfcemisor = setupConfig.rfcemisor;
 				 jsonData.regfiscal = setupConfig.regfiscal;
 				 jsonData.razonsoc = setupConfig.razonsoc;
+				 jsonData.codigoPostalEmisor = setupConfig.codigoPostalEmisor;
 			 }
 			 // Cargo la configuracion del PAC
 			 var mySuiteConfig = record.load({
 				 type: 'customrecord_mx_pac_connect_info',
 				 //MODIFICAR
 				 //id: runtime.getCurrentScript().getParameter('custscript_drt_glb_requestor')
-				 //id: 4
-				 id: requestorID
+				 id: 4
+				 //id: requestorID
 			 });
 			 var url = mySuiteConfig.getValue('custrecord_mx_pacinfo_url') || '';
 			 log.audit({
@@ -1017,6 +1088,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						var liqViejaEspecial = invoiceObj.getValue("custbody_ptg_liq_viaje_especial");
 						log.audit("liqViejaEspecial", liqViejaEspecial);
 
+
 						var customRecFactura = record.create({
 							type: "customrecord_drt_ptg_registro_factura",
 							isDynamic: true,
@@ -1155,6 +1227,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 							custbody_psg_ei_sending_method: 11, //MÉTODO DE ENVÍO DE DOCUMENTOS ELECTRÓNICOS: MySuite
 							custbody_psg_ei_status: 5, //ESTADO DEL DOCUMENTO ELECTRÓNICO (Error en la generación)
 							custbody_ptg_registro_facturacion: recIdSaved,
+							custbody_ptg_rfc_facturado: jsonData.rfcrecepFin,
 						};
 						log.audit("objSubmitError aqui salia error", objSubmitError);
 
@@ -1254,7 +1327,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 							 log.audit("if responseData1 fin XML", respxml);
 						 }
 						 
-						 if (responseData2) {
+						 /*if (responseData2) {
 							log.audit("if responseData2");
 							var resppdf = createFile(
 								 "PDF_"+nombreInvoice+'_'+resultGUID,
@@ -1265,7 +1338,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 								 runtime.getCurrentScript().getParameter('custscript_drt_glb_folder')
 							 ) || '';
 							 log.audit("if responseData2 fin PDF", resppdf);
-						 }
+						 }*/
 
 						 //newRecord.setValue({fieldId: 'custrecord_drt_base64_pdf', value: responseData2});
 						
@@ -1275,12 +1348,12 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 								value: respxml.data
 							});
 						}
-						 if (resppdf.success) {
+						 /*if (resppdf.success) {
 							 newRecord.setValue({
 								 fieldId: 'custrecord_drt_pdf_sat',
 								 value: resppdf.data
 							 });
-						 }
+						 }*/
 						 if (idFileXML.success) {
 							 newRecord.setValue({
 								 fieldId: 'custrecord_drt_doc_xml',
@@ -1290,8 +1363,8 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 								 email.send({
 									 //author: 1729,
 									 //author: 37276,
-									 author: ['jose.fernandez@disruptt.mx'],
-									 recipients: ['jose.fernandez@disruptt.mx'],
+									 author: 'jose.fernandez@disruptt.mx',
+									 recipients: 'jose.fernandez@disruptt.mx',
 									 subject: 'Timbrado PotoGas ' + jsonData.rfcemisor,
 									 body: 'Factura ' + resultGUID,
 									 attachments: [file.load({
@@ -1330,7 +1403,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 								 'custbody_mx_cfdi_certify_timestamp': parsedResponse.dateOfCertification,
 								 'custbody_psg_ei_certified_edoc': respxml.data,
 								 'custbody_psg_ei_generated_edoc': "",
-								 'custbody_edoc_generated_pdf': resppdf.data,
+								 //'custbody_edoc_generated_pdf': resppdf.data,
 								 //'custbody_mx_cfdi_usage': context.request.parameters.custbody_mx_cfdi_usage,
 								// 'custbody_psg_ei_template': 123,
 								// 'custbody_psg_ei_sending_method': 11,
@@ -1344,6 +1417,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 								 'custbody_mx_cfdi_sat_serial': parsedResponse.noCertificadoSat,
 								 'custbody_mx_cfdi_sat_signature': parsedResponse.selloSat,
 								 'custbody_mx_cfdi_signature': parsedResponse.selloCfd,
+								 'custbody_ptg_rfc_facturado': jsonData.rfcrecepFin,
 							 },
 							 options: {
 								 enableSourcing: false,
@@ -1352,6 +1426,27 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						 });
 
 						 log.debug("Factura actualizada", idSubmit);
+
+						var transactionFile = render.transaction({
+							entityId: Number(jsonData.idinvoice),
+							printMode: render.PrintMode.PDF,
+							inCustLocale: true
+						});
+
+						log.debug("transactionFile", transactionFile);
+
+						transactionFile.name = "PDF_"+nombreInvoice+'_'+resultGUID;
+						transactionFile.folder = runtime.getCurrentScript().getParameter('custscript_drt_glb_folder');
+
+						var idPDF = transactionFile.save();
+
+						record.submitFields({
+							type: record.Type.INVOICE,
+							id: jsonData.idinvoice,
+							values: {
+								custbody_edoc_generated_pdf: idPDF,
+							}
+						});
 
 
 						 log.audit({
@@ -1411,6 +1506,8 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 					log.audit("tipoServicio", tipoServicio);
 					var tiposDePagos = invoiceObj.getValue("custbody_ptg_tipos_de_pago");
 					log.audit("tiposDePagos", tiposDePagos);
+					var liqViejaEspecial = invoiceObj.getValue("custbody_ptg_liq_viaje_especial");
+					log.audit("liqViejaEspecial", liqViejaEspecial);
 
 					var customRecFactura = record.create({
 						type: "customrecord_drt_ptg_registro_factura",
@@ -1427,7 +1524,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						custrecord_ptg_id_oportunidad: oportunidad,
 						custrecord_ptg_id_factura: jsonData.idinvoice,
 						custrecord_ptg_cliente_facturado: entity,
-						custrecord_ptg_pdf_generado: resppdf.data,
+						//custrecord_ptg_pdf_generado: resppdf.data,
 						custrecord_ptg_xml_generado: respxml.data,
 						custrecord_ptg_documento_xml: idFileXML.data,
 						custrecord_ptg_status: 'Success',
@@ -1447,6 +1544,8 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 					}
 					else if(tipoServicio == 5){
 						objSumbitCR.custrecord_ptg_venta_anden = ventaAnden || '';
+					} else if(tipoServicio == 7){
+						objSumbitCR.custrecord_ptg_registro_fac_viaje_especi = liqViejaEspecial || '';
 					}
 
 					record.submitFields({
@@ -1583,9 +1682,10 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						custbody_mx_cfdi_uuid: resultGUID,
 						custbody_drt_psg_ei_generated_edoc: respxml.data, //DRT - DOCUMENTO ELECTRÓNICO GENERADO (CERTIFICADO)
 						custbody_psg_ei_certified_edoc: idFileXML.data, //DOCUMENTO ELECTRÓNICO CERTIFICADO (NO CERTIFICADO)
-						custbody_edoc_generated_pdf: resppdf.data, //PDF GENERDO
+						//custbody_edoc_generated_pdf: resppdf.data, //PDF GENERDO
 						custbody_psg_ei_status: 3, //ESTADO DEL DOCUMENTO ELECTRÓNICO (Para generación)
 						custbody_ptg_registro_facturacion: recIdSaved,
+						custbody_ptg_rfc_facturado: jsonData.rfcrecepFin,
 						// custbody_mx_cfdi_usage: value1,
 						// custbody_mx_txn_sat_payment_method: value2,
 						// custbody_mx_txn_sat_payment_term: value3,

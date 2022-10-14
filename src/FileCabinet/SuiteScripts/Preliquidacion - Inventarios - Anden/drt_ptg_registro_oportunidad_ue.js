@@ -31,6 +31,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var prepagoForm = customRec.getValue("custpage_prepago");
         var prepagoFormOld = context.oldRecord.getValue("custpage_prepago");
         var prepagoValue = customRec.getValue("custrecord_ptg_prepago_reg_oport");
+        var zonaPrecio = customRec.getValue("custrecord_ptg_ro_zona_precio");
         var prepagoBanorteId = 0;
         var prepagoTransferenciaId = 0;
         var prepagoBancomerId = 0;
@@ -50,6 +51,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           prepagoSantanderId = objMap.prepagoSantanderId;
           prepagoScotianId = objMap.prepagoScotianId;
           estatusFacturacion = objMap.estatusFacturacion;
+          articuloCilindro = objMap.articuloCilindro;
         }
         
         var preliquidacionObj = record.load({
@@ -65,20 +67,86 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         objUpdate.custrecord_ptg_prepago_reg_oport = prepagoForm;
         if(statusPreliquidacion != estatusFacturacion) {
             if(clienteOld != clienteNew){
+
+              var clienteObj = record.load({
+                type: search.Type.CUSTOMER,
+                id: clienteNew
+              });
+              var clienteDescuento = false;
+              var descuentoPeso = parseFloat(clienteObj.getValue("custentity_ptg_descuento_asignar"));
+              if(descuentoPeso > 0){
+                  clienteDescuento = true;
+              }
+              var descuentoSinIVA = descuentoPeso / 1.16;
+              var zonaPrecioObj = record.load({
+                type: "customrecord_ptg_zonasdeprecio_",
+                id: zonaPrecio,
+              });
+              var factorConversion = parseFloat(zonaPrecioObj.getValue("custrecord_ptg_factor_conversion"));
+              //var descuentoUnitario = (litrosVendidos * descuentoSinIVA) * -1;
+
+
+
                 var oportunidadObj = record.load({
                     type: record.Type.OPPORTUNITY,
                     id: oportunidad,
                 });
 
-                var objUpdate = {
+                oportunidadObj.setValue("entity", clienteNew);
+
+                var itemCountLine = oportunidadObj.getLineCount({
+                  sublistId: 'item'
+                });
+                var itemDescuentoLine = itemCountLine + 1;
+                var descuentoUnitario = 0;
+
+                for(var i = 0; i < numLines; i++){
+                  articulo = oportunidadObj.getSublistValue("item", "item", i);
+                  precioUnitario = oportunidadObj.getSublistValue("item", "rate", i);
+                  var itemObj = record.load({
+                    type: search.Type.INVENTORY_ITEM,
+                    id: articulo,
+                  });
+                  var tipoArticulo = itemObj.getValue("custitem_ptg_tipodearticulo_");
+                  var capacidad = parseInt(itemObj.getValue("custitem_ptg_capacidadcilindro_"));
+                  if(tipoArticulo == articuloCilindro){
+                    var litrosConversion = capacidad / factorConversion;
+                    descuentoUnitario = (litrosConversion * descuentoSinIVA) * -1;
+                    var nuevoPrecioUnitario = precioUnitario + descuentoUnitario;
+                    oportunidadObj.setSublistValue("item", "rate", i, nuevoPrecioUnitario);
+                  }
+                }
+
+                //Se agrega la línea de descuento en caso que el cliente tenga descuento
+                if(clienteDescuento){
+                  for (var i = itemCountLine; i < itemDescuentoLine; i++) {
+                    oportunidadObj.selectLine("item", i);
+                    oportunidadObj.setCurrentSublistValue("item", "item", idArticuloDescuento);
+                    oportunidadObj.setCurrentSublistValue("item", "rate", descuentoUnitario);
+                    oportunidadObj.commitLine("item");
+                  }
+                }
+      
+                var oportunidadSaved = oportunidadObj.save();
+                log.debug({
+                  title: "Oportunidad updated successfully",
+                  details: "Id: " + oportunidadSaved,
+                });
+                 
+
+             /*   var objUpdate = {
                     entity: clienteNew,
                 }
+
+                
                 var recOportunidad = record.submitFields({
                     type: record.Type.OPPORTUNITY,
                     id: oportunidad,
                     values: objUpdate,
                 });
-                log.audit("Oportunidad actualizada", recOportunidad);
+                log.audit("Oportunidad actualizada", recOportunidad);*/
+
+
 
                 var objDetalleResumen = {};
 

@@ -13,7 +13,7 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
- define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime", 'N/https', 'N/url', 'N/ui/serverWidget'], function (drt_mapid_cm, record, search, runtime, https, url, serverWidget) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime", 'N/https', 'N/url', 'N/ui/serverWidget', 'N/redirect', 'N/currentRecord'], function (drt_mapid_cm, record, search, runtime, https, url, serverWidget, redirect, currentRecord) {
  
   function afterSubmit(context) {
       try {
@@ -1622,8 +1622,20 @@
                 }
               }
 
+              var parametros = customRec.getValue("custrecord_ptg_pgs_parametros");
+              var customRecordType = parametros.split(" ")[0];
+              var customRecordId = parametros.split(" ")[1];
+
+              redirect.toRecord({
+                type: customRecordType,
+                id: customRecordId,
+                parameters: {
+                  'reload' : true
+                }
+              });
 
           }
+
       } catch (e) {
           log.error({ title: e.name, details: e.message });
       }
@@ -1631,6 +1643,6 @@
 
 
   return {
-      afterSubmit: afterSubmit,
+      afterSubmit: afterSubmit
   };
 });

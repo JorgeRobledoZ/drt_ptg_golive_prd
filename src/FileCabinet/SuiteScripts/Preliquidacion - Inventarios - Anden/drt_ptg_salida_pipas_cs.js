@@ -13,8 +13,8 @@
  *@NScriptType ClientScript
  */
  define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/runtime",  "N/ui/dialog"], function (drt_mapid_cm, record, search, error, runtime, dialog) {
-     function fieldChanged(context) {
-       try{
+  function fieldChanged(context) {
+      try{
       var currentRecord = context.currentRecord;
       var sublistName = context.sublistId;
       var fieldName = context.fieldId;
@@ -27,8 +27,9 @@
       var estatusViajeEnCurso = 0;
       var objMap=drt_mapid_cm.drt_liquidacion();
       if (Object.keys(objMap).length>0) {
-        estatusViajeEnCurso = objMap.estatusViajeEnCurso;
+        estatusViajeEnCurso = objMap.estatusViejeEnCurso;
       }
+      log.audit("vehiculo", vehiculo);
 
       if(vehiculo && fieldName === "custrecord_ptg_salida_pipa_"){
         var equipoObj = record.load({
@@ -36,6 +37,7 @@
           id: vehiculo,
         });
         var totalizador = equipoObj.getValue("custrecord_ptg_totalizador_");
+        log.audit("totalizador", totalizador);
         currentRecord.setValue("custrecord_ptg_lts_totalizador_salida_", totalizador);
 
         //BÚSQUEDA GUARDADA: PTG - Viaje activo SS
@@ -106,9 +108,9 @@
         details: JSON.stringify(error),
       });
     }
-    }
+  }
 
-    function pageInit(context) {
+  function pageInit(context) {
       try {
         var currentRecord = context.currentRecord;
         var name = currentRecord.getValue("name");
@@ -130,93 +132,107 @@
   }
 
   function saveRecord(context) {
-    var currentRecord = context.currentRecord;
-    var recId = currentRecord.id;
-    var numeroVehiculo = currentRecord.getValue("custrecord_ptg_salida_pipa_");
-    var numeroViaje = currentRecord.getValue("custrecord_ptg_numviaje_salida_pipa");
-    var llenadoSalida = currentRecord.getValue("custrecord_ptg_porcentaje_salida");
-    var pesoSalida = currentRecord.getValue("custrecord_ptg_peso_salida_");
-    var plantaSalida = currentRecord.getValue("custrecord_ptg_planta_salida_pipa_");
-    var ubicacionObj = record.load({
-      id: plantaSalida,
-      type: search.Type.LOCATION,
-    });
-    var bascula = ubicacionObj.getValue("custrecord_ptg_bascula_");
-    log.audit("bascula", bascula);
-    log.emergency("llenadoSalida", llenadoSalida);
-    log.audit("recId", recId);
-    log.audit("numeroVehiculo", numeroVehiculo);
-    log.audit("numeroViaje", numeroViaje);
-    if (numeroVehiculo && numeroViaje) {
-      //BÚSQUEDA GUARDADA: PTG - Llenado de Pipas SS
-      var llenadoPipasObj = search.create({
-        type: "customrecord_ptg_llenadodepipas_",
-        filters: [
-          ["custrecord_ptg_vehiculo_llenado_pipas_","anyof",numeroVehiculo], "AND", 
-          ["custrecord_ptg_num_viaje_llenado_pipas_","anyof",numeroViaje]
-        ],
-        columns:[
-          search.createColumn({name: "custrecordptg_porcen_despues_llenado", label: "PTG - % Después llenado"}),
-          search.createColumn({name: "custrecord_ptg_peso_despuesllenado", label: "PTG - Peso después llenado"})
-        ]
+    try {
+      var currentRecord = context.currentRecord;
+      var recId = currentRecord.id;
+      var numeroVehiculo = currentRecord.getValue("custrecord_ptg_salida_pipa_");
+      var numeroViaje = currentRecord.getValue("custrecord_ptg_numviaje_salida_pipa");
+      var llenadoSalida = currentRecord.getValue("custrecord_ptg_porcentaje_salida");
+      var pesoSalida = currentRecord.getValue("custrecord_ptg_peso_salida_");
+      var plantaSalida = currentRecord.getValue("custrecord_ptg_planta_salida_pipa_");
+      var ubicacionObj = record.load({
+        id: plantaSalida,
+        type: search.Type.LOCATION,
       });
-      var llenadoPipasObjCount = llenadoPipasObj.runPaged().count;
-
-      if (llenadoPipasObjCount > 0) {
-        var llenadoPipasObjResult = llenadoPipasObj.run().getRange({
-          start: 0,
-          end: 2,
+      var bascula = ubicacionObj.getValue("custrecord_ptg_bascula_");
+      log.audit("bascula", bascula);
+      log.emergency("llenadoSalida", llenadoSalida);
+      log.audit("recId", recId);
+      log.audit("numeroVehiculo", numeroVehiculo);
+      log.audit("numeroViaje", numeroViaje);
+      if (numeroVehiculo && numeroViaje) {
+        //BÚSQUEDA GUARDADA: PTG - Llenado de Pipas SS
+        var llenadoPipasObj = search.create({
+          type: "customrecord_ptg_llenadodepipas_",
+          filters: [
+            ["custrecord_ptg_vehiculo_llenado_pipas_","anyof",numeroVehiculo], "AND", 
+            ["custrecord_ptg_num_viaje_llenado_pipas_","anyof",numeroViaje]
+          ],
+          columns:[
+            search.createColumn({name: "custrecordptg_porcen_despues_llenado", label: "PTG - % Después llenado"}),
+            search.createColumn({name: "custrecord_ptg_peso_despuesllenado", label: "PTG - Peso después llenado"}),
+            search.createColumn({name: "custrecord_drt_ptg_transferencia_lp", label: "PTG - Transferencia Creada"})
+          ]
         });
-        porcentajeDespues = llenadoPipasObjResult[0].getValue({name: "custrecordptg_porcen_despues_llenado", label: "PTG - % Después llenado"});
-        pesoDespues = parseFloat(llenadoPipasObjResult[0].getValue({name: "custrecord_ptg_peso_despuesllenado", label: "PTG - Peso después llenado"})||0);
-        log.audit("pesoDespues", pesoDespues);
-        var porcentajeDespuesPF = parseFloat(porcentajeDespues);
-        log.emergency("porcentajeDespuesPF", porcentajeDespuesPF);
-        if(llenadoSalida == porcentajeDespuesPF){
-          log.audit("Porcentajes OK");
-          if(bascula){
-            log.audit("la planta tiene bascula");
-          if(pesoSalida >= pesoDespues){
-            log.audit("Peso OK");
-            return true;
+        var llenadoPipasObjCount = llenadoPipasObj.runPaged().count;
+  
+        if (llenadoPipasObjCount > 0) {
+          var llenadoPipasObjResult = llenadoPipasObj.run().getRange({
+            start: 0,
+            end: 2,
+          });
+          porcentajeDespues = llenadoPipasObjResult[0].getValue({name: "custrecordptg_porcen_despues_llenado", label: "PTG - % Después llenado"});
+          pesoDespues = parseFloat(llenadoPipasObjResult[0].getValue({name: "custrecord_ptg_peso_despuesllenado", label: "PTG - Peso después llenado"})||0);
+          transacciones = llenadoPipasObjResult[0].getValue({name: "custrecord_drt_ptg_transferencia_lp", label: "PTG - Transferencia Creada"});
+          log.audit("pesoDespues", pesoDespues);
+          var porcentajeDespuesPF = parseFloat(porcentajeDespues);
+          log.emergency("porcentajeDespuesPF", porcentajeDespuesPF);
+          log.emergency("transacciones", transacciones);
+          if(transacciones != ""){
+            log.audit("Entra validacion transacicion");
+            if(llenadoSalida == porcentajeDespuesPF){
+              log.audit("Porcentajes OK");
+              if(bascula){
+                log.audit("la planta tiene bascula");
+              if(pesoSalida >= pesoDespues){
+                log.audit("Peso OK");
+                return true;
+              } else {
+                var options = {
+                  title: "Peso de Llenado",
+                  message: "El peso registrado en el llenado mayor al peso registrado",
+                };
+                dialog.alert(options);
+                log.audit("Porcentajes NO OK");
+                return false;
+              }
+            } else {
+              log.audit("la planta NO tiene bascula");
+              return true;
+            }    
+            } else {
+              var options = {
+                title: "Registro de Llenado",
+                message: "El porcentaje registrado en el llenado no es igual al porcentaje ingresado",
+              };
+              dialog.alert(options);
+              log.audit("Porcentajes NO OK");
+              return false;
+            }
           } else {
             var options = {
-              title: "Peso de Llenado",
-              message: "El peso registrado en el llenado mayor al peso registrado",
+              title: "Registro de Llenado",
+              message: "No se generaron transacciones en el registro de llenado",
             };
             dialog.alert(options);
-            log.audit("Porcentajes NO OK");
+            log.audit("No hay llenado");
             return false;
           }
-        } else {
-          log.audit("la planta NO tiene bascula");
-          return true;
-        }
           
           
-        } else {
+        }else {
           var options = {
             title: "Registro de Llenado",
-            message: "El porcentaje registrado en el llenado no es igual al porcentaje ingresado",
+            message: "No hay registro de llenado para este vehículo con este número de viaje",
           };
           dialog.alert(options);
-          log.audit("Porcentajes NO OK");
+          log.audit("No hay llenado");
           return false;
         }
-        
-      }else {
-        var options = {
-          title: "Registro de Llenado",
-          message: "No hay registro de llenado para este vehículo con este número de viaje",
-        };
-        dialog.alert(options);
-        log.audit("No hay llenado");
-        return false;
       }
-      
-
+    } catch (error) {
+     log.error("error", error); 
     }
-    
     
   }
 

@@ -94,7 +94,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         filters:[["custrecord_ptg_vehiculo_tabladeviajes_","anyof",numeroVehiculo], "AND", ["custrecord_ptg_estatus_tabladeviajes_","anyof",estatusEnCurso]],
         columns:[
            search.createColumn({name: "internalid", sort: search.Sort.DESC, label: "Internal ID"}),
-           search.createColumn({name: "custrecord_ptg_chofer_tabladeviajes_", label: "PTG - Chofer (Tabla de viajes)"})
+           search.createColumn({name: "custrecord_ptg_chofer_tabladeviajes_", label: "PTG - Chofer (Tabla de viajes)"}),
+           search.createColumn({name: "custrecord_ptg_est_carb_viaje_", label: "PTG - ESTACIÓN DE CARBURACIÓN"})
         ]
     });
     var viajeActivoObjCount = viajeActivoObj.runPaged().count;
@@ -106,8 +107,10 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
       });
       numeroViaje = viajeActivoObjResult[0].getValue({name: "internalid", sort: search.Sort.DESC, label: "Internal ID"});
       vendedor = viajeActivoObjResult[0].getValue({name: "custrecord_ptg_chofer_tabladeviajes_", label: "PTG - Chofer (Tabla de viajes)"});
+      estacionCarburacion = viajeActivoObjResult[0].getValue({name: "custrecord_ptg_est_carb_viaje_", label: "PTG - ESTACIÓN DE CARBURACIÓN"});
       currentRecord.setValue("custrecord_ptg_num_viaje_llenado_pipas_",numeroViaje);
       currentRecord.setValue("custrecord_ptg_vendedor_despues_llenado_",vendedor);
+      currentRecord.setValue("custrecord_ptg_llp_estacion_carburacion",estacionCarburacion);
     } else {
       var options = {
         title: "Viaje",
@@ -131,6 +134,10 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         title: "error fieldChanged",
         details: JSON.stringify(error),
     });
+    log.error({
+      title: "error fieldChanged",
+      details: JSON.stringify(error),
+  });
 }
   }
 

@@ -43,6 +43,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             var status = recObj.getValue("custrecord_ptg_liquidacion_status");
             var conteoExceso = parseInt(recObj.getValue("custrecord_ptg_conteo_exceso"));
             var conteoRestriccion = parseInt(recObj.getValue("custrecord_ptg_conteo_restriccion"));
+            log.audit("conteoRestriccion", conteoRestriccion);
             var prepagosSinAplicar = parseInt(recObj.getValue("custrecord_ptg_prepago_sin_aplicar_cil"));
             var montoDesgloseEfec = recObj.getValue("custrecord_ptg_monto_totalizador");
 
@@ -91,42 +92,42 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
 
             var objMap=drt_mapid_cm.drt_liquidacion();
             if (Object.keys(objMap).length>0) {
-                efectivoId = objMap.efectivoId;
-                prepagoBanorteId = objMap.prepagoBanorteId;
-                valeId = objMap.valeId;
-                cortesiaId = objMap.cortesiaId;
-                tarjetaCreditoId = objMap.tarjetaCreditoId;
-                tarjetaDebitoId = objMap.tarjetaDebitoId;
-                multipleId = objMap.multipleId;
-                prepagoTransferenciaId = objMap.prepagoTransferenciaId;
-                creditoClienteId = objMap.creditoClienteId;
-                reposicionId = objMap.reposicionId;
-                saldoAFavorId = objMap.saldoAFavorId;
-                consumoInternoId = objMap.consumoInternoId;
-                prepagoBancomerId = objMap.prepagoBancomerId;
-                prepagoHSBCId = objMap.prepagoHSBCId;
-                prepagoBanamexId = objMap.prepagoBanamexId;
-                prepagoSantanderId = objMap.prepagoSantanderId;
-                prepagoScotianId = objMap.prepagoScotianId;
-                bonificacionId = objMap.bonificacionId;
-                ticketCardId = objMap.ticketCardId;
-                chequeBancomerId = objMap.chequeBancomerId;
-                recirculacionId = objMap.recirculacionId;
-                canceladoId = objMap.canceladoId;
-                rellenoId = objMap.rellenoId;
-                transferenciaId = objMap.transferenciaId;
-                traspasoId = objMap.traspasoId;
-                chequeSantanderId = objMap.chequeSantanderId;
-                chequeScotianId = objMap.chequeScotianId;
-                chequeHSBCId = objMap.chequeHSBCId;
-                chequeBanamexId = objMap.chequeBanamexId;
-                chequeBanorteId = objMap.chequeBanorteId;
-                tarjetaCreditoBancomerId = objMap.tarjetaCreditoBancomerId;
-                tarjetaCreditoHSBCId = objMap.tarjetaCreditoHSBCId;
-                tarjetaCreditoBanamexId = objMap.tarjetaCreditoBanamexId;
-                tarjetaDebitoBanamexId = objMap.tarjetaDebitoBanamexId;
-                tarjetaDebitoBancomerId = objMap.tarjetaDebitoBancomerId;
-                tarjetaDebitoHSBCId = objMap.tarjetaDebitoHSBCId;
+                efectivoId = objMap.efectivo;
+                prepagoBanorteId = objMap.prepagoBanorte;
+                valeId = objMap.vale;
+                cortesiaId = objMap.cortesia;
+                tarjetaCreditoId = objMap.tarjetaCredito;
+                tarjetaDebitoId = objMap.tarjetaDebito;
+                multipleId = objMap.multiple;
+                prepagoTransferenciaId = objMap.prepagoTransferencia;
+                creditoClienteId = objMap.creditoCliente;
+                reposicionId = objMap.reposicion;
+                saldoAFavorId = objMap.saldoAFavor;
+                consumoInternoId = objMap.consumoInterno;
+                prepagoBancomerId = objMap.prepagoBancomer;
+                prepagoHSBCId = objMap.prepagoHSBC;
+                prepagoBanamexId = objMap.prepagoBanamex;
+                prepagoSantanderId = objMap.prepagoSantander;
+                prepagoScotianId = objMap.prepagoScotian;
+                bonificacionId = objMap.bonificacion;
+                ticketCardId = objMap.ticketCard;
+                chequeBancomerId = objMap.chequeBancomer;
+                recirculacionId = objMap.recirculacion;
+                canceladoId = objMap.cancelado;
+                rellenoId = objMap.relleno;
+                transferenciaId = objMap.transferencia;
+                traspasoId = objMap.traspaso;
+                chequeSantanderId = objMap.chequeSantander;
+                chequeScotianId = objMap.chequeScotian;
+                chequeHSBCId = objMap.chequeHSBC;
+                chequeBanamexId = objMap.chequeBanamex;
+                chequeBanorteId = objMap.chequeBanorte;
+                tarjetaCreditoBancomerId = objMap.tarjetaCreditoBancomer;
+                tarjetaCreditoHSBCId = objMap.tarjetaCreditoHSBC;
+                tarjetaCreditoBanamexId = objMap.tarjetaCreditoBanamex;
+                tarjetaDebitoBanamexId = objMap.tarjetaDebitoBanamex;
+                tarjetaDebitoBancomerId = objMap.tarjetaDebitoBancomer;
+                tarjetaDebitoHSBCId = objMap.tarjetaDebitoHSBC;
                 gasLP = objMap.gasLP;
                 estatusPreliquidacion = objMap.estatusPreliquidacion;
                 estatusLiquidacion = objMap.estatusLiquidacion;
@@ -200,7 +201,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             
             if (type_event == "view") {
                 log.debug("status", status);
-                if(conteoRestriccion == 0 || conteoRestriccion == ""){
+                if(conteoRestriccion == 0 || conteoRestriccion == "" || conteoRestriccion == null){
                 if (status == estatusPreliquidacion && prepagosSinAplicar == 0) {
                     form.title = "Preliquidación";
                 } else if (status == estatusPreliquidacion && prepagosSinAplicar > 0) {
@@ -233,6 +234,11 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                         label: "Nuevo Viaje y Facturar",
                         functionName: "redirectToNuevoViajeYFacturacion()",
                     });
+                    // form.addButton({
+                    //     id: "custpage_drt_eliminar",
+                    //     label: "Eliminar Preliquidación",
+                    //     functionName: "redirectToEliminar()",
+                    // });
                 } else if (status == estatusFacturacion) {
                     form.addButton({
                         id: "custpage_drt_to_nuevo_viaje_solo",
@@ -255,7 +261,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                     id: recId,
                 });
                 var lineasTipoPago = recordObj.getLineCount({sublistId: "recmachcustrecord_ptg_optpreliq_"});
-                log.audit("lineasTipoPago", lineasTipoPago);
+                //log.audit("lineasTipoPago", lineasTipoPago);
     
                 for (var t = 0; t < lineasTipoPago; t++){
                     tipoPagoArray = recordObj.getSublistValue({
@@ -263,14 +269,14 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                         fieldId: "custrecord_ptg_tipopago_oportunidad_",
                         line: t,
                     });
-                    log.audit("tipoPagoArray "+t, tipoPagoArray);
+                    //log.audit("tipoPagoArray "+t, tipoPagoArray);
     
                     montoPagoArray = recordObj.getSublistValue({
                         sublistId: "recmachcustrecord_ptg_optpreliq_",
                         fieldId: "custrecord_ptg_total_",
                         line: t,
                     });
-                    log.audit("montoPagoArray "+t, montoPagoArray);
+                    log.audit("Linea: "+t, "tipoPago: "+ tipoPagoArray+" || montoPago: "+montoPagoArray);
     
                     if(tipoPagoArray == efectivoId){
                         efectivo += montoPagoArray
@@ -332,6 +338,20 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                       ignoreMandatoryFields: true,
                     },
                 });
+
+                var parms = scriptContext.request.parameters;
+                var reload = parms.reload;
+                log.audit("beforeLoad reload", reload);
+
+                if(reload == "true"){
+                    redirect.toRecord({
+                        type: customRec.type,
+                        id: customRec.id,
+                        parameters: {
+                          'reload' : false
+                        }
+                    });
+                }
 
             } else {
                 form.title = "Preliquidación con Crédito a Público General";

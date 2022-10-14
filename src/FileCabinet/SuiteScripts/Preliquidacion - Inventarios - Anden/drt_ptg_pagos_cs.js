@@ -147,9 +147,31 @@ function (drt_mapid_cm, https, currentRecord, url, message, dialog, search, runt
     }
   }
 
+  function pageInit(context) {
+    try {
+      var currentRecord = context.currentRecord;
+      var parametroRespuesta = window.location.search;
+      log.audit("parametroRespuesta", parametroRespuesta);
+      var urlParametro = new URLSearchParams(parametroRespuesta);
+      var parametroCustomRecord = urlParametro.get("customrecord");
+      var parametroIdCustom = urlParametro.get("idcustom");
+
+      if (parametroCustomRecord && parametroIdCustom) {
+        var parametro = parametroCustomRecord + " "+ parametroIdCustom
+        currentRecord.setValue("custrecord_ptg_pgs_parametros",parametro);
+      }
+    } catch (error) {
+      console.log({
+        title: "error pageInit",
+        details: JSON.stringify(error),
+      });
+    }
+  }
+
   return {
     saveRecord: saveRecord,
     validateLine: validateLine,
     fieldChanged: fieldChanged,
+    pageInit: pageInit
   };
 });

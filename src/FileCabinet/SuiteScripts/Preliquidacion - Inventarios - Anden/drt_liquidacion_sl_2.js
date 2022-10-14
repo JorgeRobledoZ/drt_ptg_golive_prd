@@ -19,13 +19,9 @@
             var req_param = context.request.parameters;
             log.audit("req_param", req_param);
 
-            log.audit("afterSubmit");
             var recId = req_param.recId;
-            log.audit("recId", recId);
             var numViaje = req_param.numViaje;
-            log.audit("numViaje", numViaje);
             var incremento_inicio = req_param.incremento_inicio;
-            log.audit("incremento_inicio", incremento_inicio);
             
             log.audit('Remaining Usage start proceso', runtime.getCurrentScript().getRemainingUsage());
 
@@ -110,13 +106,36 @@
                 (total = parseFloat(registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_total", label: "PTG - Total", })).toFixed(6)),
                 (idRegistroPagos = registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_registro_pagos", label: "PTG - Pagos", })),
                 (idCliente = registroOportunidadResult[incremento_inicio].getValue({ name: "entity", join: "CUSTRECORD_PTG_OPORTUNIDAD", label: "Customer"})),
-                (referencia = registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_referenciapago_", label: "PTG - Referencia pago"}));;
+                (referencia = registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_referenciapago_", label: "PTG - Referencia pago"}));
+
+                var oportunidadObj = record.load({
+                    type: record.Type.OPPORTUNITY,
+                    id: oportunidad,
+                });
+                var idDireccionCliente = oportunidadObj.getValue("shipaddresslist");
+                log.audit("idDireccionCliente", idDireccionCliente);
+
+                //SS: PTG - Direccion cliente SS
+                var direccionesObj = search.create({
+                    type: "customrecord_ptg_direcciones",
+                    filters: [
+                       ["custrecord_ptg_direccion","equalto",idDireccionCliente]
+                    ],
+                    columns: [
+                       search.createColumn({name: "internalid", label: "ID interno"})
+                    ]
+                });
+                var direccionesObjResult = direccionesObj.run().getRange({
+                    start: 0,
+                    end: 2,
+                });
+                (direccionCliente = direccionesObjResult[0].getValue({name: "internalid", label: "ID interno"}));
+                log.audit("direccionCliente", direccionCliente);
 
                 var clienteObj = record.load({
                     type: record.Type.CUSTOMER,
                     id: idCliente,
                 });
-                var direccionCliente = clienteObj.getValue("defaultaddress");
                 var saldoVencido = clienteObj.getValue("overduebalance");
                 var limiteCredito = clienteObj.getValue("creditlimit");
                 var saldo = clienteObj.getValue("balance");
@@ -143,7 +162,7 @@
                     conteoRestriccion += 0;
                 }
 
-                var urlModificarPago = urlPago + idRegistroPagos + "&e=T";
+                var urlModificarPago = urlPago + idRegistroPagos + "&e=T&customrecord=customrecord_ptg_preliquicilndros_&idcustom="+recId;
 
                 var recTipoPago = record.create({
                     type: "customrecord_ptg_registrooportunidad_",
@@ -156,6 +175,7 @@
                     recTipoPago.setValue("custrecord_ptg_prepago_aplicar_oport", true);    
                 }
                 recTipoPago.setValue("custrecord_ptg_total_", total);
+                recTipoPago.setValue("custrecord_ptg_total_old", total);
                 recTipoPago.setValue("custrecord_ptg_modificar_met_pago_cilind", urlModificarPago);
                 recTipoPago.setValue("custrecord_ptg_cliente_reg_oport", idCliente);
                 recTipoPago.setValue("custrecord_ptg_direccion_registroop_", direccionCliente);
@@ -166,6 +186,7 @@
                 recTipoPago.setValue("custrecord_ptg_restriccion_reg_oport", restriccion);
                 recTipoPago.setValue("custrecord_ptg_referencia_reg_oport", referencia);
                 recTipoPago.setValue("custrecord_ptg_optpreliq_", recId);
+
                 var recTipoPagoIdSaved = recTipoPago.save();
                 log.debug({
                     title: "DETALLE DE TIPO DE PAGO",
@@ -306,7 +327,9 @@
             //BÚSQUEDA GUARDADA: DRT - PTG - Detalle Movimientos
             var detalleMovimientoSearch = search.create({
                 type: "customrecord_ptg_regitrodemovs_",
-                filters: [["custrecord_ptg_num_viaje_oportunidad","anyof",numViaje], "AND", ["custrecord_ptg_origen","is","T"]],
+                filters: [["custrecord_ptg_num_viaje_oportunidad","anyof",numViaje], "AND", 
+                ["custrecord_ptg_origen","is","T"],"AND", 
+                ["custrecord_drt_ptg_reg_oportunidad","noneof","@NONE@"]],
                 columns: [
                     search.createColumn({name: "internalid", label: "Internal ID"}),
                     search.createColumn({name: "custrecord_ptg_ventagas_", label: "PTG - Venta Gas"}),
@@ -328,6 +351,7 @@
                     type: search.Type.INVENTORY_ITEM,
                     id: cilindro,
                 });
+                log.audit("idRegistroMovimientos", idRegistroMovimientos);
                 log.debug("lookupItem", itemObjDM);
                 var litrosCapacidad = itemObjDM.getValue("custitem_ptg_capacidadcilindro_");
                 log.debug("litrosCapacidad", litrosCapacidad);
@@ -338,7 +362,25 @@
                 var ptgLTS = ventaGasInt * litrosCapacidadInt;
                 log.debug("ptgLTS", ptgLTS);
 
-                var objUpdateRegistroMovimiento = {
+                var recObj = record.copy({
+                    type: "customrecord_ptg_regitrodemovs_",
+                    id: idRegistroMovimientos,
+                    isDynamic: true,
+                });
+                recObj.setValue("name", idRegistroMovimientos);
+                recObj.setValue("custrecord_drt_ptg_reg_transaccion", null);
+                recObj.setValue("custrecord_ptg_origen", false);
+                recObj.setValue("custrecord_ptg_lts_", ptgLTS);
+                recObj.setValue("custrecord_ptg_rutavehiculo_", recId);
+
+                var recordId = recObj.save();
+
+                
+                   
+
+
+
+              /*  var objUpdateRegistroMovimiento = {
                     custrecord_ptg_lts_: ptgLTS,
                     custrecord_ptg_rutavehiculo_: recId,
                 };
@@ -346,8 +388,8 @@
                     id: idRegistroMovimientos,
                     type: "customrecord_ptg_regitrodemovs_",
                     values: objUpdateRegistroMovimiento,
-                });
-                log.emergency("idRegMov", idRegMov);
+                });*/
+                log.emergency("recordId", recordId);
             }
             log.audit('Remaining Usage end for detalle de movimientos', runtime.getCurrentScript().getRemainingUsage());
 
@@ -512,7 +554,9 @@
                 redirect.toRecord({
                     type: 'customrecord_ptg_preliquicilndros_',
                     id: recId,
-                    parameters: {}
+                    parameters: {
+                        'reload' : true
+                    }
                 });
             }
            
@@ -521,7 +565,9 @@
             redirect.toRecord({
                 type: 'customrecord_ptg_preliquicilndros_',
                 id: recId,
-                parameters: {}
+                parameters: {
+                    'reload' : true
+                }
             });
         }
     }

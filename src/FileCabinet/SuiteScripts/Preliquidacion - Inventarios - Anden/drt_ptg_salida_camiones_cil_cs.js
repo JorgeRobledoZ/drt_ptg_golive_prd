@@ -13,6 +13,37 @@
  *@NScriptType ClientScript
  */
 define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/error", "N/currentRecord", 'N/ui/dialog', "N/runtime"], function (drt_mapid_cm, record, search, error, currentRecord, dialog, runtime) {
+    function pageInit(context) {
+        try {
+          var currentRecord = context.currentRecord;
+
+            var nombreSublistaDotacion = "recmachcustrecord_no_viaje_salida_camion_dot_";
+            var numeroLineas = currentRecord.getLineCount(nombreSublistaDotacion);
+            for(var j = 0; j < numeroLineas; j++){
+              dotacion = currentRecord.getSublistField({
+                sublistId: nombreSublistaDotacion,
+                fieldId: 'custrecord_ptg_dotacion_cilindros',
+                line: j
+              });
+                 
+              articulo = currentRecord.getSublistField({
+                sublistId: nombreSublistaDotacion,
+                fieldId: 'custrecord_ptg_cilindro_dotacion_',
+                line: j
+              });
+    
+              dotacion.isDisabled = true;
+              articulo.isDisabled = true;
+            }
+    
+        } catch (error) {
+          console.log({
+            title: "error pageInit",
+            details: JSON.stringify(error),
+          });
+        }
+      }
+
     function fieldChanged(context) {
         try {
             debugger;
@@ -24,7 +55,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             var estatusViajeEnCurso = 0;
             var objMap=drt_mapid_cm.drt_liquidacion();
             if (Object.keys(objMap).length>0) {
-                estatusViajeEnCurso = objMap.estatusViajeEnCurso;
+                estatusViajeEnCurso = objMap.estatusViejeEnCurso;
             }
 
             //BÚSQUEDA GUARDADA: PTG - Viaje activo SS
@@ -100,6 +131,25 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                     });
                     currentRecord.commitLine({sublistId: "recmachcustrecord_no_viaje_salida_camion_dot_", });
                 }
+
+                var nombreSublistaDotacion = "recmachcustrecord_no_viaje_salida_camion_dot_";
+                var numeroLineas = currentRecord.getLineCount(nombreSublistaDotacion);
+                for(var j = 0; j < numeroLineas; j++){
+                    dotacion = currentRecord.getSublistField({
+                      sublistId: nombreSublistaDotacion,
+                      fieldId: 'custrecord_ptg_dotacion_cilindros',
+                      line: j
+                    });
+                       
+                    articulo = currentRecord.getSublistField({
+                      sublistId: nombreSublistaDotacion,
+                      fieldId: 'custrecord_ptg_cilindro_dotacion_',
+                      line: j
+                    });
+          
+                    dotacion.isDisabled = true;
+                    articulo.isDisabled = true;
+                }
             }
 
             
@@ -117,8 +167,24 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           var vehiculo = currentRecord.getText("custrecord_ptg_vehiculo_salida_camion_");
           var numViaje = currentRecord.getValue("custrecord_ptg_noviaje_salidacomion_");
 
+          var numViajeObj = record.load({
+            type: "customrecord_ptg_tabladeviaje_enc2_",
+            id: numViaje
+          });
+          var transacciones = numViajeObj.getValue("custrecord_drt_ptg_transferencia_tv");
+          var transaccion = transacciones[2];
+
           if(numViaje){
-            return true;
+            if(transaccion){
+                return true;
+            } else {
+                var options = {
+                    title: "Viaje sin transacción",
+                    message: "No hay transacción generada para el vehículo "+vehiculo,
+                };
+                dialog.alert(options);
+            }
+            
           } else {
             var options = {
               title: "Vehículo sin número de viaje.",
@@ -139,5 +205,6 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
     return {
         fieldChanged: fieldChanged,
         saveRecord: saveRecord,
+        pageInit: pageInit,
     };
 });

@@ -223,7 +223,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm',"N/record", "N/search", "N
         type: search.Type.CUSTOMER,
         id: cliente
       });
-      var nombreClienteAFacturar = clienteObj.getValue("custentity_razon_social_para_facturar");
+      var nombreClienteAFacturar = clienteObj.getValue("custentity_mx_sat_registered_name");
 
       var recOportunidad = record.create({
         type: record.Type.OPPORTUNITY,
@@ -286,6 +286,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm',"N/record", "N/search", "N
       recPagos.setValue("custrecord_ptg_oportunidad_pagos", recOportunidadIdSaved);
       recPagos.setValue("custrecord_ptg_total_servicio", totalVenta);
       recPagos.setValue("custrecord_registro_desde_oportunidad_p", true);
+      recPagos.setValue("custrecord_ptg_pagos_cliente", cliente);
 
       var recIdSavedAndenPagos = recPagos.save();
 

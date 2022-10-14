@@ -14,7 +14,7 @@ define(["N/search"], function (search) {
             }) || '';
 
             var Temp = 131;
-
+            /*
             if (sublistFieldName === 'custrecord_ptg_noviaje_csa_') {
                 debugger;
 
@@ -43,6 +43,10 @@ define(["N/search"], function (search) {
                         search.createColumn({
                             name: "internalid",
                             label: "ID interno"
+                        }),
+                        search.createColumn({
+                            name: "custrecord_ptg_litros_2",
+                            label: "litros"
                         })
                     ]
                 });
@@ -197,7 +201,7 @@ define(["N/search"], function (search) {
                 }
 
             }
-
+            */
             if (sublistName === 'recmachcustrecord_ptg_confirmacion_salida_' && sublistFieldName === 'custrecord_ptg_numembarqueprogra_confirm') {
 
                 var embarqueP = currentRecord.getCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_numembarqueprogra_confirm') || '';
@@ -313,87 +317,17 @@ define(["N/search"], function (search) {
                             name: "custrecord_ptg_precio_salida_",
                             label: "PTG - Precio"
                         }),
+                        search.createColumn({
+                            name: "custrecord_ptg_litros_2",
+                            label: "PTG-litros Salida"
+                        }),
+                        search.createColumn({
+                            name: "custrecord_ptg_embarque_salida_",
+                            label: "#embauque"
+                        })
                         //
                     ]
                 });
-                /*
-                var customrecord_ptg_detalleentradatranspo_SearchObj = search.create({
-                    type: "customrecord_ptg_detalleentradatranspo_",
-                    filters: [
-                        ["custrecord_ptg_numembarqueprogram_", "anyof", embarqueP]
-                    ],
-                    columns: [
-                        search.createColumn({
-                            name: "custrecord_ptg_numembarqueprogram_",
-                            label: "PTG - #Embarque Programado"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_plantaoriginal_",
-                            label: "PTG - Planta Original"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_plantadestino_",
-                            label: "PTG - Planta Destino"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_numentrega_",
-                            label: "PTG - #Entrega"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_embarque_",
-                            label: "PTG - Embarque"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_identificadordeunidadpg_",
-                            label: "PTG - Identificador de Unidad(PG)"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_captanque90_",
-                            label: "PTG - Cap Tanque 90%"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_kgspemex_",
-                            label: "PTG - Kgs Pemex "
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_litros_",
-                            label: "PTG - Litros"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_porcentajellenado_",
-                            label: "PTG - % Llenado"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_presionkgcm_",
-                            label: "PTG - Press Kg/Cm2"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_temcentigrados_",
-                            label: "PTG - Temp Cº"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_pesoentrada_",
-                            label: "PTG - Peso Entrada"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_sello1_",
-                            label: "PTG - Sello 1 "
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_sello1violado_",
-                            label: "PTG - Sello 1 violado"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_sello2_",
-                            label: "PTG - Sello 2"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_sello2violado_",
-                            label: "PTG - Sello 2 violado"
-                        })
-                    ]
-                });
-                */
                 var searchResultCount = customrecord_ptg_detallesalida_SearchObj.run().getRange(0, 1);
                 log.audit('searchResultCount', searchResultCount)
                 if (searchResultCount.length > 0) {
@@ -480,6 +414,14 @@ define(["N/search"], function (search) {
 
                     var precioSalida = searchResultCount[0].getValue({
                         name: 'custrecord_ptg_precio_salida_'
+                    })
+
+                    var litros = searchResultCount[0].getValue({
+                        name: 'custrecord_ptg_litros_2'
+                    })
+
+                    var nEmbarque = searchResultCount[0].getValue({
+                        name: 'custrecord_ptg_embarque_salida_'
                     })
 
                     log.audit('centroEmbarcadorText', centroEmbarcadorText);
@@ -591,6 +533,8 @@ define(["N/search"], function (search) {
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_pesofinal_confirmacion_', pesoSalida);
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_pesoinicial_confirmacion_', pesoEntrada);
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_precion_confirmacion', precioSalida)
+                    currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_litros_confirm', litros)
+                    currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_confirmacion_salida_', 'custrecord_ptg_embarque_confirmacion_', nEmbarque)
                 }
             }
         } catch (error) {

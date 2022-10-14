@@ -13,94 +13,21 @@ define(["N/search", 'N/ui/message', 'N/ui/dialog', 'N/error'], function (search,
             var ordenCompra = currentRecord.getValue({
                 fieldId: 'custrecord_ptg_numvijae_sa_'
             }) || '';
-            /*
-            if (sublistFieldName === 'custrecord_ptg_numvijae_sa_') {
-                debugger;
-
-                var customrecord_ptg_entradatransporte_SearchObj = search.create({
-                    type: "customrecord_ptg_entradatransporte_",
-                    filters: [
-                        ["custrecord_ptg_numviajecompra_", "anyof", ordenCompra]
-                    ],
-                    columns: [
-                        search.createColumn({
-                            name: "custrecord_ptg_nombrechofer_",
-                            label: "PTG - Nombre chofer"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_plantacompras_",
-                            label: "PTG - Planta (compras)"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_provtransportista_",
-                            label: "PTG - Proveedor Transportista"
-                        }),
-                        search.createColumn({
-                            name: "custrecord_ptg_centroembartrans_",
-                            label: "PTG -Centro embarcador entrada transporte"
-                        }),
-                        search.createColumn({
-                            name: "internalid",
-                            label: "ID interno"
-                        })
-                    ]
-                });
-                var resultCountCustom = customrecord_ptg_entradatransporte_SearchObj.run().getRange(0, 1);
-                if (resultCountCustom.length > 0) {
-                    var chofer = resultCountCustom[0].getValue({
-                        name: 'custrecord_ptg_nombrechofer_'
-                    });
-
-                    var planta = resultCountCustom[0].getValue({
-                        name: 'custrecord_ptg_plantacompras_'
-                    });
-
-                    var proveedor = resultCountCustom[0].getValue({
-                        name: 'custrecord_ptg_provtransportista_'
-                    });
-
-                    var centroEmbarcador = resultCountCustom[0].getValue({
-                        name: 'custrecord_ptg_centroembartrans_'
-                    });
-
-                    var id = resultCountCustom[0].getValue({
-                        name: 'internalid'
-                    });
-
-                    currentRecord.setValue({
-                        fieldId: 'custrecord_ptg_nombredelchofer_',
-                        value: chofer
-                    })
-
-                    currentRecord.setValue({
-                        fieldId: 'custrecord_ptg_planta_sa_',
-                        value: planta
-                    })
-
-                    currentRecord.setValue({
-                        fieldId: 'custrecord_ptg_proveedortransportista_sa',
-                        value: proveedor
-                    })
-
-                    currentRecord.setValue({
-                        fieldId: 'custrecord_ptg_centroembarcador_salida_',
-                        value: centroEmbarcador
-                    })
-                }
-
-            }
-            */
 
             if (sublistName === 'recmachcustrecord_ptg_detallesalida_' && sublistFieldName === 'custrecord_ptg_embarqueprog_salida_') {
                 debugger
                 var embarqueP = currentRecord.getCurrentSublistValue('recmachcustrecord_ptg_detallesalida_', 'custrecord_ptg_embarqueprog_salida_') || '';
                 log.audit('embarqueP', embarqueP)
+
+                
+
                 var customrecord_ptg_detalleentradatranspo_SearchObj = search.create({
                     type: "customrecord_ptg_detalleentradatranspo_",
                     filters: [
                         ["custrecord_ptg_numembarqueprogram_", "is", embarqueP]
                     ],
                     columns: [
+                        search.createColumn({name: "internalid", label: "Internal ID"}),
                         search.createColumn({
                             name: "custrecord_ptg_numembarqueprogram_",
                             label: "PTG - #Embarque Programado"
@@ -192,9 +119,15 @@ define(["N/search", 'N/ui/message', 'N/ui/dialog', 'N/error'], function (search,
                         search.createColumn({
                             name: "custrecord_ptg_precio_articulo",
                             label: "PTG - Precio"
+                        }),
+                        search.createColumn({
+                            name: "custrecord_ptg_densidad",
+                            label: "DEnsidad"
+                        }),
+                        search.createColumn({
+                            name: "custrecord_ptg_embarque_",
+                            label: "#Embaruqe"
                         })
-
-                        //custrecord_ptg_embarque_
                     ]
                 });
                 var searchResultCount = customrecord_ptg_detalleentradatranspo_SearchObj.run().getRange(0, 1);
@@ -274,6 +207,18 @@ define(["N/search", 'N/ui/message', 'N/ui/dialog', 'N/error'], function (search,
                         dif = pEntrada - pemex;
                     }
 
+                    var dencidad = searchResultCount[0].getValue({
+                        name:"custrecord_ptg_densidad"
+                    });
+
+                    var idEntrada = searchResultCount[0].getValue({
+                        name:"internalid"
+                    });
+
+                    var numEntrega = searchResultCount[0].getValue({
+                        name: "custrecord_ptg_embarque_"
+                    })
+
 
                     //
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_detallesalida_', 'custrecord_ptg_plantaoriginal_salida_', plantaO);
@@ -295,7 +240,12 @@ define(["N/search", 'N/ui/message', 'N/ui/dialog', 'N/error'], function (search,
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_detallesalida_', 'custrecord_ptg_prov_trans_salida_', transportista);
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_detallesalida_', 'custrecord_ptg_embarque_salida_', ptg_embarque);
                     currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_detallesalida_', 'custrecord_ptg_precio_salida_', precio);
+                    currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_detallesalida_', 'custrecord_ptg_densidad_salida_', dencidad);
+                    //currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_detallesalida_', 'custrecord_ptg_detallesalida_', idEntrada);
+                    currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_detallesalida_', 'custrecord_ptg_embarque_salida_', numEntrega)
                 }
+
+
             }
 
             if (sublistName === 'recmachcustrecord_ptg_detallesalida_' && sublistFieldName === 'custrecord_ptg_peso_salida_salida') {

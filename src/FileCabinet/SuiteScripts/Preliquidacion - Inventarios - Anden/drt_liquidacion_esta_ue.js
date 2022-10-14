@@ -236,12 +236,17 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                         label: "Liquidación Estacionarios",
                         functionName: "redirectTo()",
                     });
-                }
-                if (status == estatusLiquidacion && (montoDesgloseEfec != "" || montoDesgloseEfec > 0)) {
+                } else if (status == estatusLiquidacion && (montoDesgloseEfec != "" || montoDesgloseEfec > 0)) {
                     form.addButton({
                         id: "custpage_drt_to_nuevo_viaje",
                         label: "Nuevo Viaje y Facturar",
                         functionName: "redirectToNuevoViajeYFacturacion()",
+                    });
+                } else if (status == estatusFacturacion) {
+                    form.addButton({
+                        id: "custpage_drt_to_nuevo_viaje_solo",
+                        label: "Nuevo Viaje",
+                        functionName: "redirectToNuevoViaje()",
                     });
                 }
                 
