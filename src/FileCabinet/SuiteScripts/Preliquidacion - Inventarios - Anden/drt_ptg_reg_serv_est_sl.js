@@ -19,17 +19,11 @@
             var req_param = context.request.parameters;
             log.audit("req_param", req_param);
 
-            log.audit("afterSubmit");
             var recId = req_param.recId;
-            log.audit("recId", recId);
             var vehiculo = req_param.vehiculo;
-            log.audit("vehiculo", vehiculo);
             var fechaInicio = req_param.fechaInicio;
-            log.audit("fechaInicio", fechaInicio);
             var fechaFin = req_param.fechaFin;
-            log.audit("fechaFin", fechaFin);
             var incremento_inicio = req_param.incremento_inicio;
-            log.audit("incremento_inicio", incremento_inicio);
             
             log.audit('Remaining Usage start proceso', runtime.getCurrentScript().getRemainingUsage());
 

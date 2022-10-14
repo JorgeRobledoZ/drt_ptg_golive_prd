@@ -375,7 +375,7 @@ define(
             } catch (error) {
                 log.error(`error drt_liquidacion`, error);
             } finally {
-                log.debug(`respuesta drt_liquidacion ${runtime.envType}`, respuesta);
+                //log.debug(`respuesta drt_liquidacion ${runtime.envType}`, respuesta);
                 return respuesta;
             }
         }
@@ -543,6 +543,7 @@ define(
                         cajaGeneralSanLuis: 3151,
                         servicioViajeEspecial: 7,
                         listoParaEnviar: 1,
+                        paraGeneracion: 1,
                         
                     },
                     [runtime.EnvType.SANDBOX]: {
@@ -704,6 +705,7 @@ define(
                         cajaGeneralSanLuis: 2788,
                         servicioViajeEspecial: 7,
                         listoParaEnviar: 1,
+                        paraGeneracion: 1,
                     }
                 }
                 respuesta = mapObj[runtime.envType];

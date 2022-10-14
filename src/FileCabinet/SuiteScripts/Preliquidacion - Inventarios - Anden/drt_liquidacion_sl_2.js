@@ -19,13 +19,9 @@
             var req_param = context.request.parameters;
             log.audit("req_param", req_param);
 
-            log.audit("afterSubmit");
             var recId = req_param.recId;
-            log.audit("recId", recId);
             var numViaje = req_param.numViaje;
-            log.audit("numViaje", numViaje);
             var incremento_inicio = req_param.incremento_inicio;
-            log.audit("incremento_inicio", incremento_inicio);
             
             log.audit('Remaining Usage start proceso', runtime.getCurrentScript().getRemainingUsage());
 
@@ -116,7 +112,7 @@
                     type: record.Type.OPPORTUNITY,
                     id: oportunidad,
                 });
-                var idDireccionCliente = oportunidadObj.getValue("shippingaddress_key");
+                var idDireccionCliente = oportunidadObj.getValue("shipaddresslist");
                 log.audit("idDireccionCliente", idDireccionCliente);
 
                 //SS: PTG - Direccion cliente SS
@@ -190,6 +186,7 @@
                 recTipoPago.setValue("custrecord_ptg_restriccion_reg_oport", restriccion);
                 recTipoPago.setValue("custrecord_ptg_referencia_reg_oport", referencia);
                 recTipoPago.setValue("custrecord_ptg_optpreliq_", recId);
+
                 var recTipoPagoIdSaved = recTipoPago.save();
                 log.debug({
                     title: "DETALLE DE TIPO DE PAGO",
