@@ -293,7 +293,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'SuiteScripts/drt_custom_
 
             log.debug("idItemFulfillment", idItemFulfillment);
 
-            drt_update_record_cm.requestSuitelet("itemfulfillment",idItemFulfillment);
+            drt_update_record_cm.requestSuitelet("itemfulfillment",idItemFulfillment, newRecord.type, newRecord.id);
 
             if(transacciones0){
               idTransaccionArray.push(transacciones0);
