@@ -51,9 +51,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                     isDynamic: true
                 });
 
-                var folio = currentRecord.getValue({
-                    fieldId: 'custrecord_ptg_folio_consectivo_confirm'
-                });
+                var folio = "";
                 let objPo = {};
                 let arrayPo = [];
                 let idVendorBill = '';
@@ -430,169 +428,6 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                             } catch (error_recepcion) {
                                 log.audit('error_recepcion', error_recepcion)
                             }
-                        }
-
-                        /**********************Proceso Cliente DEsvio************************ */
-
-                        if (arrayPo[po]['cliente_desvio']) {
-                            try {
-                                let createSalesOrder = record.create({
-                                    type: record.Type.SALES_ORDER,
-                                    isDynamic: true
-                                });
-
-                                createSalesOrder.setValue({
-                                    fieldId: 'customform',
-                                    value: form_sales_order
-                                });
-
-                                createSalesOrder.setValue({
-                                    fieldId: 'entity',
-                                    value: arrayPo[po]['cliente_desvio']
-                                });
-
-                                createSalesOrder.setValue({
-                                    fieldId: 'subsidiary',
-                                    value: arrayPo[po]['subsidiaria']
-                                });
-
-                                createSalesOrder.setValue({
-                                    fieldId: 'location',
-                                    value: arrayPo[po]['location']
-                                });
-
-                                createSalesOrder.selectNewLine({
-                                    sublistId: "item",
-                                });
-
-                                createSalesOrder.setCurrentSublistValue({
-                                    sublistId: "item",
-                                    fieldId: "item",
-                                    value: arrayPo[po]['item']
-                                });
-
-                                createSalesOrder.setCurrentSublistValue({
-                                    sublistId: "item",
-                                    fieldId: "quantity",
-                                    value: arrayPo[po]['litros']
-                                });
-                                var precioC = parseFloat(arrayPo[po]['precioConfirmacion']);
-                                var precioCliente = parseFloat(arrayPo[po]['sobre_precio_cliente']);
-                                var rateC = precioC + precioCliente;
-                                log.audit('rateC', rateC)
-
-                                createSalesOrder.setCurrentSublistValue({
-                                    sublistId: "item",
-                                    fieldId: "rate",
-                                    value: rateC.toFixed(6)
-                                });
-
-                                createSalesOrder.setCurrentSublistValue({
-                                    sublistId: "item",
-                                    fieldId: "inventorylocation",
-                                    value: arrayPo[po]['location']
-                                });
-
-                                createSalesOrder.setCurrentSublistValue({
-                                    sublistId: "item",
-                                    fieldId: "custcol_ptg_registro_salida_",
-                                    value: arrayPo[po]['idDetalle']
-                                });
-
-                                createSalesOrder.setCurrentSublistValue({
-                                    sublistId: "item",
-                                    fieldId: "custcol_ptg_fl_",
-                                    value: arrayPo[po]['folio']
-                                });
-
-                                let idArticle = createSalesOrder.commitLine({
-                                    sublistId: "item",
-                                });
-
-                                saveinvoice = createSalesOrder.save();
-
-                                log.audit('saveinvoice', saveinvoice);
-
-                                if (saveinvoice) {
-
-                                    var loadSo = record.load({
-                                        type: 'salesorder',
-                                        id: saveinvoice,
-                                        isDynamic: false
-                                    });
-
-                                    var lineas = loadSo.getLineCount('item');
-
-                                    for (var j = 0; j < lineas; j++) {
-                                        loadSo.setSublistValue({
-                                            sublistId: 'item',
-                                            fieldId: 'inventorylocation',
-                                            value: arrayPo[po]['location'],
-                                            line: j
-                                        });
-                                    }
-
-                                    let idSOS = loadSo.save();
-                                    log.audit('ordenVenta', idSOS);
-
-                                    let itemFulFill = record.transform({
-                                        fromType: record.Type.SALES_ORDER,
-                                        fromId: idSOS,
-                                        toType: record.Type.ITEM_FULFILLMENT,
-                                        isDynamic: true,
-                                        defaultValues: {
-                                            inventorylocation: arrayPo[po]['location']
-                                        }
-                                    });
-
-                                    itemFulFill.setValue({
-                                        fieldId: 'customform',
-                                        value: form_full_filment_
-                                    });
-
-                                    var lineasFulfillCliente = itemFulFill.getLineCount({
-                                        sublistId: "item"
-                                    });
-
-                                    for (var so = 0; so < lineasFulfillCliente; so++) {
-                                        itemFulFill.selectLine({
-                                            sublistId: 'item',
-                                            line: so
-                                        });
-
-                                        itemFulFill.setCurrentSublistValue({
-                                            sublistId: 'item',
-                                            fieldId: 'custcol_ptg_registro_salida_',
-                                            value: arrayPo[po]['idDetalle']
-                                        });
-
-                                        itemFulFill.commitLine({
-                                            sublistId: 'item'
-                                        });
-                                    }
-
-                                    let saveItemFull = itemFulFill.save();
-                                    log.audit('saveItemFull', saveItemFull);
-
-                                    let invoice = record.transform({
-                                        fromType: record.Type.SALES_ORDER,
-                                        fromId: saveinvoice,
-                                        toType: record.Type.INVOICE,
-                                        isDynamic: true,
-                                    });
-
-                                    invoice.setValue({
-                                        fieldId: 'customform',
-                                        value: form_invoice
-                                    });
-
-                                    let saveInvoice = invoice.save();
-                                    log.audit('saveInvoice', saveInvoice);
-                                }
-                            } catch (error_cliente_desvio) {
-                                log.audit('error_cliente_desvio', error_cliente_desvio);
-                            }
-
                         }
 
                         /***********Proceso Facturacion de Compra*************/
@@ -1159,6 +994,177 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                             }
                         }
 
+                        /**********************Proceso Cliente DEsvio************************ */
+
+                        if (arrayPo[po]['cliente_desvio']) {
+                            try {
+                                let createSalesOrder = record.create({
+                                    type: record.Type.SALES_ORDER,
+                                    isDynamic: true
+                                });
+
+                                createSalesOrder.setValue({
+                                    fieldId: 'customform',
+                                    value: form_sales_order
+                                });
+
+                                createSalesOrder.setValue({
+                                    fieldId: 'entity',
+                                    value: arrayPo[po]['cliente_desvio']
+                                });
+
+                                createSalesOrder.setValue({
+                                    fieldId: 'subsidiary',
+                                    value: arrayPo[po]['subsidiaria']
+                                });
+
+                                createSalesOrder.setValue({
+                                    fieldId: 'location',
+                                    value: arrayPo[po]['location']
+                                });
+
+                                createSalesOrder.selectNewLine({
+                                    sublistId: "item",
+                                });
+
+                                createSalesOrder.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: "item",
+                                    value: arrayPo[po]['item']
+                                });
+
+                                createSalesOrder.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: "quantity",
+                                    value: arrayPo[po]['litros']
+                                });
+                                var precioC = parseFloat(arrayPo[po]['precioConfirmacion']);
+                                var precioCliente = parseFloat(arrayPo[po]['sobre_precio_cliente']);
+                                var rateC = precioC + precioCliente;
+                                log.audit('rateC', rateC)
+
+                                createSalesOrder.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: "rate",
+                                    value: rateC.toFixed(6)
+                                });
+
+                                createSalesOrder.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: "inventorylocation",
+                                    value: arrayPo[po]['location']
+                                });
+
+                                createSalesOrder.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: "custcol_ptg_registro_salida_",
+                                    value: arrayPo[po]['idDetalle']
+                                });
+
+                                var searchLukoopVB = search.lookupFields({
+                                    type: search.Type.VENDOR_BILL,
+                                    id: idVendorBill,
+                                    columns: ['transactionnumber']
+                                });
+
+                                log.audit('searchLukoopVB', searchLukoopVB);
+
+                                createSalesOrder.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: "custcol_ptg_fl_",
+                                    value: searchLukoopVB.transactionnumber
+                                });
+
+                                let idArticle = createSalesOrder.commitLine({
+                                    sublistId: "item",
+                                });
+
+                                saveinvoice = createSalesOrder.save();
+
+                                log.audit('saveinvoice', saveinvoice);
+
+                                if (saveinvoice) {
+
+                                    var loadSo = record.load({
+                                        type: 'salesorder',
+                                        id: saveinvoice,
+                                        isDynamic: false
+                                    });
+
+                                    var lineas = loadSo.getLineCount('item');
+
+                                    for (var j = 0; j < lineas; j++) {
+                                        loadSo.setSublistValue({
+                                            sublistId: 'item',
+                                            fieldId: 'inventorylocation',
+                                            value: arrayPo[po]['location'],
+                                            line: j
+                                        });
+                                    }
+
+                                    let idSOS = loadSo.save();
+                                    log.audit('ordenVenta', idSOS);
+
+                                    let itemFulFill = record.transform({
+                                        fromType: record.Type.SALES_ORDER,
+                                        fromId: idSOS,
+                                        toType: record.Type.ITEM_FULFILLMENT,
+                                        isDynamic: true,
+                                        defaultValues: {
+                                            inventorylocation: arrayPo[po]['location']
+                                        }
+                                    });
+
+                                    itemFulFill.setValue({
+                                        fieldId: 'customform',
+                                        value: form_full_filment_
+                                    });
+
+                                    var lineasFulfillCliente = itemFulFill.getLineCount({
+                                        sublistId: "item"
+                                    });
+
+                                    for (var so = 0; so < lineasFulfillCliente; so++) {
+                                        itemFulFill.selectLine({
+                                            sublistId: 'item',
+                                            line: so
+                                        });
+
+                                        itemFulFill.setCurrentSublistValue({
+                                            sublistId: 'item',
+                                            fieldId: 'custcol_ptg_registro_salida_',
+                                            value: arrayPo[po]['idDetalle']
+                                        });
+
+                                        itemFulFill.commitLine({
+                                            sublistId: 'item'
+                                        });
+                                    }
+
+                                    let saveItemFull = itemFulFill.save();
+                                    log.audit('saveItemFull', saveItemFull);
+
+                                    let invoice = record.transform({
+                                        fromType: record.Type.SALES_ORDER,
+                                        fromId: saveinvoice,
+                                        toType: record.Type.INVOICE,
+                                        isDynamic: true,
+                                    });
+
+                                    invoice.setValue({
+                                        fieldId: 'customform',
+                                        value: form_invoice
+                                    });
+
+                                    let saveInvoice = invoice.save();
+                                    log.audit('saveInvoice', saveInvoice);
+                                }
+                            } catch (error_cliente_desvio) {
+                                log.audit('error_cliente_desvio', error_cliente_desvio);
+                            }
+
+                        }
+
                         /*****************Proceso Intercompañia*************+ */
                         try {
                             if (arrayPo[po]['tipo_desvio'] == 4) {
@@ -1264,10 +1270,18 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                         value: arrayPo[po]['idDetalle']
                                     });
 
+                                    var searchLukoopVB = search.lookupFields({
+                                        type: search.Type.VENDOR_BILL,
+                                        id: idVendorBill,
+                                        columns: ['transactionnumber']
+                                    });
+    
+                                    log.audit('searchLukoopVB', searchLukoopVB);
+
                                     invoiceInter.setCurrentSublistValue({
                                         sublistId: "item",
                                         fieldId: "custcol_ptg_fl_",
-                                        value: arrayPo[po]['folio']
+                                        value: searchLukoopVB.transactionnumber
                                     });
 
                                     invoiceInter.commitLine({
