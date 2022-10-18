@@ -170,15 +170,12 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                     type: record.Type.CUSTOMER,
                     id: idCliente,
                   });
-                  var idArray = [];
-                  var defaultBillingArray = [];
                   var descuento = 0;
                   var precio = 0;
                   var tipoDescuento = clienteObj.getValue("custentity_ptg_tipo_descuento");
-                  log.audit("tipoDescuento", tipoDescuento);
-                  var cantidadDescuento = parseFloat(clienteObj.getValue("custentity_ptg_descuento_asignar"));
-                  log.audit("cantidadDescuento", cantidadDescuento);
-                  var lineCount = clienteObj.getLineCount({ sublistId:'addressbook' })||0;
+                  var cantidadDescuento = parseFloat(clienteObj.getValue("custentity_ptg_descuento_asignar")||0);
+                  var descuentoSinIVA = cantidadDescuento / 1.16;
+                  log.audit("tipoDescuento: "+ tipoDescuento, "cantidadDescuento: "+ cantidadDescuento+" descuentoSinIVA: "+ descuentoSinIVA);
 
                   var direccionCliente = 0;
                   if(direccionPublicoGeneral){
@@ -192,14 +189,13 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
 
                   var direccionObj = record.load({
                     type: "customrecord_ptg_direcciones",
-                    //id: direccionEmbarque,
-                    //id: direccionPublicoGeneral,
                     id: direccionCliente,
                   });
                   log.audit("direccionObj", direccionObj);
                   var idZonaPrecio = direccionObj.getValue("custrecord_ptg_zona_precios");
                   log.audit("idZonaPrecio", idZonaPrecio);
-                  var precio = 0;
+                  var precioPorLitro = 0;
+                  var factorConversion = 0;
 
                   if(idZonaPrecio){
                     var zonaPrecioObj = record.load({
@@ -207,64 +203,15 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                       id: idZonaPrecio,
                     });
                     log.audit("zonaPrecioObj", zonaPrecioObj);
-                    precio = zonaPrecioObj.getValue("custrecord_ptg_precio_kg");
-                    log.audit("precio", precio);
+                    precioPorLitro = zonaPrecioObj.getValue("custrecord_ptg_precio_");
+                    factorConversion = zonaPrecioObj.getValue("custrecord_ptg_factor_conversion");
+                    log.audit("precioPorLitro", precioPorLitro);
                   } else {
                     idZonaPrecio = null;
-                    precio = 0;
+                    precioPorLitro = 0;
                   }
 
-                  
-
-
-
-                  /*for ( var i = 0; i < lineCount; i++){
-                    idArray[i] = clienteObj.getSublistValue({
-                      sublistId: "addressbook",
-                      fieldId: "id",
-                      line: i,
-                    }) || "";
-                    log.audit("id:", idArray[i]);
-          
-                    defaultBillingArray[i] = clienteObj.getSublistValue({
-                      sublistId: "addressbook",
-                      fieldId: "defaultbilling",
-                      line: i,
-                    }) || "";
-                    log.audit("defaultBillingArray:", defaultBillingArray[i]);
-          
-                    if(defaultBillingArray[i]){
-                      var sublistFieldValue = clienteObj.getSublistSubrecord({
-                        sublistId: "addressbook",
-                        fieldId: 'addressbookaddress',
-                        line: i,
-                      });
-              
-                      var idColoniaRuta = sublistFieldValue.getValue("custrecord_ptg_colonia_ruta");
-                      log.audit("idColoniaRuta", idColoniaRuta);
-              
-                      var coloniasRutasObj = record.load({
-                        type: "customrecord_ptg_coloniasrutas_",
-                        id: idColoniaRuta,
-                      });
-              
-                      var idZonaPrecio = coloniasRutasObj.getValue("custrecord_ptg_zona_de_precio_");
-                      log.audit("idZonaPrecio", idZonaPrecio);
-              
-                      var zonaPrecioObj = record.load({
-                        type: "customrecord_ptg_zonasdeprecio_",
-                        id: idZonaPrecio,
-                      });
-              
-                      precio = zonaPrecioObj.getValue("custrecord_ptg_precio_kg");
-                      log.audit("precio", precio);
-                    }
-            
-                  }*/
-
-
-
-                  if(precio > 0){
+                  /*if(precio > 0){
                     if(tipoDescuento == descuentoPorcentaje){
                       log.audit("Descuento Porcentaje precio zona");
                       var porcentaje = cantidadDescuento / 100;
@@ -309,7 +256,12 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                   } else if (!tipoDescuento){
                     descuento = precio;
                     log.audit("NO descuento", descuento);
-                  }
+                  }*/
+
+                  descuento = (precioPorLitro - descuentoSinIVA)/factorConversion;
+                  log.audit("descuento", descuento);
+
+
 
                   currentRecord.setCurrentSublistValue({
                     sublistId: idRegistroDeServicios,
@@ -456,7 +408,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         ticketCardId = objMap.ticketCardId;
         recirculacionId = objMap.recirculacionId;
         canceladoId = objMap.canceladoId;
-        traspasoId = objMap.traspasoId;
+        traspasoId = objMap.traspaso;
         tarjetaCreditoBancomerId = objMap.tarjetaCreditoBancomerId;
         tarjetaCreditoHSBCId = objMap.tarjetaCreditoHSBCId;
         tarjetaCreditoBanamexId = objMap.tarjetaCreditoBanamexId;
@@ -479,7 +431,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var totalServCilindrosOld = currentRecord.getCurrentSublistValue({ sublistId: sublistName, fieldId: "custrecord_ptg_tot_ctrl_reg_serv_cil_lin",});
 
         //if (!direccionCliente || !clienteServCilindros || !articuloServCilindros || !cantidadServCilindros || !precioUnitarioServCilindros || !formaPago){
-        if (!direccionCliente || !clienteServCilindros || !articuloServCilindros || !precioUnitarioServCilindros || !formaPago){
+        //if (!direccionCliente || !clienteServCilindros || !articuloServCilindros || !precioUnitarioServCilindros || !formaPago){
+        if (!clienteServCilindros || !articuloServCilindros || !formaPago){
         log.debug("formaPago", formaPago);
           var options = {
             title: "Faltan datos",
