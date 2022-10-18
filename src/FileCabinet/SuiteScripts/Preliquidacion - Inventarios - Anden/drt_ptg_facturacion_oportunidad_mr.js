@@ -40,7 +40,7 @@
                 filters: arrayFilters
             });
 
-            valoresProceso.custrecord_ptg_plc_etapa = 1;
+            //valoresProceso.custrecord_ptg_plc_etapa = 1;
 
 
         } catch (error) {
@@ -535,7 +535,7 @@
                 value: recObjID
             });
 
-            objUpdate.custrecord_ptg_plc_etapa = 1;
+            //objUpdate.custrecord_ptg_plc_etapa = 1;
                
         } catch (error) {
             log.error({
@@ -632,42 +632,42 @@
             var objMap=drt_mapid_cm.drt_liquidacion();
             if (Object.keys(objMap).length>0) {
                 articuloServicio = objMap.articuloServicio;
-                efectivoId = objMap.efectivoId;
-                prepagoBanorteId = objMap.prepagoBanorteId;
-                valeId = objMap.valeId;
-                cortesiaId = objMap.cortesiaId;
-                tarjetaCreditoId = objMap.tarjetaCreditoId;
-                tarjetaDebitoId = objMap.tarjetaDebitoId;
-                multipleId = objMap.multipleId;
-                prepagoTransferenciaId = objMap.prepagoTransferenciaId;
-                creditoClienteId = objMap.creditoClienteId;
-                reposicionId = objMap.reposicionId;
-                saldoAFavorId = objMap.saldoAFavorId;
-                consumoInternoId = objMap.consumoInternoId;
-                prepagoBancomerId = objMap.prepagoBancomerId;
-                prepagoHSBCId = objMap.prepagoHSBCId;
-                prepagoBanamexId = objMap.prepagoBanamexId;
-                prepagoSantanderId = objMap.prepagoSantanderId;
-                prepagoScotianId = objMap.prepagoScotianId;
-                bonificacionId = objMap.bonificacionId;
-                ticketCardId = objMap.ticketCardId;
-                chequeBancomerId = objMap.chequeBancomerId;
-                recirculacionId = objMap.recirculacionId;
-                canceladoId = objMap.canceladoId;
-                rellenoId = objMap.rellenoId;
-                transferenciaId = objMap.transferenciaId;
-                traspasoId = objMap.traspasoId;
-                chequeSantanderId = objMap.chequeSantanderId;
-                chequeScotianId = objMap.chequeScotianId;
-                chequeHSBCId = objMap.chequeHSBCId;
-                chequeBanamexId = objMap.chequeBanamexId;
-                chequeBanorteId = objMap.chequeBanorteId;
-                tarjetaCreditoBancomerId = objMap.tarjetaCreditoBancomerId;
-                tarjetaCreditoHSBCId = objMap.tarjetaCreditoHSBCId;
-                tarjetaCreditoBanamexId = objMap.tarjetaCreditoBanamexId;
-                tarjetaDebitoBanamexId = objMap.tarjetaDebitoBanamexId;
-                tarjetaDebitoBancomerId = objMap.tarjetaDebitoBancomerId;
-                tarjetaDebitoHSBCId = objMap.tarjetaDebitoHSBCId;
+                efectivoId = objMap.efectivo;
+                prepagoBanorteId = objMap.prepagoBanorte;
+                valeId = objMap.vale;
+                cortesiaId = objMap.cortesia;
+                tarjetaCreditoId = objMap.tarjetaCredito;
+                tarjetaDebitoId = objMap.tarjetaDebito;
+                multipleId = objMap.multiple;
+                prepagoTransferenciaId = objMap.prepagoTransferencia;
+                creditoClienteId = objMap.creditoCliente;
+                reposicionId = objMap.reposicion;
+                saldoAFavorId = objMap.saldoAFavor;
+                consumoInternoId = objMap.consumoInterno;
+                prepagoBancomerId = objMap.prepagoBancomer;
+                prepagoHSBCId = objMap.prepagoHSBC;
+                prepagoBanamexId = objMap.prepagoBanamex;
+                prepagoSantanderId = objMap.prepagoSantander;
+                prepagoScotianId = objMap.prepagoScotian;
+                bonificacionId = objMap.bonificacion;
+                ticketCardId = objMap.ticketCard;
+                chequeBancomerId = objMap.chequeBancomer;
+                recirculacionId = objMap.recirculacion;
+                canceladoId = objMap.cancelado;
+                rellenoId = objMap.relleno;
+                transferenciaId = objMap.transferencia;
+                traspasoId = objMap.traspaso;
+                chequeSantanderId = objMap.chequeSantander;
+                chequeScotianId = objMap.chequeScotian;
+                chequeHSBCId = objMap.chequeHSBC;
+                chequeBanamexId = objMap.chequeBanamex;
+                chequeBanorteId = objMap.chequeBanorte;
+                tarjetaCreditoBancomerId = objMap.tarjetaCreditoBancomer;
+                tarjetaCreditoHSBCId = objMap.tarjetaCreditoHSBC;
+                tarjetaCreditoBanamexId = objMap.tarjetaCreditoBanamex;
+                tarjetaDebitoBanamexId = objMap.tarjetaDebitoBanamex;
+                tarjetaDebitoBancomerId = objMap.tarjetaDebitoBancomer;
+                tarjetaDebitoHSBCId = objMap.tarjetaDebitoHSBC;
             }
 
             if(idFacturaPI){
@@ -778,6 +778,7 @@
             }
             
             else if (objValueTipoPago == cortesiaId || objValueTipoPago == reposicionId || objValueTipoPago == bonificacionId){
+                log.audit("UN PAGO cortesía, reposicion o bonificacion");
                 //Pago con cortesia, reposicion, bonificacion
                 var creditMemoObj = record.transform({
                     fromType: record.Type.INVOICE,
@@ -814,16 +815,16 @@
         }
 
             objUpdate.custrecord_ptg_terminado_cilindros = true;
-            
+            objUpdate.custrecord_ptg_plc_etapa = 1;
 			
         } catch (error) {
+            valoresProceso.custrecord_ptg_plc_etapa = 3;
             log.error({
                 title: 'error reduce',
                 details: JSON.stringify(error)
             });
             objUpdate.custrecord_ptg_error_cilindro = error.message || '';
         } finally {
-            objUpdate.custrecord_ptg_plc_etapa = 2;
             var registroCilindros = record.submitFields({
                 type: "customrecord_ptg_preliquicilndros_",
                 id: id_search,
