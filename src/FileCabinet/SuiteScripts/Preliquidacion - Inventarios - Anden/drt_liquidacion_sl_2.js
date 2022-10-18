@@ -17,7 +17,7 @@
     function onRequest(context) {
         try {
             var req_param = context.request.parameters;
-            log.audit("req_param", req_param);
+            log.emergency("req_param", req_param);
 
             var recId = req_param.recId;
             var numViaje = req_param.numViaje;
@@ -107,6 +107,7 @@
                 (idRegistroPagos = registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_registro_pagos", label: "PTG - Pagos", })),
                 (idCliente = registroOportunidadResult[incremento_inicio].getValue({ name: "entity", join: "CUSTRECORD_PTG_OPORTUNIDAD", label: "Customer"})),
                 (referencia = registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_referenciapago_", label: "PTG - Referencia pago"}));
+                log.audit("oportunidad tipo pago", oportunidad);
 
                 var oportunidadObj = record.load({
                     type: record.Type.OPPORTUNITY,
@@ -119,7 +120,8 @@
                 var direccionesObj = search.create({
                     type: "customrecord_ptg_direcciones",
                     filters: [
-                       ["custrecord_ptg_direccion","equalto",idDireccionCliente]
+                       ["custrecord_ptg_direccion","equalto",idDireccionCliente], "AND", 
+                       ["isinactive","is","F"]
                     ],
                     columns: [
                        search.createColumn({name: "internalid", label: "ID interno"})
@@ -534,13 +536,20 @@
 
             if(incremento_inicio != 0){
                 var nuevoIncremento = incremento_inicio - 1;
-                log.audit("nuevoIncremento", nuevoIncremento);
+                log.emergency("nuevoIncremento", nuevoIncremento);
+                var newIncremento = 0;
+                if(incremento_inicio == nuevoIncremento){
+                    newIncremento = nuevoIncremento - 1;
+                } else {
+                    newIncremento = incremento_inicio
+                }
+                log.emergency("newIncremento", newIncremento);
                 var parametros2 = {
                     'recId': recId,
                     'numViaje': numViaje,
-                    'incremento_inicio': nuevoIncremento
+                    'incremento_inicio': newIncremento
                 };
-                log.audit("parametros2", parametros2);
+                log.emergency("parametros2", parametros2);
     
                 var redirectToStl2 = redirect.toSuitelet({
                     scriptId: "customscript_drt_liquidacion_sl_2",
