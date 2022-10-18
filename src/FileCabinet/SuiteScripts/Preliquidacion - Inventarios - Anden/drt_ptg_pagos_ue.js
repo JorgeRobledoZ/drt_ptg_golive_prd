@@ -29,6 +29,8 @@
               var vehiculoConsumoInterno = customRec.getValue("custrecord_ptg_vehiculo_consumo_interno");
               var numeroViajeConsumoInterno = customRec.getValue("custrecord_ptg_num_viaje_consumo_interno");
               var kilometrajeConsumoInterno = customRec.getValue("custrecord_ptg_kilometra_consumo_interno");
+              var idCliente = customRec.getValue("custrecord_ptg_pagos_cliente");
+              var idDireccion = customRec.getValue("custrecord_ptg_pagos_direccion");
               var objPagos = {};
               var arrayPagos = [];
               var objPagosOportunidad = {};
@@ -70,6 +72,7 @@
                 prepagoScotianId = objMap.prepagoScotianId;
                 recirculacionId = objMap.recirculacionId;
                 canceladoId = objMap.canceladoId;
+                publicoGeneral = objMap.publicoGeneral;
               }
 
               log.audit("oportunidadID", oportunidadID);
@@ -77,6 +80,19 @@
               log.audit("lineas", lineas);
               log.audit("lineasOld", lineasOld);
               log.audit("carburacion", carburacion);
+              log.audit("idDireccion", idDireccion);
+
+              if(idDireccion){
+                var direccionObj = record.load({
+                  type: "customrecord_ptg_direcciones",
+                  id: idDireccion,
+                });
+                var internalDireccion = parseInt(direccionObj.getValue("custrecord_ptg_direccion"));
+                log.audit("internalDireccion", internalDireccion);
+              }
+
+              
+
               if(!carburacion){
                 var numeroViajeObj = record.load({
                   type: "customrecord_ptg_tabladeviaje_enc2_",
@@ -1287,6 +1303,15 @@
                 var objCilindros = {};
                 var objDetalleResumen = {};
 
+                if(idCliente && idDireccion){
+                  objCilindros.custrecord_ptg_cliente_reg_oport = idCliente;
+                  objCilindros.custrecord_ptg_direccion_registroop_ = idDireccion;
+
+                  objDetalleResumen.custrecord_ptg_cliente_detalleresumen_ = idCliente;
+                }
+
+                
+
                 if(lineas != lineasOld){
                   for (var i = lineasOld; i < lineas; i++){
                     tipoPagoArraySublista[i] = customRec.getSublistValue({
@@ -1487,6 +1512,7 @@
                   });
                   (idInternoRegistroCil = registroCilindroObjResult[0].getValue({name: "internalid", sort: search.Sort.DESC, label: "ID interno"}));
 
+                  log.audit("objCilindros", objCilindros);
                   var registroUpd = record.submitFields({
                     type: "customrecord_ptg_registrooportunidad_",
                     id: idInternoRegistroCil,
@@ -1575,9 +1601,16 @@
                 log.audit("Una opcion de pago", opcionPago);
               }
               
+              var solicitaFactura = false;
+              if(idCliente != publicoGeneral){
+                solicitaFactura = true;
+              }
               var objUpdate = {
+                entity: idCliente,
                 custbody_ptg_opcion_pago_obj: objValue,
                 custbody_ptg_opcion_pago: opcionPago,
+                shipaddresslist: internalDireccion,
+                custbody_ptg_cliente_solicita_factura: solicitaFactura,
               }
               log.audit("objUpdate", objUpdate);
 
