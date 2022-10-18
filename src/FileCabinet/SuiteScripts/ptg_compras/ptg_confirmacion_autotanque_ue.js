@@ -589,31 +589,24 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
 
                             var vendorbillSearchObj = search.create({
                                 type: "vendorbill",
-                                filters: [
-                                    ["type", "anyof", "VendBill"],
-                                    "AND",
-                                    ["mainline", "is", "T"],
-                                    "AND",
-                                    ["name", "anyof", "16072"]
+                                filters:
+                                [
+                                    ["type","anyof","VendBill"], 
+                                    "AND", 
+                                    ["mainline","is","T"], 
+                                    "AND", 
+                                    ["custbody_ptg_fact_flete_","is","T"]
                                 ],
-                                columns: [
-                                    search.createColumn({
-                                        name: "internalid",
-                                        summary: "COUNT",
-                                        label: "ID interno"
-                                    })
+                                columns:
+                                [
+                                    search.createColumn({name: "tranid", label: "Document Number"})
                                 ]
                             });
-                            var conteoBusqueda = vendorbillSearchObj.run().getRange({
-                                start: 0,
-                                end: 1000,
-                            });
-                            log.debug("vendorbillSearchObj result count", conteoBusqueda);
+                            var conteoBusqueda = vendorbillSearchObj.runPaged().count;
+                            log.audit("vendorbillSearchObj result count", conteoBusqueda);
 
-                            var columnas = conteoBusqueda[0].columns;
-
-                            var numeroViajeBusqueda = conteoBusqueda[0].getValue(columnas[0]);
-                            var numeroEntero = parseInt(numeroViajeBusqueda);
+                           
+                            var numeroEntero = conteoBusqueda + 1;
                             log.audit('numeroEntero1', numeroEntero);
                             numeroEntero = numeroEntero + 1
 
@@ -651,8 +644,13 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                             });
 
                             facturaFlete.setValue({
+                                fieldId: 'custbody_ptg_fact_flete_',
+                                value: true
+                            })
+
+                            facturaFlete.setValue({
                                 fieldId: 'tranid',
-                                value: 'PTG-Flete' + numeroEntero
+                                value: 'PTG-Flete-' + numeroEntero
                             });
 
                             facturaFlete.setValue({
@@ -663,6 +661,22 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                             facturaFlete.setValue({
                                 fieldId: 'memo',
                                 value: 'factura de flete'
+                            });
+                            
+                            
+                            facturaFlete.setValue({
+                                fieldId: 'custpage_4601_appliesto',
+                                value: true
+                            });
+
+                            facturaFlete.setValue({
+                                fieldId: 'custpage_4601_witaxcode',
+                                value: 1
+                            });
+
+                            facturaFlete.setValue({
+                                fieldId: 'custbody_4601_entitytype',
+                                value: 1
                             });
 
                             facturaFlete.selectNewLine({
@@ -703,6 +717,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                             //custpage_4601_witaxcode
                             //landedcostcategory
                             //custcol_4601_witaxapplies
+                            
                             facturaFlete.setCurrentSublistValue({
                                 sublistId: "item",
                                 fieldId: 'mandatorytaxcode',
@@ -1616,6 +1631,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                 log.audit('pgRec', pgRecepcion);
 
                                 if (pgRecepcion == arrayPo[po]['pg']) {
+                                    log.audit('entro', 'ok')
                                     recepcionLoad.setSublistValue({
                                         sublistId: 'item',
                                         fieldId: 'quantity',
@@ -1628,7 +1644,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
 
                             var idRecepcionSave = recepcionLoad.save();
 
-                            log.debug('idRecepcionSave', idRecepcionSave)
+                            log.audit('idRecepcionSave', idRecepcionSave)
 
 
                         }
