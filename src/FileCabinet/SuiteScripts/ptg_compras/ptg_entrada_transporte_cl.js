@@ -29,18 +29,26 @@ define(["N/search", 'N/ui/dialog'], function (search, dialog) {
 
                     log.audit('filtros', filtros);
                     var customrecord_ptg_detalleentradatranspo_SearchObj = search.create({
-                        type: "customrecord_ptg_detalleentradatranspo_",
-                        filters: filtros,
+                        type: "purchaseorder",
+                        filters: [
+                            ["type", "anyof", "PurchOrd"],
+                            "AND",
+                            ["custcol2", "is", pgLineaText],
+                            "AND",
+                            ["mainline", "is", "F"],
+                            "AND",
+                            ["custcol_ptg_pg_en_uso_", "is", "T"]
+                        ],
                         columns: []
                     });
                     var searchDetalleEntrada = customrecord_ptg_detalleentradatranspo_SearchObj.runPaged().count
 
                     log.audit('searchDetalleEntrada', searchDetalleEntrada);
 
-                    if (searchDetalleEntrada > 0) {
+                    if (searchDetalleEntrada > 1) {
                         dialog.alert({
                             title: "Error",
-                            message: "Ya se tiene un registro de entrada con este mismo Pg:" + "  " + pgLineaText
+                            message: "Este" + "  " + pgLineaText + "Se encuentra en uso en una orden de compra."
                         });
 
                         currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_det_entradatranspo_', 'custrecord_ptg_numembarqueprogram_', "");
@@ -164,7 +172,62 @@ define(["N/search", 'N/ui/dialog'], function (search, dialog) {
         }
     }
 
+    function saveRecord(context) {
+        try {
+            var currentRecord = context.currentRecord;
+            debugger
+            var line_count = currentRecord.getLineCount({
+                sublistId: 'recmachcustrecord_ptg_det_entradatranspo_'
+            });
+            var pg_select = "";
+            var pg_orden = "";
+            for(var  i = 0; i <  line_count; i++){
+                pg_select = currentRecord.getSublistValue({
+                    sublistId: 'recmachcustrecord_ptg_det_entradatranspo_',
+                    fieldId: 'custrecord_ptg_numembarqueprogram_',
+                    line: i
+                });
+
+                pg_orden = currentRecord.getSublistValue({
+                    sublistId: 'recmachcustrecord_ptg_det_entradatranspo_',
+                    fieldId: 'custrecord_ptg_embarque_',
+                    line: i
+                });
+            }
+
+            var customrecord_ptg_detallesalida_SearchObj = search.create({
+                type: "customrecord_ptg_detalleentradatranspo_",
+                filters:
+                [
+                    ["custrecord_ptg_numembarqueprogram_","anyof",pg_select], 
+                    "AND", 
+                    ["custrecord_ptg_embarque_","is", pg_orden]
+                ],
+                columns:
+                [
+                   search.createColumn({name: "internalid", label: "Internal ID"})
+                ]
+             });
+             var searchRehistro = customrecord_ptg_detallesalida_SearchObj.runPaged().count;
+             log.audit('searchRehistro', searchRehistro);
+
+             if(searchRehistro > 0){
+                dialog.alert({
+                    title: "Error",
+                    message: "Ya se tiene este mismo pg en uso relacionado a una orden de compra."
+                });
+                return false;
+             } else {
+                return true;
+             }
+
+        } catch (error_saveRecord) {
+            log.audit('error_saveRecord', error_saveRecord)
+        }
+    }
+
     return {
         fieldChanged: fieldChanged,
+        saveRecord: saveRecord
     }
 });
