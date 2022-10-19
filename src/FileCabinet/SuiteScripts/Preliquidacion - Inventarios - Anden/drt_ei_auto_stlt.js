@@ -133,35 +133,6 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 		 return result;
 	 }
 
-	/*function generateUrlParamString(data) {
-		return Object.keys(data).map(function (k) {
-			return encodeURIComponent(k) + '=' + encodeURI(data[k]);
-		}).join('&');
-	}
-
-	function getQRcode(data) {
-		var SAT_URL_LINK = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx';
-		var QR_WIDTH = 10;
-		var QR_HEIGHT = 10;
-		var SELLO_LAST_CH = 8;
-		var BASE64_TXT_IN_URL = 'base64,';
-		var url = SAT_URL_LINK+'?' + generateUrlParamString({
-			Id :data.cfdiUuid,
-			re : data.rfcEmisor,
-			rr : data.rfcReceptor,
-			tt : data.voucherTotal,
-			fe : data.selloCfd.substring(data.selloCfd.length - SELLO_LAST_CH),
-		});
-		var qr = qrcode(0,'M');
-		qr.addData(url,'Byte');
-		qr.make();
-		var genQrCode = qr.createDataURL(QR_WIDTH, QR_HEIGHT);
-		var base64TxtIdx = genQrCode.indexOf(BASE64_TXT_IN_URL);
-		var qrCode = genQrCode.substr(base64TxtIdx+BASE64_TXT_IN_URL.length);
-		log.audit('qrCode',qrCode);
-		return qrCode;
-	}*/
-
 	 function getXMLHead(userName) {
 		 log.audit("getXMLHead(userName)");
 		 // Obtengo el folio de la factura
@@ -383,7 +354,6 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 		  var itemCount = rec.getLineCount({
 			  sublistId : 'item'
 			});
-//		log.audit('Numero lineas: ' + itemCount);
 		for (var j=0; j<itemCount; j++) {
 			log.audit("vuelta j", j);
 			var lineaArray = j;
@@ -515,52 +485,6 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 
 		log.audit("arrayItem.push", arrayItem);
 
-		 
-		 /*var rangini = 0;
-		 var rangend = 1000;
-		 var subtot = 0;
-		 var taxtot = 0;
-		 var total = 0;
-		 var destot = 0;
-		 
-		 var sourceId = runtime.getCurrentScript().getParameter('custscript_drt_glb_search');
-		 // cargo la busqueda guardada
-		 var searchRecord = search.load({
-			 id: sourceId
-		 });
-
-		 var today = runtime.getCurrentScript().getParameter('custscript_drt_glb_today') || null;
-		 if (!today) {
-			 today = new Date();
-			 today = format.format({
-				 value: today,
-				 type: format.Type.DATE
-			 });
-		 } else {
-			 today = format.format({
-				 value: today,
-				 type: format.Type.DATE
-			 });
-		 }
-
-		 var schResultRange = searchRecord.run().getRange({
-			 start: rangini,
-			 end: rangend
-		 });
-		 log.audit('schResultRange', schResultRange.length);
-		 do {
-			 schResultRange.forEach(function (row) {
-
-				 var itemtype = row.getValue({
-					 name: 'type',
-					 join: 'item'
-				 }).toLowerCase();
-				 var itemCodeSAT = row.getText('custcol_mx_txn_line_sat_item_code');
-
-				 subtot += parseFloat(row.getValue('amount'));
-				 taxtot += parseFloat(row.getValue('taxamount'));
-				 total += parseFloat(row.getValue('grossamount'));*/
-
 				 // Busqueda del Permiso de la Ubicación
 				 var Objpermiso = search.lookupFields({
 					type: search.Type.LOCATION,
@@ -616,71 +540,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						 consecutivo: rec.getValue("transactionnumber"),
 						 
 						 items: arrayItem
-						/* [{
-							 itemid: rec.getSublistValue({
-								sublistId: 'item', 
-								fieldId: 'item',
-								line: 0
-							 }) || "",
-							 name: rec.getSublistValue({
-								sublistId: 'item', 
-								fieldId: 'item_display',
-								line: 0
-							 }), 
-							 quantity: rec.getSublistValue({
-								sublistId: 'item', 
-								fieldId: 'quantity',
-								line: 0
-							}),
-							 unit: rec.getSublistValue({
-								sublistId: 'item', 
-								fieldId: 'unit',
-								line: 0
-							 }),
-							 taxcodeid: rec.getSublistValue({
-								sublistId: 'item', 
-								fieldId: 'taxcode',
-								line: 0
-							 }),
-							 taxcode: rec.getSublistText({
-								sublistId: 'item', 
-								fieldId: 'taxcode',
-								line: 0
-							 }),
-							 taxrate: '0.160000',
-							 rate: parseFloat(rec.getSublistValue({
-								sublistId: 'item', 
-								fieldId: 'rate',
-								line: 0
-							 })).toFixed(2),
-							 taxamt: parseFloat(rec.getSublistValue({
-								sublistId: 'item', 
-								fieldId: 'tax1amt',
-								line: 0
-							 })).toFixed(2),
-							 amount: parseFloat(rec.getSublistValue({
-								sublistId: 'item', 
-								fieldId: 'amount',
-								line: 0
-							 })).toFixed(2),
-							 discount: parseFloat(rec.getSublistValue({
-								sublistId: 'item', 
-								fieldId: 'discountamount',
-								line: 0
-							 }) || 0).toFixed(2),
-							 idinvoice: rec.id,
-							 type: rec.type,
-							 ClaveUnidad: (rec.getSublistValue({
-								sublistId: 'item', 
-								fieldId: 'units_display',
-								line: 0
-							}) || ";").split(';')[0],
-							ClaveProdServ: (rec.getSublistValue({
-								sublistId: 'item', 
-								fieldId: 'custcol_mx_txn_line_sat_item_code_display',
-								line: 0
-							 }) || " ").split(' ')[0],
-						 },]*/
+			
 					 };
 					 isentry = false;
 					var clienteObj = record.load({
@@ -709,82 +569,10 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 					 log.audit("jsonData", jsonData);
 					//log.audit("jsonData.items.length", jsonData.items.length);
 
-				 } /*else {
-					log.audit("***ENTRA ELSE***");
-					 jsonData.items.push({
-						 itemid: row.getValue({
-							 name: "custitem_dtt_skuproducteca",
-							 join: "item"
-						 }) || "", //row.getText('item'),
-						 name: row.getValue({
-							 name: 'salesdescription',
-							 join: 'item'
-						 }) || row.getValue({
-							 name: "custitem_dtt_skuproducteca",
-							 join: "item"
-						 }),
-						 quantity: row.getValue('quantity'),
-						 unit: row.getValue('unit'),
-						 taxcodeid: row.getValue('taxcode'),
-						 taxcode: row.getText('taxcode'),
-						 taxrate: '0.160000',
-						 rate: parseFloat(row.getValue('rate')).toFixed(2),
-						 taxamt: parseFloat(row.getValue('taxamount')).toFixed(2),
-						 amount: parseFloat(row.getValue('amount')).toFixed(2),
-						 discount: parseFloat(row.getValue('discountamount') || 0).toFixed(2),
-						 satcode: itemCodeSAT,
-						 idcashsales: row.id,
-						 type: row.type,
-						 ClaveUnidad: (row.getValue({
-							 name: "custitem_drt_nc_units",
-							 join: "item"
-						 }) || ";").split(';')[1],
-						 ClaveProdServ: (row.getValue({
-							 name: "custitem_drt_nc_units",
-							 join: "item"
-						 }) || ";").split(';')[0]
-					 });
-				 }*/
-			 /*});
-			 rangini = rangend;
-			 rangend += 1000;
-			 schResultRange = searchRecord.run().getRange({
-				 start: rangini,
-				 end: rangend
-			 });
-
-		 } while (schResultRange.length > 0);*/
-
-		/* if (jsonData) {
-			 jsonData.subtot = subtot.toFixed(2);
-			 jsonData.taxtot = taxtot.toFixed(2);
-			 jsonData.total = ((total + taxtot) - destot).toFixed(2);
-			 jsonData.destot = destot.toFixed(2);
-		 }*/
+				 }
 		 log.audit('Remaining Usage getAllRecords', runtime.getCurrentScript().getRemainingUsage());
 	 }
 
-/*	 function createFileXML(xml) {
-
-		 var date = new Date();
-		 date = getFormatDateXML(date);
-
-		 var fileObj = file.create({
-			 name: 'XML' + date,
-			 fileType: file.Type.XMLDOC,
-			 contents: xml,
-			 description: 'XML SAT',
-			 encoding: file.Encoding.UTF8,
-			 folder: runtime.getCurrentScript().getParameter('custscript_drt_glb_folder'),
-			 isOnline: true
-		 });
-		 var fileId = fileObj.save();
-		 log.audit({
-			 title: 'fileId',
-			 details: JSON.stringify(fileId)
-		 });
-		 return fileId;
-	 }*/
 
 	 function createFile(param_name, param_fileType, param_contents, param_description, param_encoding, param_folder) {
 		 try {
@@ -1129,99 +917,6 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 							values: objSumbitCR,
 						})
 
-
-
-						/*if(tipoServicio == 1){
-							log.audit("TIPOSERVICIO 1");
-							var objSumbitCR = {
-								id_oportunidad: oportunidad,
-								id_factura: jsonData.idinvoice,
-								status: description,
-								fecha: fecha,
-								entity: entity,
-								registro_pre_liq: preLiqCilindro,
-							}
-							log.audit("objSumbitCR ERROR", objSumbitCR);
-	
-							var customRecFactura = record.create({
-								type: "customrecord_drt_ptg_registro_factura",
-								isDynamic: true,
-							  });
-	
-							  customRecFactura.setValue("custrecord_ptg_id_oportunidad", objSumbitCR.id_oportunidad);
-							  customRecFactura.setValue("custrecord_ptg_id_factura", objSumbitCR.id_factura);
-							  customRecFactura.setValue("custrecord_ptg_status", objSumbitCR.status);
-							  customRecFactura.setValue("custrecord_ptg_fecha_creacion", objSumbitCR.fecha);
-							  customRecFactura.setValue("custrecord_ptg_num_viaje_fac_", objSumbitCR.registro_pre_liq);
-	
-							  var recIdSaved = customRecFactura.save();
-							  log.debug({
-								title: "Regisro de facturacion con error creado",
-								details: "Id Saved: " + recIdSaved,
-							  });
-						}
-						if(tipoServicio == 2){
-							log.audit("TIPOSERVICIO 2");
-							var objSumbitCR = {
-								id_oportunidad: oportunidad,
-								id_factura: jsonData.idinvoice,
-								status: description,
-								fecha: fecha,
-								entity: entity,
-								registro_pre_liq: preLiqEstacionario,
-							}
-							log.audit("objSumbitCR ERROR", objSumbitCR);
-	
-							var customRecFactura = record.create({
-								type: "customrecord_drt_ptg_registro_factura",
-								isDynamic: true,
-							  });
-	
-							  customRecFactura.setValue("custrecord_ptg_id_oportunidad", objSumbitCR.id_oportunidad);
-							  customRecFactura.setValue("custrecord_ptg_id_factura", objSumbitCR.id_factura);
-							  customRecFactura.setValue("custrecord_ptg_status", objSumbitCR.status);
-							  customRecFactura.setValue("custrecord_ptg_fecha_creacion", objSumbitCR.fecha);
-							  customRecFactura.setValue("custrecord_ptg_num_viaje_fac_estac", objSumbitCR.registro_pre_liq);
-	
-							  var recIdSaved = customRecFactura.save();
-							  log.debug({
-								title: "Registo de facturacion con error creado",
-								details: "Id Saved: " + recIdSaved,
-							  });
-						}
-						if(tipoServicio == 3){
-							log.audit("TIPOSERVICIO 3");
-							var objSumbitCR = {
-								id_oportunidad: oportunidad,
-								id_factura: jsonData.idinvoice,
-								status: description,
-								fecha: fecha,
-								entity: entity,
-								registro_pre_liq: preLiqCarburacion,
-							}
-							log.audit("objSumbitCR ERROR", objSumbitCR);
-	
-							var customRecFactura = record.create({
-								type: "customrecord_drt_ptg_registro_factura",
-								isDynamic: true,
-							  });
-	
-							  customRecFactura.setValue("custrecord_ptg_id_oportunidad", objSumbitCR.id_oportunidad);
-							  customRecFactura.setValue("custrecord_ptg_id_factura", objSumbitCR.id_factura);
-							  customRecFactura.setValue("custrecord_ptg_status", objSumbitCR.status);
-							  customRecFactura.setValue("custrecord_ptg_fecha_creacion", objSumbitCR.fecha);
-							  customRecFactura.setValue("custrecord_ptg_registro_fac_carburacion", objSumbitCR.registro_pre_liq);
-	
-							  var recIdSaved = customRecFactura.save();
-							  log.debug({
-								title: "Registo de facturacion con error creado",
-								details: "Id Saved: " + recIdSaved,
-							  });
-						}*/
-
-
-
-
 						var objSubmitError = {
 							custbody_psg_ei_template: 123, //PLANTILLA DEL DOCUMENTO ELECTRÓNICO: MySuite outbound invoice template
 							custbody_psg_ei_sending_method: 11, //MÉTODO DE ENVÍO DE DOCUMENTOS ELECTRÓNICOS: MySuite
@@ -1268,17 +963,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						 return;
 					 } else {
 
-						 // proceso de forma correcta
-						 /*resultGUID = nodeResponse.getElementsByTagName({
-							 tagName: 'DocumentGUID'
-						 })[0].textContent;*/
 						 var resultGUID = parsedResponse.cfdiUuid;
-
-						 // Obtiene el Timestamp de la certificación
-						 /*var resultTimeStamp = nodeResponse.getElementsByTagName({
-                            tagName: 'IssuedTimeStamp'
-                        })[0].textContent;
-						log.audit("resultTimeStamp", resultTimeStamp);*/
 						var resultTimeStamp = parsedResponse.dateOfCertification;
 
 						 var responseData1 = xml_response.getElementsByTagName({
@@ -1297,19 +982,6 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						 });
 						 log.audit("newRecord", newRecord);
 						 
-						 // Agrego el registro personalizado
-						  
-						 //newRecord.setValue({
-						 //	fieldId: 'custrecord_drt_json_data',
-						 //	value: JSON.stringify(jsonData)
-						 //});
-						 //newRecord.setValue({
-						 //	fieldId: 'custrecord_drt_base64_xml',
-						 //	value: responseData1
-						 //}); 
-						 
-						 //var resp = {};
-						// var resppdf = {};
 						 if (responseData1) {
 							 log.audit("if responseData1");
 							var respxml = createFile(
@@ -1327,20 +999,6 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 							 log.audit("if responseData1 fin XML", respxml);
 						 }
 						 
-						 /*if (responseData2) {
-							log.audit("if responseData2");
-							var resppdf = createFile(
-								 "PDF_"+nombreInvoice+'_'+resultGUID,
-								 file.Type.PDF,
-								 responseData2,
-								 'PFD Certificado',
-								 file.Encoding.UTF8,
-								 runtime.getCurrentScript().getParameter('custscript_drt_glb_folder')
-							 ) || '';
-							 log.audit("if responseData2 fin PDF", resppdf);
-						 }*/
-
-						 //newRecord.setValue({fieldId: 'custrecord_drt_base64_pdf', value: responseData2});
 						
 						 if (respxml.success) {
 							newRecord.setValue({
@@ -1348,12 +1006,6 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 								value: respxml.data
 							});
 						}
-						 /*if (resppdf.success) {
-							 newRecord.setValue({
-								 fieldId: 'custrecord_drt_pdf_sat',
-								 value: resppdf.data
-							 });
-						 }*/
 						 if (idFileXML.success) {
 							 newRecord.setValue({
 								 fieldId: 'custrecord_drt_doc_xml',
@@ -1361,8 +1013,6 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 							 });
 							 try {
 								 email.send({
-									 //author: 1729,
-									 //author: 37276,
 									 author: 'jose.fernandez@disruptt.mx',
 									 recipients: 'jose.fernandez@disruptt.mx',
 									 subject: 'Timbrado PotoGas ' + jsonData.rfcemisor,
@@ -1403,15 +1053,8 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 								 'custbody_mx_cfdi_certify_timestamp': parsedResponse.dateOfCertification,
 								 'custbody_psg_ei_certified_edoc': respxml.data,
 								 'custbody_psg_ei_generated_edoc': "",
-								 //'custbody_edoc_generated_pdf': resppdf.data,
-								 //'custbody_mx_cfdi_usage': context.request.parameters.custbody_mx_cfdi_usage,
-								// 'custbody_psg_ei_template': 123,
-								// 'custbody_psg_ei_sending_method': 11,
-								// 'custbody_psg_ei_status': 3,
-								 'custbody_ptg_registro_facturacion': recIdSaved,
+								 //'custbody_ptg_registro_facturacion': recIdSaved,
 								 'custbody_mx_cfdi_cadena_original': parsedResponse.cfdiCadenaOriginal,
-								 //'custbody_mx_cfdi_folio':'CUSTINVC13605',
-								 //'custbody_mx_cfdi_issue_datetime': parsedResponse.dateOfCertification,
 								 'custbody_mx_cfdi_issuer_serial': parsedResponse.noCertificado,
 								 'custbody_mx_cfdi_qr_code': parsedResponse.cfdiQrCode,
 								 'custbody_mx_cfdi_sat_serial': parsedResponse.noCertificadoSat,
@@ -1460,29 +1103,6 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 			 
 			 if (!test) {
 				 log.audit("!test, !test");
-				 // Actualizo las transaaciones con los datos de la factura global
-				/* if (resp.success) {
-					 log.audit("resp.success");
-					 newRecord.setValue({
-						 fieldId: 'custrecord_drt_xml_sat',
-						 value: resp.data
-					 });
-				 }
-				 if (resppdf.success) {
-					 log.audit("resppdf.success");
-					 newRecord.setValue({
-						 fieldId: 'custrecord_drt_pdf_sat',
-						 value: resp.data
-					 });
-				 }
-				 if (idFileXML.success) {
-					 log.audit("idFileXML.success");
-					 newRecord.setValue({
-						 fieldId: 'custrecord_drt_doc_xml',
-						 value: idFileXML.data
-					 });
-				 }*/
-				// for (var i = 0; i < jsonData.items.length; i++) {
 
 					var invoiceObj = record.load({
                         type: search.Type.INVOICE,
@@ -1524,13 +1144,11 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						custrecord_ptg_id_oportunidad: oportunidad,
 						custrecord_ptg_id_factura: jsonData.idinvoice,
 						custrecord_ptg_cliente_facturado: entity,
-						//custrecord_ptg_pdf_generado: resppdf.data,
 						custrecord_ptg_xml_generado: respxml.data,
 						custrecord_ptg_documento_xml: idFileXML.data,
 						custrecord_ptg_status: 'Success',
 						custrecord_ptg_fecha_creacion: fecha,
 						custrecord_ptg_tipos_pagos: tiposDePagos,
-						//entity: entity,
 					}
 
 					if(tipoServicio == 1){
@@ -1554,129 +1172,6 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						values: objSumbitCR,
 					})
 
-					/*if(tipoServicio == 1){
-						var objSumbitCR = {
-							id_oportunidad: oportunidad,
-							id_factura: jsonData.idinvoice,
-							documento_pdf_cert: resppdf.data,
-							documento_xml_cert: respxml.data,
-							documento_xml: idFileXML.data,
-							status: 'Success',
-							fecha: fecha,
-							entity: entity,
-							registro_pre_liq: preLiqCilindro,
-						}
-						log.audit("objSumbitCR", objSumbitCR);
-	
-						var customRecFactura = record.create({
-							type: "customrecord_drt_ptg_registro_factura",
-							isDynamic: true,
-						  });
-				  
-						  customRecFactura.setValue("custrecord_ptg_id_oportunidad", objSumbitCR.id_oportunidad);
-						  customRecFactura.setValue("custrecord_ptg_id_factura", objSumbitCR.id_factura);
-						  customRecFactura.setValue("custrecord_ptg_pdf_generado", objSumbitCR.documento_pdf_cert);
-						  customRecFactura.setValue("custrecord_ptg_xml_generado", objSumbitCR.documento_xml_cert);
-						  customRecFactura.setValue("custrecord_ptg_documento_xml", objSumbitCR.documento_xml);
-						  customRecFactura.setValue("custrecord_ptg_status", objSumbitCR.status);
-						  customRecFactura.setValue("custrecord_ptg_fecha_creacion", objSumbitCR.fecha);
-						  customRecFactura.setValue("custrecord_ptg_num_viaje_fac_", objSumbitCR.registro_pre_liq);
-				  
-						  var recIdSaved = customRecFactura.save();
-						  log.debug({
-							title: "Registo de facturacion creado",
-							details: "Id Saved: " + recIdSaved,
-						  });
-					}
-
-					if(tipoServicio == 2){
-						var objSumbitCR = {
-							id_oportunidad: oportunidad,
-							id_factura: jsonData.idinvoice,
-							documento_pdf_cert: resppdf.data,
-							documento_xml_cert: respxml.data,
-							documento_xml: idFileXML.data,
-							status: 'Success',
-							fecha: fecha,
-							entity: entity,
-							registro_pre_liq_esta: preLiqEstacionario,
-						}
-						log.audit("objSumbitCR", objSumbitCR);
-	
-						var customRecFactura = record.create({
-							type: "customrecord_drt_ptg_registro_factura",
-							isDynamic: true,
-						  });
-				  
-						  customRecFactura.setValue("custrecord_ptg_id_oportunidad", objSumbitCR.id_oportunidad);
-						  customRecFactura.setValue("custrecord_ptg_id_factura", objSumbitCR.id_factura);
-						  customRecFactura.setValue("custrecord_ptg_pdf_generado", objSumbitCR.documento_pdf_cert);
-						  customRecFactura.setValue("custrecord_ptg_xml_generado", objSumbitCR.documento_xml_cert);
-						  customRecFactura.setValue("custrecord_ptg_documento_xml", objSumbitCR.documento_xml);
-						  customRecFactura.setValue("custrecord_ptg_status", objSumbitCR.status);
-						  customRecFactura.setValue("custrecord_ptg_fecha_creacion", objSumbitCR.fecha);
-						  customRecFactura.setValue("custrecord_ptg_num_viaje_fac_estac", objSumbitCR.registro_pre_liq_esta);
-				  
-						  var recIdSaved = customRecFactura.save();
-						  log.debug({
-							title: "Registo de facturacion creado",
-							details: "Id Saved: " + recIdSaved,
-						  });
-					}
-
-					if(tipoServicio == 3){
-						var objSumbitCR = {
-							id_oportunidad: oportunidad,
-							id_factura: jsonData.idinvoice,
-							documento_pdf_cert: resppdf.data,
-							documento_xml_cert: respxml.data,
-							documento_xml: idFileXML.data,
-							status: 'Success',
-							fecha: fecha,
-							entity: entity,
-							registro_pre_liq_carb: preLiqCarburacion,
-						}
-						log.audit("objSumbitCR", objSumbitCR);
-	
-						var customRecFactura = record.create({
-							type: "customrecord_drt_ptg_registro_factura",
-							isDynamic: true,
-						  });
-				  
-						  customRecFactura.setValue("custrecord_ptg_id_oportunidad", objSumbitCR.id_oportunidad);
-						  customRecFactura.setValue("custrecord_ptg_id_factura", objSumbitCR.id_factura);
-						  customRecFactura.setValue("custrecord_ptg_pdf_generado", objSumbitCR.documento_pdf_cert);
-						  customRecFactura.setValue("custrecord_ptg_xml_generado", objSumbitCR.documento_xml_cert);
-						  customRecFactura.setValue("custrecord_ptg_documento_xml", objSumbitCR.documento_xml);
-						  customRecFactura.setValue("custrecord_ptg_status", objSumbitCR.status);
-						  customRecFactura.setValue("custrecord_ptg_fecha_creacion", objSumbitCR.fecha);
-						  customRecFactura.setValue("custrecord_ptg_registro_fac_carburacion", objSumbitCR.registro_pre_liq_carb);
-				  
-						  var recIdSaved = customRecFactura.save();
-						  log.debug({
-							title: "Registo de facturacion creado",
-							details: "Id Saved: " + recIdSaved,
-						  });
-					}*/
-
-					
-
-
-					  //Traza de documento electrónico
-/*					  var customRecAuditoria = record.create({
-						type: "customrecord_psg_ei_audit_trail",
-						isDynamic: true,
-					  });
-					  customRecAuditoria.setValue("custrecord_psg_ei_audit_transaction", objSumbitCR.id_factura);
-					  customRecAuditoria.setValue("custrecord_psg_ei_audit_entity", objSumbitCR.entity);
-					  customRecAuditoria.setValue("custrecord_psg_ei_audit_event", 3);
-					  customRecAuditoria.setValue("custrecord_psg_ei_audit_owner", runtime.getCurrentUser().id);
-					  customRecAuditoria.setValue("custrecord_psg_ei_audit_details", "Documento electrónico correctamente certificado");
-					  var recIdSavedAuditoria = customRecAuditoria.save();
-					  log.debug({
-						title: "Registro de traza de facturacion creado",
-						details: "Id Saved: " + recIdSavedAuditoria,
-					  });*/
 
 					  var objSubmit = {
 						custbody_mx_cfdi_uuid: resultGUID,
@@ -1686,30 +1181,8 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						custbody_psg_ei_status: 3, //ESTADO DEL DOCUMENTO ELECTRÓNICO (Para generación)
 						custbody_ptg_registro_facturacion: recIdSaved,
 						custbody_ptg_rfc_facturado: jsonData.rfcrecepFin,
-						// custbody_mx_cfdi_usage: value1,
-						// custbody_mx_txn_sat_payment_method: value2,
-						// custbody_mx_txn_sat_payment_term: value3,
 					};
 					log.audit("objSubmit", objSubmit);
-
-					/* if (runtime.getCurrentScript().getRemainingUsage() <= 3000 && (i + 1) < jsonData.items.length) {
-						 log.audit("runtime.getCurrentScript().getRemainingUsage() <= 3000 && (i + 1) < jsonData.items.length)");
-						 var status = task.create({
-							 taskType: task.TaskType.SCHEDULED_SCRIPT,
-							 scriptId: runtime.getCurrentScript().id,
-							 deploymentId: runtime.getCurrentScript().deploymentId,
-							 params: {
-								 custscript_drt_glb_uuid: resultGUID,
-								 custscript_drt_glb_folio: jsonData.idsetfol
-							 }
-						 });
-						 if (status == 'QUEUED') {
-							 return;
-						 }
-					 }*/
-					 // var value1 = runtime.getCurrentScript().getParameter('custscript_drt_glb_usagecfdi');
-					 // var value2 = runtime.getCurrentScript().getParameter('custscript_drt_glb_payform_sat');
-					 // var value3 = runtime.getCurrentScript().getParameter('custscript_drt_glb_paymethod_sat');
 
 					 var id = record.submitFields({
 						 type: record.Type.INVOICE,
