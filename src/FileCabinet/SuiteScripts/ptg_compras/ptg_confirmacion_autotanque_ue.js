@@ -410,6 +410,13 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                             value: arrayPo[po]['litros'],
                                             line: k
                                         });
+                                        
+                                        recepcion2.setCurrentSublistValue({
+                                            sublistId: 'item',
+                                            fieldId: 'rate',
+                                            value: arrayPo[po]['rate'],
+                                            line: k
+                                        });
                                     } else {
                                         recepcion2.setCurrentSublistValue({
                                             sublistId: 'item',
