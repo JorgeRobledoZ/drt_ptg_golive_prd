@@ -27,7 +27,11 @@ define(["N/search", 'N/ui/message', 'N/ui/dialog', 'N/error'], function (search,
                         ["custrecord_ptg_numembarqueprogram_", "is", embarqueP]
                     ],
                     columns: [
-                        search.createColumn({name: "internalid", label: "Internal ID"}),
+                        search.createColumn({
+                            name: "internalid",
+                            sort: search.Sort.DESC,
+                            label: "Internal ID"
+                        }),
                         search.createColumn({
                             name: "custrecord_ptg_numembarqueprogram_",
                             label: "PTG - #Embarque Programado"
@@ -133,6 +137,11 @@ define(["N/search", 'N/ui/message', 'N/ui/dialog', 'N/error'], function (search,
                 var searchResultCount = customrecord_ptg_detalleentradatranspo_SearchObj.run().getRange(0, 1);
                 log.audit('searchResultCount', searchResultCount)
                 if (searchResultCount.length > 0) {
+                    for(var h in searchResultCount){
+                        log.audit('g', searchResultCount[h].getValue({
+                            name: 'custrecord_ptg_nombrechofer_'
+                        }))
+                    }
                     var plantaO = searchResultCount[0].getValue({
                         name: 'custrecord_ptg_plantaoriginal_'
                     });
