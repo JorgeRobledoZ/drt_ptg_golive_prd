@@ -12,17 +12,25 @@ $("#tipoDireccion").on('change', function(e) {
         $('.direccion-entrega').removeClass('d-none');
         $("input[name=tipoAccionFormCliente]").trigger("change");
         // $('#tipoServicioFormCliente').val("").trigger('change');
+        if ( userRoleId == idAgenteHEB ) {
+            $('.campos-contrato').removeClass('d-none');
+        }
     } else if ( val == tipoDirSoloFacturacion ) {// Sólo facturación
         $('.direccion-entrega').addClass('d-none');
         $('.tipo-aviso-programado').addClass('d-none');
         // $("input[name=tipoAccionFormCliente]").trigger("change");
         $('#tipoServicioFormCliente').val("").trigger('change');
+        $('.campos-contrato').addClass('d-none');
+        $('#requiereContrato2').prop('checked', true).trigger("change");
 
     } else {// Se ocultan todos los campos de entre calles para abajo
         $('.direccion-entrega').addClass('d-none');
         $('.tipo-aviso-programado').addClass('d-none');
         // $("input[name=tipoAccionFormCliente]").trigger("change");
         $('#tipoServicioFormCliente').val("").trigger('change');
+        $('.campos-contrato').addClass('d-none');
+        $('#requiereContrato2').prop('checked', true).trigger("change");
+
     }
 });
 

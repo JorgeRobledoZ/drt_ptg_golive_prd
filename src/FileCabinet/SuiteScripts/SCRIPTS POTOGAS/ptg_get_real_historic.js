@@ -14,6 +14,7 @@ define(['N/search', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (se
     function _get(request) {
 
         try {
+            log.debug('Request', request)
             var customVars = drt_mapid_cm.getVariables();
             var transactionSearchObj = search.create({
                 type: "transaction",
@@ -29,7 +30,8 @@ define(['N/search', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (se
                     "AND", 
                     ["custbody_ptg_estado_pedido","anyof",customVars.statusPedidoEntregado],
                     "AND", 
-                    ["shippingaddress.internalid","anyof",request.idAddress]
+                    ["custbody_ptg_id_direccion_envio", "is", request.idAddress]
+                    // ["shippingaddress.internalid","anyof",request.idAddress]
                 ],
                 columns:
                 [
@@ -42,7 +44,8 @@ define(['N/search', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (se
                       label: "ID interno"
                    }),*/
                     search.createColumn({name: "quantity", label: "Cantidad"}),
-                    search.createColumn({name: "total", label: "Importe (total de transacción)"})
+                    search.createColumn({name: "total", label: "Importe (total de transacción)"}),
+                    search.createColumn({name: "tranid", label: "OPORTUNIDAD #"})
                 ]
             });
             var contador = transactionSearchObj.runPaged().count;
@@ -67,6 +70,7 @@ define(['N/search', 'SuiteScripts/drt_custom_module/drt_mapid_cm'], function (se
                             articulo: results[i].getText(columnas[2]),                   
                             cantidad: results[i].getValue(columnas[3]),
                             total: results[i].getValue(columnas[4]),
+                            num_documento: results[i].getValue(columnas[5]),
                         }
                         arrayData.push(data);
                    }

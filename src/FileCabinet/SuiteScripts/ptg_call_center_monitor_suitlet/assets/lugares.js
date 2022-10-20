@@ -22,6 +22,11 @@ $("#editarDireccion").click(function() {
     if(loadColonias) {
         infoMsg('warning', 'Aun están cargando los datos para direcciones, favor de esperar un momento');
     } else {
+        // $('.campos-contrato').addClass('d-none');
+
+        // if ( userRoleId == idAgenteHEB ) {
+        //     $('.campos-contrato').removeClass('d-none');
+        // }
         let direccion = $('#direccionCliente').children(':selected').data('address');
         $("#tipoAccionDireccion").val('guardar');
         let periodo = '';
@@ -182,6 +187,7 @@ $("#editarDireccion").click(function() {
             $("#formDireccionesModal").modal("show");
             swal.close();     
         }
+        $('#tipoServicioFormCliente').trigger("change");
         console.log(direccion);
     }
 });
@@ -491,17 +497,26 @@ function setDataRutas(items, elem, trigger = true) {
     }
 }
 
-// Se debe modificar la ruta dependiendo del tipo de servicio
+/**
+ *  Se debe modificar la ruta dependiendo del tipo de servicio
+ *  Si el tipo de servicio es estacionario, que te habilite el input de requiere contrato
+ *  Caso contrario, inhabilitar dicho input y marcarlo como que no requiere contrato
+ */
 $('select#tipoServicioFormCliente').on('change', function(e) {
     let val = $(this).val();
     $('.art-fre-est').addClass('d-none');
     $('.art-fre-cil').addClass('d-none');
     $('.art-fre-mon').addClass('d-none');
     if ( val == idCilindro ) {// Cilindros
+        $("input[name=requiereContrato]").prop("disabled", true);
+        $('#requiereContrato2').prop('checked', true).trigger("change");
         $('.art-fre-cil').removeClass('d-none');
     } else if ( val == idEstacionario ) {// Estacionarios
+        $("input[name=requiereContrato]").prop("disabled", false);
         $('.art-fre-est').removeClass('d-none');
     } else if ( val == idMontacarga ) {// montacarga
+        $("input[name=requiereContrato]").prop("disabled", true);
+        $('#requiereContrato2').prop('checked', true).trigger("change");
         $('.art-fre-mon').removeClass('d-none');
     }
 

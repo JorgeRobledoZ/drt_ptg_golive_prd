@@ -192,7 +192,7 @@ function setCustomerInfo(customer, idAddress = null) {
     $('#notasCliente').text(customer.notasCustomer ? customer.notasCustomer : 'Sin notas');
     $('#tipoCliente').text(customer.typeCustomer);
     $('#razonSocialPedido').val(customer.razonSocialFact);
-    $('#razonSocialPedido').data('title',customer.razonSocialFact);
+    $('#razonSocialPedido').prop('title',customer.razonSocialFact);
     $('#rfcPedido').val(customer.rfc);
     $("#requiereFacturaPedido").prop("checked", false).trigger("change");
     // Campos del formulario quejas y fugas
@@ -289,11 +289,13 @@ function getRealHistoric() {
 
     setAjax(settings).then((response) => {
         let auxData = {},
-            auxDataArray = [];
+        auxDataArray = [];
+
         response.data.forEach(element => {
-            if(!auxData[element.id]) {
+            if(! auxData[element.id] ) {
                 auxData[element.id] = {
                     id: element.id,
+                    num_documento: element.num_documento,
                     fecha_cierre: element.fecha_cierre,
                     total: element.total,
                     articulos: [{
@@ -318,22 +320,23 @@ function getRealHistoric() {
         auxDataArray.forEach(element => {
             let tr ='<tr>'+
                         '<td class="ion-text-center sticky-col"></td>'+
-                        '<td class="ion-text-center">'+element.id+'</td>'+
+                        '<td class="ion-text-center">'+element.num_documento+'</td>'+
+                        // '<td class="ion-text-center">'+element.id+'</td>'+
                         '<td class="ion-text-center">'+element.fecha_cierre+'</td>'+
                         '<td class="ion-text-center">';
 
-                element.articulos.forEach(element2 => {
-                    tr +=       '<li>'+element2.nombre + '  *  ' + element2.cantidad +'</li>';
-                });
-                tr +=   '</td>'+
-                        '<td class="ion-text-center">$'+element.total+'</td>'+
-                    '</tr>';
+            element.articulos.forEach(element2 => {
+                tr +=       '<li>'+element2.nombre + '  *  ' + element2.cantidad +'</li>';
+            });
+            tr += '</td>'+
+                    '<td class="ion-text-center">$'+element.total+'</td>'+
+                '</tr>';
+            
             $("#table-historico-consumos tbody").append(tr);   
         });
-        if(auxDataArray.length == 0) {
-            $("#table-historico-consumos tbody").append('<tr>'+
-                                                            '<td colspan="5" class="text-center">Sin histórico encontrado</td>'+
-                                                        '</tr>');   
+
+        if( auxDataArray.length == 0 ) {
+            $("#table-historico-consumos tbody").append('<tr><td colspan="5" class="text-center">Sin histórico encontrado</td></tr>');   
         }
         console.log(auxDataArray);
     }).catch((error) => {
@@ -1014,7 +1017,9 @@ function clearCustomerInfo () {
     $('div#historic-data table.table-gen tbody').children('tr').remove();
 
     // Se remueven los datos personalizados del cliente del form de pedidos
-    $('#desdePedido, #hastaPedido, #zonaVentaPedido').val('');
+    $('#desdePedido, #hastaPedido, #zonaVentaPedido, #razonSocialPedido, #rfcPedido').val('');
+    $('#razonSocialPedido').prop('title', 'Razón Social');
+    $("#requiereFacturaPedido").prop("checked", false).trigger("change");
 
     // Se remueven los datos personalizados del cliente en quejas y figas
     $('#emailFugaQueja, #telefonoFugaQueja').val('');

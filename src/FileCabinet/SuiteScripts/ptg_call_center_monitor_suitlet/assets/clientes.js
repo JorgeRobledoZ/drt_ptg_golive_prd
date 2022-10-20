@@ -634,6 +634,7 @@ function saveCustomer() {
     let numFact          = 0;
     let numEnt           = 0;
     let numEntFact       = 0;
+    let validaPrincipal  = true;
     /**
      * Si es un cliente nuevo:
      * Debe existir al menos una dirección de entrega, pero si el cliente requiere factura, 
@@ -650,8 +651,19 @@ function saveCustomer() {
 
                 if ( trAdd.tipoDireccion == tipoDirEntFact ) { numEntFact ++; }
                 else if ( trAdd.tipoDireccion == tipoDirSoloEntrega ) { numEnt ++; }
-                else if ( trAdd.tipoDireccion == tipoDirSoloFacturacion ) { numFact ++; }
+                else if ( trAdd.tipoDireccion == tipoDirSoloFacturacion ) {
+                    numFact ++; 
+                    if ( trAdd.principal ) {
+                        validaPrincipal = false;
+                    }
+                }
             });
+
+            // La dirección de sólo facturación no puede ser marcada como principal
+            if ( !validaPrincipal ) {
+                infoMsg('warning', 'La dirección de sólo facturación no puede ser marcada como principal');
+                return;
+            }
 
             if ( requiereFactura ) {// Requiere al menos una de facturación y una de entrega
                 if ( numEntFact > 0 ) {
