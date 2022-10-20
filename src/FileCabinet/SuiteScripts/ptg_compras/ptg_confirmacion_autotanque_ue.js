@@ -752,7 +752,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
 
                         /**************Proceso de Creacion de Orden de traslado****************** */
 
-                        if (arrayPo[po]['planta_desvio'] || arrayPo[po]['cliente_desvio']) {
+                        if (arrayPo[po]['tipo_desvio'] == 1 || arrayPo[po]['tipo_desvio'] == 2) {
                             try {
                                 let createTransferOrder = record.create({
                                     type: record.Type.TRANSFER_ORDER,
@@ -1249,7 +1249,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                     if (arrayPo[po]['tipo_desvio'] == 4) {
                                         invoiceInter.setValue({
                                             fieldId: 'location',
-                                            value: arrayPo[po]['location']
+                                            value: idAlmacenVirtual 
                                         });
                                     } else {
                                         invoiceInter.setValue({
@@ -1324,7 +1324,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                         var lineas = loadSo.getLineCount('item');
                                         var ubicacion_linea = 0;
                                         if (arrayPo[po]['tipo_desvio'] == 4) {
-                                            ubicacion_linea = arrayPo[po]['location'];
+                                            ubicacion_linea = idAlmacenVirtual;
                                         } else {
                                             ubicacion_linea = ubicacion_intercompany_invoice
                                         }
@@ -1424,9 +1424,17 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                                 value: arrayPo[po]['subsidiaria_linea']
                                             });
 
+                                            var ubicacion = 0;
+                                            
+                                            if (arrayPo[po]['tipo_desvio'] == 4) {
+                                                ubicacion = idAlmacenVirtual;
+                                            } else {
+                                                ubicacion = arrayPo[po]['planta_desvio']
+                                            }
+
                                             billInter.setValue({
                                                 fieldId: 'location',
-                                                value: arrayPo[po]['planta_desvio']
+                                                value: ubicacion
                                             });
 
                                             billInter.setValue({
