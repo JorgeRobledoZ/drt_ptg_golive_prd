@@ -117,8 +117,9 @@ define(["N/search", 'N/ui/dialog'], function (search, dialog) {
             if (sublistName === 'recmachcustrecord_ptg_det_entradatranspo_' && sublistFieldName === 'custrecord_ptg_kgspemex_') {
                 //custrecord_ptg_kgspemex_
                 var kgsPemex = currentRecord.getCurrentSublistValue('recmachcustrecord_ptg_det_entradatranspo_', 'custrecord_ptg_kgspemex_') || '';
-
-                var total = kgsPemex / .505;
+                var dencidad = currentRecord.getCurrentSublistValue('recmachcustrecord_ptg_det_entradatranspo_', 'custrecord_ptg_densidad') || '';
+                debugger;
+                var total = kgsPemex / dencidad;
                 total = total.toFixed(3)
 
                 currentRecord.setCurrentSublistValue('recmachcustrecord_ptg_det_entradatranspo_', 'custrecord_ptg_litros_', total);
