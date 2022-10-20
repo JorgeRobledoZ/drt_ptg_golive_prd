@@ -261,13 +261,6 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "N/record", "N/search"], 
                                             value: idRecepcion,
                                             line: y
                                         });
-
-                                        registro.setSublistValue({
-                                            sublistId: 'item',
-                                            fieldId: 'custcol_ptg_proceso_terminado',
-                                            value: true,
-                                            line: y
-                                        });
                                     }
                                 }
                             }
