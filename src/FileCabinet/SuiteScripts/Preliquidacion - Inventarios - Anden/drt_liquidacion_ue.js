@@ -46,6 +46,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             log.audit("conteoRestriccion", conteoRestriccion);
             var prepagosSinAplicar = parseInt(recObj.getValue("custrecord_ptg_prepago_sin_aplicar_cil"));
             var montoDesgloseEfec = recObj.getValue("custrecord_ptg_monto_totalizador");
+            var etapaMensaje = recObj.getValue("custrecord_ptg_plc_etapa");
 
             var efectivoId = 0;
             var prepagoBanorteId = 0;
@@ -164,7 +165,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                //BÚSQUEDA GUARDADA: PTG - Registro Facturación Generadas Cil
             var facturasGeneradas = search.create({
                 type: "customrecord_drt_ptg_registro_factura",
-                filters: [["custrecord_ptg_num_viaje_fac_","anyof", recId]],
+                filters: [["custrecord_ptg_num_viaje_fac_","anyof", recId], "AND", 
+                ["isinactive","is","F"]],
                 columns: [
                    search.createColumn({name: "scriptid", sort: search.Sort.ASC, label: "ID de script"})
                 ]
@@ -239,13 +241,24 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                     //     label: "Eliminar Preliquidación",
                     //     functionName: "redirectToEliminar()",
                     // });
-                } else if (status == estatusFacturacion) {
+                } else if (status == estatusFacturacion && etapaMensaje == 2 && facturasGeneradasErrorResultCount > 0){
+                    form.addButton({
+                        id: "custpage_drt_to_facturar_solo",
+                        label: "Reprocesar Facturación",
+                        functionName: "facturarOportunidad()",
+                    });
                     form.addButton({
                         id: "custpage_drt_to_nuevo_viaje_solo",
                         label: "Nuevo Viaje",
                         functionName: "redirectToNuevoViaje()",
                     });
-                }
+                }  else if (status == estatusFacturacion) {
+                    form.addButton({
+                        id: "custpage_drt_to_nuevo_viaje_solo",
+                        label: "Nuevo Viaje",
+                        functionName: "redirectToNuevoViaje()",
+                    });
+                } 
              
 
                 if (status == estatusFacturacion) {
@@ -369,7 +382,6 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
                 }
             }
             form.clientScriptModulePath = "./drt_preliq_liquidacion_cs.js";
-            //form.clientScriptModulePath = "../SuiteBundles/Bundle 426938/drt_preliq_liquidacion_cs.js";
 
         } catch (error) {
             log.error("ERROR", error);
