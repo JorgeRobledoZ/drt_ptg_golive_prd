@@ -857,10 +857,6 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						});
 						var oportunidad = invoiceObj.getValue("opportunity");
 						log.audit("OPORTUNIDAD ERROR", oportunidad);
-						var fecha = invoiceObj.getValue("createddate");
-						log.audit("FECHA ERROR", fecha);
-						var entity = invoiceObj.getValue("entity");
-						log.audit("entity", entity);
 						var preLiqCilindro = invoiceObj.getValue("custbody_ptg_registro_pre_liq");
 						log.audit("preLiqCilindro", preLiqCilindro);
 						var preLiqEstacionario = invoiceObj.getValue("custbody_ptg_registro_pre_liq_esta");
@@ -875,26 +871,12 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						log.audit("tiposDePagos", tiposDePagos);
 						var liqViejaEspecial = invoiceObj.getValue("custbody_ptg_liq_viaje_especial");
 						log.audit("liqViejaEspecial", liqViejaEspecial);
-
-
-						var customRecFactura = record.create({
-							type: "customrecord_drt_ptg_registro_factura",
-							isDynamic: true,
-						});
-						var recIdSaved = customRecFactura.save();
-						log.debug({
-							title: "Registro de facturacion con error creado",
-							details: "Id Saved: " + recIdSaved,
-						});
+						var recIdSaved = invoiceObj.getValue("custbody_ptg_registro_facturacion");
+						log.audit("recIdSaved", recIdSaved);
 
 
 						var objSumbitCR = {
-							custrecord_ptg_id_oportunidad: oportunidad,
-							custrecord_ptg_id_factura: jsonData.idinvoice,
-							custrecord_ptg_cliente_facturado: entity,
 							custrecord_ptg_status: description,
-							custrecord_ptg_fecha_creacion: fecha,
-							custrecord_ptg_tipos_pagos: tiposDePagos,
 						}
 
 						if(tipoServicio == 1){
@@ -921,7 +903,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 							custbody_psg_ei_template: 123, //PLANTILLA DEL DOCUMENTO ELECTRÓNICO: MySuite outbound invoice template
 							custbody_psg_ei_sending_method: 11, //MÉTODO DE ENVÍO DE DOCUMENTOS ELECTRÓNICOS: MySuite
 							custbody_psg_ei_status: 5, //ESTADO DEL DOCUMENTO ELECTRÓNICO (Error en la generación)
-							custbody_ptg_registro_facturacion: recIdSaved,
+							//custbody_ptg_registro_facturacion: recIdSaved,
 							custbody_ptg_rfc_facturado: jsonData.rfcrecepFin,
 						};
 						log.audit("objSubmitError aqui salia error", objSubmitError);
@@ -1108,12 +1090,6 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
                         type: search.Type.INVOICE,
                         id: jsonData.idinvoice,
                     });
-                    var oportunidad = invoiceObj.getValue("opportunity");
-                    log.audit("oportunidad", oportunidad);
-					var fecha = invoiceObj.getValue("createddate");
-					log.audit("fecha", fecha);
-					var entity = invoiceObj.getValue("entity");
-					log.audit("entity", entity);
 					var preLiqCilindro = invoiceObj.getValue("custbody_ptg_registro_pre_liq");
 					log.audit("preLiqCilindro", preLiqCilindro);
 					var preLiqEstacionario = invoiceObj.getValue("custbody_ptg_registro_pre_liq_esta");
@@ -1128,27 +1104,13 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 					log.audit("tiposDePagos", tiposDePagos);
 					var liqViejaEspecial = invoiceObj.getValue("custbody_ptg_liq_viaje_especial");
 					log.audit("liqViejaEspecial", liqViejaEspecial);
-
-					var customRecFactura = record.create({
-						type: "customrecord_drt_ptg_registro_factura",
-						isDynamic: true,
-					});
-
-					var recIdSaved = customRecFactura.save();
-					log.debug({
-						title: "Registro de facturacion creado",
-						details: "Id Saved: " + recIdSaved,
-					});
+					var recIdSaved = invoiceObj.getValue("custbody_ptg_registro_facturacion");
+					log.audit("recIdSaved", recIdSaved);
 
 					var objSumbitCR = {
-						custrecord_ptg_id_oportunidad: oportunidad,
-						custrecord_ptg_id_factura: jsonData.idinvoice,
-						custrecord_ptg_cliente_facturado: entity,
 						custrecord_ptg_xml_generado: respxml.data,
 						custrecord_ptg_documento_xml: idFileXML.data,
 						custrecord_ptg_status: 'Success',
-						custrecord_ptg_fecha_creacion: fecha,
-						custrecord_ptg_tipos_pagos: tiposDePagos,
 					}
 
 					if(tipoServicio == 1){
@@ -1179,7 +1141,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						custbody_psg_ei_certified_edoc: idFileXML.data, //DOCUMENTO ELECTRÓNICO CERTIFICADO (NO CERTIFICADO)
 						//custbody_edoc_generated_pdf: resppdf.data, //PDF GENERDO
 						custbody_psg_ei_status: 3, //ESTADO DEL DOCUMENTO ELECTRÓNICO (Para generación)
-						custbody_ptg_registro_facturacion: recIdSaved,
+						//custbody_ptg_registro_facturacion: recIdSaved,
 						custbody_ptg_rfc_facturado: jsonData.rfcrecepFin,
 					};
 					log.audit("objSubmit", objSubmit);
