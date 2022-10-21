@@ -364,7 +364,7 @@
                         recOportunidad.setValue("custbody_ptg_zonadeprecioop_", zonaPrecio);
                         recOportunidad.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
                         recOportunidad.setValue("shipaddresslist", internalIdDireccion);
-                        recOportunidad.setValue("custbody_ptg_id_direccion_envio", direccionID);
+                        recOportunidad.setValue("custbody_ptg_id_direccion_envio", idDireccionCliente);
                         for (var i = 0; i < 1; i++) {
                             recOportunidad.selectLine("item", i);
                             recOportunidad.setCurrentSublistValue("item", "item", articulo);
@@ -402,7 +402,7 @@
                         type: "customrecord_ptg_registro_servicios_ci_l",
                         values: regServCilUpdate,
                     });
-                 } else{
+                 } else {
                     objPagos = {
                         metodo_txt: formaPagoTXT,
                         tipo_pago: formaPago,
@@ -430,6 +430,7 @@
                     recOportunidad.setValue("custbody_ptg_cliente_solicita_factura", solicitaFactura);
                     recOportunidad.setValue("custbody_razon_social_para_facturar", nombreClienteAFacturar);
                     recOportunidad.setValue("shipaddresslist", internalIdDireccion);
+                    recOportunidad.setValue("custbody_ptg_id_direccion_envio", idDireccionCliente);
                     for (var i = 0; i < 1; i++) {
                         recOportunidad.selectLine("item", i);
                         recOportunidad.setCurrentSublistValue("item", "item", articulo);
