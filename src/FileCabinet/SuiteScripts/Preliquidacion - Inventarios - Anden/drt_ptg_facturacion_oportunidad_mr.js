@@ -140,16 +140,42 @@
                             var link = https.get({
                                 url: urlStlt
                             });
+                            log.audit("link", link);
                         } else {
                             log.debug("Esta factura esta ok", idTransaccion);
                         }
+                        // context.write({
+                        //     key: idTransaccion,
+                        //     value: {crear_pago: "false"}
+                        // });
+                    } else {
+                        log.emergency("Esta factura no tiene registro de facturacion: ", idTransaccion);
+                    }
+
+                    //SS: PTG - Pago a factura
+                    var pagoAFacturaObj = search.create({
+                        type: "customerpayment",
+                        filters: [
+                           ["type","anyof","CustPymt"], "AND", 
+                           ["mainline","is","F"], "AND", 
+                           ["paidtransaction","anyof",idTransaccion]
+                        ],
+                        columns: [
+                           search.createColumn({name: "paidtransaction", label: "Transacción paga"})
+                        ]
+                     });
+                     var pagoAFacturaCount = pagoAFacturaObj.runPaged().count;
+                     if(pagoAFacturaCount > 0){
                         context.write({
                             key: idTransaccion,
                             value: {crear_pago: "false"}
                         });
-                    } else {
-                        log.emergency("Esta factura no tiene registro de facturacion: ", idTransaccion);
-                    }
+                     } else {
+                        context.write({
+                            key: idTransaccion,
+                            value: {crear_pago: "true"}
+                        });
+                     }
     
                 }
             } else {
@@ -334,7 +360,7 @@
                     type: search.Type.CUSTOMER,
                     id: cliente
                 });
-                var clienteAFacturar = clienteObj.getValue("custentity_mx_sat_registered_name");
+                var clienteAFacturar = clienteObj.getValue("custentity_razon_social_para_facturar");
                 nombreClienteAFacturar = clienteAFacturar;
                 var terminosCliente = clienteObj.getValue("terms");
                 var terminos = terminosCliente;
@@ -480,9 +506,7 @@
                     var entityObj = record.load({
                         type: search.Type.CUSTOMER,
                         id: cliente,
-                    });
-                    log.audit("entityObj", entityObj);
-    
+                    });    
                     cfdiCliente = entityObj.getValue("custentity_disa_uso_de_cfdi_") || 3;
                     log.audit("cfdiCliente solicita", cfdiCliente);
                 }
@@ -550,10 +574,31 @@
                 var fecha = invoiceObj.getValue("createddate");
                 var tiposDePagos = invoiceObj.getValue("custbody_ptg_tipos_de_pago");
 
-                var recIdSaved = 0;
+                var registroFacturacion = searchRegistroFacturacion(idOportunidad);
+                log.audit("registroFacturacion", registroFacturacion);
+
+                var recSuccess = registroFacturacion.success;
+                var recIdSaved = registroFacturacion.recIdSaved;
+
+                if(recSuccess){
+                    record.submitFields({
+                        type: "customrecord_drt_ptg_registro_factura",
+                        id: recIdSaved,
+                        values: {
+                            custrecord_ptg_id_factura: recObjID,
+                            custrecord_ptg_cliente_facturado: cliente,
+                            custrecord_ptg_fecha_creacion: fecha,
+                            custrecord_ptg_tipos_pagos: tiposDePagos
+                        },
+                        options: {
+                            enableSourcing: true,
+                            ignoreMandatoryFields: true
+                        }
+                    });
+                }
 
                 //SS: Registro Facturación Oportunidad
-                var registroFacObj = search.create({
+                /*var registroFacObj = search.create({
                     type: "customrecord_drt_ptg_registro_factura",
                     filters: [
                        ["custrecord_ptg_id_oportunidad","anyof",idOportunidad], "AND", 
@@ -563,8 +608,11 @@
                        search.createColumn({name: "internalid", label: "ID interno"})
                     ]
                 });
+                log.debug("registroFacObj", registroFacObj);
                 var registroFacCount = registroFacObj.runPaged().count;
+                log.debug("registroFacCount", registroFacCount);
                 if(registroFacCount > 0){
+                    log.debug("Entra if");
                     var registroFacResult = registroFacObj.run().getRange({
                         start: 0,
                         end: 2,
@@ -586,7 +634,8 @@
                         }
                     });
 
-                } else {
+                }*/ else {
+                    log.debug("Entra else");
                     var customRecFactura = record.create({
                         type: "customrecord_drt_ptg_registro_factura",
                         isDynamic: true,
@@ -627,6 +676,7 @@
                 var link = https.get({
                     url: urlStlt
                 });
+                log.audit("link", link);
     
             }
                 context.write({
@@ -636,6 +686,14 @@
             }
                
         } catch (error) {
+
+            var registroFacturacion = searchRegistroFacturacion(idOportunidad);
+            log.audit("registroFacturacion error map", registroFacturacion);
+
+            var recSuccess = registroFacturacion.success;
+            var recIdSaved = registroFacturacion.recIdSaved;
+
+
             log.error({
                 title: 'error map',
                 details: JSON.stringify(error)
@@ -643,21 +701,24 @@
             objUpdate.custrecord_ptg_error_cilindro = error.message || '';
             objSumbitError.custrecord_ptg_status = error.message;
 
-            var customRecFactura = record.create({
-                type: "customrecord_drt_ptg_registro_factura",
-                isDynamic: true,
-            });
-            var recIdSaved = customRecFactura.save();
-            log.debug({
-                title: "Registro de facturacion con error creado",
-                details: "Id Saved: " + recIdSaved,
-            });
+            if(!recSuccess){
+                var customRecFactura = record.create({
+                    type: "customrecord_drt_ptg_registro_factura",
+                    isDynamic: true,
+                });
+                recIdSaved = customRecFactura.save();
+                log.debug({
+                    title: "Registro de facturacion con error creado",
+                    details: "Id Saved: " + recIdSaved,
+                });
+            }
 
-            record.submitFields({
+            var registroFacUpd = record.submitFields({
                 id: recIdSaved,
                 type: "customrecord_drt_ptg_registro_factura",
                 values: objSumbitError,
-            })
+            });
+            log.error("Registro actualizado factura error map", registroFacUpd);
         } finally {
             var registroCilindros = record.submitFields({
                 type: "customrecord_ptg_preliquicilndros_",
@@ -1040,6 +1101,38 @@
                 title: "error searchMapeoPagos",
                 details: JSON.stringify(error),
             });
+        }
+    }
+
+    function searchRegistroFacturacion(idOportunidad){
+        try {
+            var respuestaRegistroFacturacion = {
+                success: false
+            }
+            //SS: Registro Facturación Oportunidad
+            var registroFacObj = search.create({
+                type: "customrecord_drt_ptg_registro_factura",
+                filters: [
+                   ["custrecord_ptg_id_oportunidad","anyof",idOportunidad], "AND", 
+                   ["custrecord_ptg_id_factura","anyof","@NONE@"],"AND", 
+                   ["isinactive","is","F"]
+                ],
+                columns: [
+                   search.createColumn({name: "internalid", label: "ID interno"})
+                ]
+            });
+            var registroFacCount = registroFacObj.runPaged().count;
+            if(registroFacCount > 0){
+                var registroFacResult = registroFacObj.run().getRange({
+                    start: 0,
+                    end: 2,
+                });
+                respuestaRegistroFacturacion.success = true;
+                respuestaRegistroFacturacion.recIdSaved = Number(registroFacResult[0].getValue({name: "internalid", label: "ID interno"}));
+            }
+            return respuestaRegistroFacturacion;
+        } catch (error) {
+            log.error("error searchRegistroFacturacion", error);
         }
     }
 
