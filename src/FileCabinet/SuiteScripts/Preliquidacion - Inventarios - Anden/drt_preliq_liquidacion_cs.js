@@ -459,7 +459,7 @@
             var urlll = location.href;
             log.audit("urlll_2", urlll);
 
-          var url = location.href + "&cf=" + newForm;
+          var url = location.href + "&cf=" + newForm+"&reload=true";
           log.debug('url_2', url);
           location.replace(url);
       } catch (e) {
@@ -514,7 +514,8 @@
         record.submitFields({
             type: recObj.type,
             id: recObj.id,
-            values: {custrecord_ptg_liquidacion_status : estatusEjecutado}
+            values: {
+              custrecord_ptg_liquidacion_status : estatusEjecutado}
         })
 
         var viajesObj = record.load({
@@ -538,7 +539,7 @@
           var urlll = location.href;
           log.audit("urlll_2", urlll);
 
-        var url = location.href + "&cf=" + newForm;
+        var url = location.href + "&cf=" + newForm+"&reload=true";
         log.debug('url_2', url);
         location.replace(url);
 
@@ -547,7 +548,6 @@
         }
         log.debug("objUrl", objUrl);
 
-        //var urlRedirect = 'https://5298967-sb1.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=486&vehiculo='+vehiculo;
         var urlRedirect = urlCustomRecord+vehiculo+urlCustomRecordFormulario+formularioCilindro;
 
         window.open(urlRedirect, '_blank');
@@ -587,6 +587,14 @@
         id: recObj.id
       });
       log.audit("lookupRecord", recordObj);
+
+      record.submitFields({
+        type: recObj.type,
+        id: recObj.id,
+        values: {
+          custrecord_ptg_plc_etapa : 1
+        }
+      })
 
         var urlStlt = url.resolveScript({
           scriptId: "customscript_drt_ptg_facturacion_opor_sl",
@@ -723,7 +731,7 @@
             var newStr = str.substr(0, limiteURL);
             log.debug("newStr", newStr);
 
-            var url = newStr + "&cf=" + newFormF;
+            var url = newStr + "&cf=" + newFormF+"&reload=true";
             log.debug('url_3', url);
             location.replace(url);
 
