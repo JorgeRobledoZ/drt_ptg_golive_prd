@@ -70,6 +70,11 @@
                 ventaServicioGas = objMap.ventaServicioGas;
                 ventaServicioCilindro = objMap.ventaServicioCilindro;
                 ventaServicio = objMap.ventaServicio;
+
+                envase10 = objMap.envase10;
+                envase20 = objMap.envase20;
+                envase30 = objMap.envase30;
+                envase45 = objMap.envase45;
             }
 
             //LINEA
@@ -247,8 +252,55 @@
             log.audit('Remaining Usage end for servicios facturar', runtime.getCurrentScript().getRemainingUsage());
 
 
+            //DETALLE VENTA DE ENVASES
+            //BÚSQUEDA GUARDADA: DRT PTG - Detalle venta de envases
+            var detalleVentaEnvaseSearch = search.create({
+                type: "customrecord_ptg_regitrodemovs_",
+                filters: [
+                    ["custrecord_ptg_num_viaje_oportunidad","anyof", numViaje], "AND", 
+                    ["custrecord_ptg_cilindro","anyof",envase10,envase20,envase30,envase45], "AND", 
+                    ["custrecord_ptg_origen","is","T"],"AND", 
+                    ["custrecord_drt_ptg_reg_oportunidad","noneof","@NONE@"],"AND", 
+                    ["isinactive","is","F"]
+                ],
+                columns: [
+                    search.createColumn({name: "custrecord_ptg_cilindro", summary: "GROUP", label: "PTG - Cilindro"}),
+                    search.createColumn({name: "custrecord_ptg_envasesvendidos_", summary: "SUM", label: "PTG - Envases vendidos",}),
+                    search.createColumn({name: "custrecord_ptg_tasa", summary: "SUM", label: "PTG - TASA"})
+                ],
+            });
+            log.audit("detalleVentaEnvaseSearch", detalleVentaEnvaseSearch);
+            var detalleVentaEnvaseResultCount = detalleVentaEnvaseSearch.runPaged().count;
+            log.audit("detalleVentaEnvaseResultCount", detalleVentaEnvaseResultCount);
+            var detalleVentaEnvaseResult = detalleVentaEnvaseSearch.run().getRange({
+                start: 0,
+                end: detalleVentaEnvaseResultCount,
+            });
+            log.audit("detalleVentaEnvaseResult", detalleVentaEnvaseResult);
+            log.audit('Remaining Usage start for', runtime.getCurrentScript().getRemainingUsage());
+            if(incremento_inicio < detalleVentaEnvaseResultCount){
+                (cilindro = detalleVentaEnvaseResult[incremento_inicio].getValue({name: "custrecord_ptg_cilindro", summary: "GROUP", label: "PTG - Cilindro",})),
+                (envaseVendido = detalleVentaEnvaseResult[incremento_inicio].getValue({name: "custrecord_ptg_envasesvendidos_", summary: "SUM", label: "PTG - Envases vendidos",})),
+                (tasa = detalleVentaEnvaseResult[incremento_inicio].getValue({name: "custrecord_ptg_tasa", summary: "SUM", label: "PTG - TASA",}));
 
-
+                var recVentasEnvases = record.create({
+                    type: "customrecord_ptg_ventadeenvases",
+                    isDynamic: true,
+                });
+                recVentasEnvases.setValue("custrecordptg_tipocilindro_ventaenvases_", cilindro);
+                recVentasEnvases.setValue("custrecord_ptg_cantidad_ventaenvases_", envaseVendido);
+                recVentasEnvases.setValue("custrecord_ptg_precioventaenvases_", tasa);
+                recVentasEnvases.setValue("custrecord_ptg_importe_ventaenvases_", (envaseVendido * tasa));
+                recVentasEnvases.setValue("custrecord_ptg_totalventaenvases_", ((envaseVendido * tasa)*1.16));
+                recVentasEnvases.setValue("custrecord_ptg_noviajeventaenvases_", recId);
+                var recVentasEnvasesIdSaved = recVentasEnvases.save();
+                log.debug({
+                    title: "DETALLE DE VENTAS ENVASES",
+                    details: "Id Saved: " + recVentasEnvasesIdSaved,
+                });
+                log.audit('Remaining Usage end for', runtime.getCurrentScript().getRemainingUsage());
+            }
+            
 
             //DETALLE RESUMEN
             //BÚSQUEDA GUARDADA: DRT PTG - Detalle Resumen
@@ -376,21 +428,6 @@
                 recObj.setValue("custrecord_ptg_rutavehiculo_", recId);
 
                 var recordId = recObj.save();
-
-                
-                   
-
-
-
-              /*  var objUpdateRegistroMovimiento = {
-                    custrecord_ptg_lts_: ptgLTS,
-                    custrecord_ptg_rutavehiculo_: recId,
-                };
-                var idRegMov = record.submitFields({
-                    id: idRegistroMovimientos,
-                    type: "customrecord_ptg_regitrodemovs_",
-                    values: objUpdateRegistroMovimiento,
-                });*/
                 log.emergency("recordId", recordId);
             }
             log.audit('Remaining Usage end for detalle de movimientos', runtime.getCurrentScript().getRemainingUsage());
@@ -541,13 +578,13 @@
                 if(incremento_inicio == nuevoIncremento){
                     newIncremento = nuevoIncremento - 1;
                 } else {
-                    newIncremento = incremento_inicio
+                    newIncremento = nuevoIncremento
                 }
                 log.emergency("newIncremento", newIncremento);
                 var parametros2 = {
                     'recId': recId,
                     'numViaje': numViaje,
-                    'incremento_inicio': newIncremento
+                    'incremento_inicio': nuevoIncremento
                 };
                 log.emergency("parametros2", parametros2);
     
