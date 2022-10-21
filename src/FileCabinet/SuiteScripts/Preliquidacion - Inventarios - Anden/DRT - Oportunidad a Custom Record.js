@@ -106,6 +106,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
   function afterSubmit(context) {
     try {
       if (context.type == "create") {
+        log.audit("creacion");
         var customRec = context.newRecord;
         var recId = customRec.id;
         var formulario = customRec.getValue("customform");
@@ -334,6 +335,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         }*/
       }
       if (context.type == "edit") {
+        log.audit("edit");
         var customRec = context.newRecord;
         var recId = customRec.id;
         var servicioEstacionario = false;
@@ -354,10 +356,12 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         var nombre = customRec.getValue("tranid");  
         var codigoMovimiento = customRec.getValue("custbody_ptg_codigo_movimiento");
         var cliente = customRec.getValue("entity");
+        log.emergency("cliente", cliente);
         var clienteTxt = customRec.getText("entity");
         var estacionCarburacion = customRec.getValue("custbody_ptg_estacion_carburacion");
         var origenServicio = customRec.getValue("custbody_ptg_origen_servicio");
         var direccionCustom = customRec.getValue("custbody_ptg_id_direccion_envio");
+        log.emergency("direccionCustom", direccionCustom);
         var articuloArray = [];
         var capacidadArray = [];
         var cantidadArray = [];
@@ -414,8 +418,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
         
 
         if(probabilidad == "100" && !registroCreadoMov && numeroViaje){
-
-
+          log.audit("ENTRA 4");
           for (var j = 0; j < itemCount; j++) {
 
             articuloArray[j] = customRec.getSublistValue({
@@ -530,6 +533,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
 
 
             if(lookupItemType == articuloEstacionario){
+              log.audit("ENTRA 536");
               servicioEstacionario = true;
 
               if(articuloArray[j] != idArticuloDescuento){
@@ -587,9 +591,11 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
 
             } 
             else {
-
+              log.audit("ENTRA 594");
               if(!origenServicio){
+                log.audit("ENTRA 596");
                 if(articuloArray[j] != idArticuloDescuento){
+                  log.audit("ENTRA 598");
                   var rec = record.create({
                     type: "customrecord_ptg_regitrodemovs_",
                     isDynamic: true,
@@ -655,13 +661,13 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           recPagos.setValue("custrecord_ptg_num_viaje_pagos", numeroViaje);
           recPagos.setValue("custrecord_ptg_total_servicio", total);
           recPagos.setValue("custrecord_registro_desde_oportunidad_p", true);
+          recPagos.setValue("custrecord_ptg_pagos_cliente", cliente);
+          recPagos.setValue("custrecord_ptg_pagos_direccion", direccionCustom);
           if(servicioEstacionario){
             recPagos.setValue("custrecord_ptg_total_litros_esta", cantidadTotalstacionario);
           } else {
             recPagos.setValue("custrecord_ptg_total_litros_esta", cantidadTotalCilindros);
           }
-          recPagos.setValue("custrecord_ptg_pagos_cliente", cliente);
-          recPagos.setValue("custrecord_ptg_pagos_direccion", direccionCustom);
 
           var recIdSavedEstacionariosPagos = recPagos.save();
 
@@ -674,7 +680,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
           }
           
           log.debug({
-            title: "Record created successfully pagos",
+            title: "Record created successfully pagos 2",
             details: "Id Saved: " + recIdSavedEstacionariosPagos,
           });
 
