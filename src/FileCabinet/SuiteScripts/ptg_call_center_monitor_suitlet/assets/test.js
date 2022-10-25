@@ -1653,7 +1653,7 @@ function gestionarServicio($this) {
     $(".tab").first().trigger("click");
     $("#agregarProducto").parent().addClass('d-none');
     loadMsg();
-    $("#dataPedidosCliente").html(customerGlobal.id + " - " + customerGlobal.nombreCompleto);
+    $("#dataPedidosCliente").html(customerGlobal.entityId + " - " + customerGlobal.nombreCompleto);
     $("#dataPedidosTelefono").html(customerGlobal.telefono.trim());
     $("#dataPedidosDireccion").html(getDireccionFormat(servicio, "pedido"));
 

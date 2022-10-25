@@ -988,7 +988,7 @@ function gestionarServicio($this) {
     $("#tipoCasoFuga, #tipoCasoQueja").addClass("d-none");
     $("#sinSeleccionCaso, #data-casos").addClass("d-none");
 
-    $("#dataPedidosCliente").html(servicio.id_cliente + " - " + servicio.nombre_cliente);
+    $("#dataPedidosCliente").html(servicio.entityidcliente + " - " + servicio.nombre_cliente);
     $("#dataPedidosTelefono").html(servicio.telefono.trim());
     $("#dataPedidosDireccion").html(getDireccionFormat(servicio, "pedido"));
 
@@ -996,6 +996,7 @@ function gestionarServicio($this) {
     $("#fechaSolicitudPedido").html(dateFormatFromDate(servicio.fecha_solicitud, '5'));
 
     $("#fechaPrometidaPedido").val(dateFormatFromDate(servicio.fecha_prometida, "2"));
+    $("#fechaPrometidaPedido").prop('disabled', true);
     $("#desdePedido").val(servicio.desde ? getTimeFromString(servicio.desde) : null);
     $("#hastaPedido").val(servicio.hasta ? getTimeFromString(servicio.hasta) : null);
 
@@ -1927,7 +1928,7 @@ function getDefaultNotification(tipo, item, observacion = "") {
     };
     if(tipo == 'pedido') {
         //Llena msj de sms
-        auxNoti.sms += formatTime(timeFormatFromDate(new Date(), "2")) + ","+ item.id_cliente/*+","*/+item.label+",";
+        auxNoti.sms += formatTime(timeFormatFromDate(new Date(), "2")) + ","+ item.entityidcliente/*+","*/+item.label+",";
         auxNoti.sms += item.street.trim()+",";
         auxNoti.sms += item.nExterior.trim()+",";
         auxNoti.sms += (item.nInterior && item.nInterior.trim()) ? item.nInterior.trim()+"," : '';
@@ -1965,7 +1966,7 @@ function getDefaultNotification(tipo, item, observacion = "") {
         }
 
         //Llena msj de notificación
-        auxNoti.notificacion +=  "Cliente: " + item.id_cliente+item.label + " - " + item.nombre_cliente.trim() + "\n"+
+        auxNoti.notificacion +=  "Cliente: " + item.entityidcliente+item.label + " - " + item.nombre_cliente.trim() + "\n"+
                     (item.conContrato ? "Contrato: " + item.contrato.trim()+'('+item.digitoVerificador+')' +"\n" : "") +
                     "Dirección: " + getDireccionFormat(item, "pedido")+"\n";
                     
@@ -1996,7 +1997,7 @@ function getDefaultNotification(tipo, item, observacion = "") {
         }
     } else {
         //Llena msj de sms
-        auxNoti.sms += formatTime(timeFormatFromDate(new Date(), "2")) + ","+ item.id_cliente+","+item.label+",";
+        auxNoti.sms += formatTime(timeFormatFromDate(new Date(), "2")) + ","+ item.entityidcliente+","+item.label+",";
         auxNoti.sms += item.calleDireccion.trim()+",";
         auxNoti.sms += item.nExterior.trim()+",";
         auxNoti.sms += (item.nInterior && item.nInterior.trim()) ? item.nInterior.trim()+"," : '';
@@ -2012,7 +2013,7 @@ function getDefaultNotification(tipo, item, observacion = "") {
         }
     
         //Llena msj de notificación
-        auxNoti.notificacion +=  "Cliente: " + item.id_cliente + " - " + item.nombre.trim() + "\n"+
+        auxNoti.notificacion +=  "Cliente: " + item.entityidcliente + " - " + item.nombre.trim() + "\n"+
                     (item.contrato && item.contrato.trim() ? "Contrato: " + item.contrato.trim() +"\n" : "") +
                     "Dirección: " + getDireccionFormat(item, "caso")+"\n";
              

@@ -3,6 +3,9 @@
 $("#agregarDirecciones, #agregarDireccion").click( function() {
     let id = $(this).attr('id');
     $('.dias-semana').prop('checked', true);
+    // Resetean los select de dirección
+    $('#estadoDireccion').val('');
+    $('#estadoDireccion').trigger('change');
 
     if ( id == 'agregarDirecciones' ) {// Nueva dirección de cliente nuevo
         // Se remueven las opciones de poder agregar una dirección de facturación

@@ -59,10 +59,14 @@ $('select#productoFormProductos, select#capacidadFormProductos, #capacidadMontac
 
 // Valida la información mostrada en el modal del producto
 $('select#productoFormProductos').on('change', function(e) {
+    let minGasLp = Number($('select#plantas').children(':selected').data('pedido-minimo'));
+    $('.minimo-gas-lp').text(getCorrectFormat(minGasLp));
+    
     let val = $(this).val();
     $('.info-minimo-gas-lp').addClass('d-none');
     $(".estacionarioFormProductos").addClass("d-none");
     $(".cilindroFormProductos").addClass("d-none");
+    $('.info-minimo-gas-lp').addClass('d-none');
     $(".montacargaFormProductos").addClass("d-none");
     if ( val == "cilindro" ) {
         $("#totalFormProductos").prop('readonly', true);
@@ -71,6 +75,7 @@ $('select#productoFormProductos').on('change', function(e) {
         $('.info-minimo-gas-lp').removeClass('d-none');
         $("#totalFormProductos").attr('readonly', false);
         $(".estacionarioFormProductos").removeClass("d-none");
+        $('.info-minimo-gas-lp').removeClass('d-none');
     } else if ( val == "montacarga" ) {
         $("#totalFormProductos").attr('readonly', true);
         $(".montacargaFormProductos").removeClass("d-none");
@@ -160,9 +165,11 @@ $('body').delegate('.edit-producto-cil, .edit-producto-est, .edit-producto-mont'
     let artObj   = button.parent().parent().data('item');
     let total    = 0;
     let subtotal = 0;
+    let minGasLp = Number($('select#plantas').children(':selected').data('pedido-minimo'));
     // let direccion = $('select#direccionCliente').children('option:selected').data('address');
     $('#pedidoProductoTimeUnix').val(artObj.timeUnix);
-    
+    $('.minimo-gas-lp').text(getCorrectFormat(minGasLp));
+
     if ( button.hasClass('edit-producto-cil') ) {// Producto cilindro
         prices = Number($('#zonaPrecioCliente').data("precioKg"));
         lblPrice = 'Precio x kg ';
@@ -189,6 +196,7 @@ $('body').delegate('.edit-producto-cil, .edit-producto-est, .edit-producto-mont'
         $("#totalFormProductos").attr('readonly', false);
         $(".estacionarioFormProductos").removeClass("d-none");
         $(".cilindroFormProductos").addClass("d-none");
+        $('.info-minimo-gas-lp').removeClass('d-none');
 
         subtotal = parseFloat( Number(artObj.capacity) * Number(prices) );
         total    = parseFloat( Number(subtotal) * 1.16 );
@@ -328,9 +336,9 @@ $('#guardarMetodoPagoForm').on('click', function () {
         console.log("entre al if");
         agregarMetodoPago(metodoObj);
     } else {
-        console.log("entre al else");
+        console.log("entre al else para guardar este metodo", metodoObj);
         let tr = $("#formMetodoPagosModal").data("tr");
-        console.log(tr, tr.data());
+        // console.log(tr, tr.data());
         tr.data("metodoId", metodoId);
         tr.data("metodo", metodoObj);
         $(tr.find("td")[0]).html(metodoObj.metodo_txt);
@@ -356,6 +364,9 @@ async function onClickAddProducto() {
         let newTimeUnix   = Date.now();
         let defaultProMsg = $('#sinProductos');
         let prices = 0;
+        let minimoGasLp   = Number($('select#plantas').children(':selected').data('pedido-minimo'));
+        let textoMinGasLp = getCorrectFormat(minimoGasLp);
+    
         if(validateForm($("#formProductosModal"))) {
             return;
         }
@@ -482,12 +493,19 @@ async function onClickAddProducto() {
 
         } else if ( tipoProducto == 'estacionario' ) {// Estacionario
 
+            let litros = Number( $("#litrosFormProductos").val() );
+
+            if (! Number.isInteger(litros)) {
+                infoMsg("warning", "No puede guardarse un pedido con decimales en los litros.");
+                return;
+            }
+
             $('.productosEstacionarioPedido').parent().parent().removeClass('d-none');
             
             let total  = parseFloat( $('#totalFormProductos').data("value") );
-            let litros = parseInt( $("#litrosFormProductos").val() );
             let minimoGasLp      = Number($('select#plantas').children(':selected').data('pedido-minimo'));
             let articulo = {
+                "timeUnix"  : timeUnixEdit,
                 "zoneprice" : prices,// Este es el valor de la zona
                 "tipo"      : 2,
                 "capacity"  : litros,
@@ -497,33 +515,33 @@ async function onClickAddProducto() {
 
             
 
-            if ( searchTr.length ) {// Se verifica si el artículo fue previamente registrado
+            if ( searchTrByItem.length ) {// Se verifica si el artículo fue previamente registrado
                 
                 if ( productoId ) {// Si es una edición, se reemplazará todo el contenido
-                    searchTr.data('item', articulo);
-                    searchTr.children('td').siblings("td:nth-child(2)").text(articulo['capacity']);
-                    searchTr.children('td').siblings("td:nth-child(3)").data('total', total);
-                    searchTr.children('td').siblings("td:nth-child(3)").text('$'+getCorrectFormat(total)+' MXN');
+                    searchTrByItem.data('item', articulo);
+                    searchTrByItem.children('td').siblings("td:nth-child(2)").text(articulo['capacity']);
+                    searchTrByItem.children('td').siblings("td:nth-child(3)").data('total', total);
+                    searchTrByItem.children('td').siblings("td:nth-child(3)").text('$'+getCorrectFormat(total)+' MXN');
                 } else {// Se suma el consumo del cliente
-                    let firstItem         = searchTr.data('item');
-                    let firstTotal        = parseFloat( searchTr.children('td').siblings("td:nth-child(3)").data('total') );
+                    let firstItem         = searchTrByItem.data('item');
+                    let firstTotal        = parseFloat( searchTrByItem.children('td').siblings("td:nth-child(3)").data('total') );
                     firstItem['capacity'] = firstItem['capacity'] + articulo['capacity'];
                     console.log(firstItem, total, firstTotal);
                     total = parseFloat(Number(total) + Number(firstTotal));
-                    searchTr.data('item', firstItem);
-                    searchTr.children('td').siblings("td:nth-child(2)").text(firstItem['capacity']);
-                    searchTr.children('td').siblings("td:nth-child(3)").data('total', total);
-                    searchTr.children('td').siblings("td:nth-child(3)").text('$'+getCorrectFormat(total)+' MXN');
+                    searchTrByItem.data('item', firstItem);
+                    searchTrByItem.children('td').siblings("td:nth-child(2)").text(firstItem['capacity']);
+                    searchTrByItem.children('td').siblings("td:nth-child(3)").data('total', total);
+                    searchTrByItem.children('td').siblings("td:nth-child(3)").text('$'+getCorrectFormat(total)+' MXN');
                     console.log(firstItem);
                 }
 
                 if(total < minimoGasLp) {
-                    infoMsg("warning", "El pedido es menor a la cantidad minima");
+                    infoMsg("warning", "El pedido es menor a la cantidad minima de $"+textoMinGasLp+" MXN");
                 }
 
             } else {// Se llena la información del item
                 if(total < minimoGasLp) {
-                    infoMsg("warning", "El pedido es menor a la cantidad minima");
+                    infoMsg("warning", "El pedido es menor a la cantidad minima de $"+textoMinGasLp+" MXN");
                 }
                 articulo.timeUnix = newTimeUnix;
                 $(".productosEstacionarioPedido tbody").append(
@@ -550,6 +568,7 @@ async function onClickAddProducto() {
             let total  = parseFloat( $('#totalFormProductos').data("value") );
             let litros = parseFloat( $("#capacidadMontacargaFormProductos").val() );
             let articulo = {
+                "timeUnix"  : timeUnixEdit,
                 "zoneprice" : prices,// Este es el valor de la zona
                 "tipo"      : 2,
                 "capacity"  : litros,
@@ -1054,6 +1073,7 @@ $('body').delegate('.delete-metodo-pago','click', function() {
 
 // Agrega un método de pago a la tabla de métodos
 function agregarMetodoPago(metodoObj) {
+    console.log('Se agregó el siguiente método de pago', metodoObj);
     let searchTr = [];
     for (let x = 0; x <  $('table.productosMetodoPago > tbody > tr').length; x++) {
         const element =  $('table.productosMetodoPago > tbody > tr')[x];
@@ -1162,7 +1182,8 @@ function setDefPago(total) {
     if($(".productosMetodoPago tbody").find(".metodo-item").length == 1) {
         let item = $($(".productosMetodoPago tbody").find(".metodo-item")[0]);
         let metodoObj = item.data("metodo");
-        metodoObj.monto = total;
+        metodoObj.monto = total.toFixed(6);
+        metodoObj.monto_inicial = total.toFixed(6);
         item.data("metodo", metodoObj);
         let td = $(item.find("td")[2]);
         td.data("total", total);
