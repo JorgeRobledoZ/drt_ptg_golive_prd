@@ -22,6 +22,12 @@
             var recId = req_param.recId;
             var numViaje = req_param.numViaje;
             var incremento_inicio = req_param.incremento_inicio;
+            var incremento_fin = incremento_inicio - 7;
+            log.emergency("incremento_inicio: "+incremento_inicio, "incremento_fin: "+incremento_fin);
+
+            if(incremento_fin <= 0){
+                incremento_fin = 0;
+            }
             
             log.audit('Remaining Usage start proceso', runtime.getCurrentScript().getRemainingUsage());
 
@@ -95,23 +101,32 @@
             log.debug("registroOportunidad", registroOportunidad);
             var registroOportunidadResultCount = registroOportunidad.runPaged().count;
             log.audit("Registro Oportunidad Result Count", registroOportunidadResultCount);
+            if(registroOportunidadResultCount > 0){
             var registroOportunidadResult = registroOportunidad.run().getRange({
                 start: 0,
                 end: registroOportunidadResultCount,
             });
             log.debug("registroOportunidadResult", registroOportunidadResult);
-            var conteoExceso = 0;
+            for(var i = incremento_inicio; i >= incremento_fin; i--){
+                log.emergency("i", i);
+
+
+            var preliquidacionRec = search.lookupFields({
+                type: 'customrecord_ptg_preliquicilndros_',
+                id: recId,
+                columns: ['custrecord_ptg_conteo_exceso']
+            });
+            var conteoExceso = preliquidacionRec.custrecord_ptg_conteo_exceso;
             var conteoRestriccion = 0;
             log.audit('Remaining Usage start for pagos oportunidad', runtime.getCurrentScript().getRemainingUsage());
-            if(incremento_inicio < registroOportunidadResultCount){
-                log.audit("incremento_inicio", incremento_inicio);
-                (oportunidad = registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_oportunidad", label: "PTG - Oportunidad", })),
-                (viaje = registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_num_viaje", label: "PTG - Numero de viaje", })),
-                (pago = registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_tipo_pago", label: "PTG - Tipo de Pago", })),
-                (total = parseFloat(registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_total", label: "PTG - Total", })).toFixed(6)),
-                (idRegistroPagos = registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_registro_pagos", label: "PTG - Pagos", })),
-                (idCliente = registroOportunidadResult[incremento_inicio].getValue({ name: "entity", join: "CUSTRECORD_PTG_OPORTUNIDAD", label: "Customer"})),
-                (referencia = registroOportunidadResult[incremento_inicio].getValue({ name: "custrecord_ptg_referenciapago_", label: "PTG - Referencia pago"}));
+            //if(incremento_inicio < registroOportunidadResultCount){
+                (oportunidad = registroOportunidadResult[i].getValue({ name: "custrecord_ptg_oportunidad", label: "PTG - Oportunidad", })),
+                (viaje = registroOportunidadResult[i].getValue({ name: "custrecord_ptg_num_viaje", label: "PTG - Numero de viaje", })),
+                (pago = registroOportunidadResult[i].getValue({ name: "custrecord_ptg_tipo_pago", label: "PTG - Tipo de Pago", })),
+                (total = parseFloat(registroOportunidadResult[i].getValue({ name: "custrecord_ptg_total", label: "PTG - Total", })).toFixed(6)),
+                (idRegistroPagos = registroOportunidadResult[i].getValue({ name: "custrecord_ptg_registro_pagos", label: "PTG - Pagos", })),
+                (idCliente = registroOportunidadResult[i].getValue({ name: "entity", join: "CUSTRECORD_PTG_OPORTUNIDAD", label: "Customer"})),
+                (referencia = registroOportunidadResult[i].getValue({ name: "custrecord_ptg_referenciapago_", label: "PTG - Referencia pago"}));
                 log.audit("oportunidad tipo pago", oportunidad);
 
                 var oportunidadObj = record.load({
@@ -139,13 +154,24 @@
                 (direccionCliente = direccionesObjResult[0].getValue({name: "internalid", label: "ID interno"}));
                 log.audit("direccionCliente", direccionCliente);
 
-                var clienteObj = record.load({
+                /*var clienteObj = record.load({
                     type: record.Type.CUSTOMER,
                     id: idCliente,
                 });
                 var saldoVencido = clienteObj.getValue("overduebalance");
                 var limiteCredito = clienteObj.getValue("creditlimit");
-                var saldo = clienteObj.getValue("balance");
+                var saldo = clienteObj.getValue("balance");*/
+
+                var customerRec = search.lookupFields({
+                    type: record.Type.CUSTOMER,
+                    id: idCliente,
+                    columns: ['overduebalance','creditlimit','balance']
+                });
+                var saldoVencido = customerRec.overduebalance;
+                var limiteCredito = customerRec.creditlimit;
+                var saldo = customerRec.balance;
+
+
 
                 if(idCliente != publicoGeneral && pago == creditoCliente){
                     if((saldoVencido > 0) || (limiteCredito < saldo)){
@@ -213,6 +239,7 @@
             });
 
         }
+    }
 
 
             //BÚSQUEDA GUARDADA: PTG - Oportunidades a Facturar Cil
@@ -229,14 +256,17 @@
             });
             var searchResultCount = opportunitySearchObj.runPaged().count;
             log.debug("searchResultCount",searchResultCount);
+            if(searchResultCount > 0){
             var opportunityObjResult = opportunitySearchObj.run().getRange({
                 start: 0,
                 end: searchResultCount,
             });
             log.audit('Remaining Usage start for servicios facturar', runtime.getCurrentScript().getRemainingUsage());
-            log.audit("incremento_inicio", incremento_inicio);
-            if(incremento_inicio < searchResultCount){
-                (idInternoOportunidad = opportunityObjResult[incremento_inicio].getValue({name: "internalid", label: "Internal ID"}));
+            //log.audit("incremento_inicio", incremento_inicio);
+            
+            for(var j = incremento_inicio; j >= incremento_fin; j--){
+                log.emergency("j", j);
+                (idInternoOportunidad = opportunityObjResult[j].getValue({name: "internalid", label: "Internal ID"}));
                 var recOportunidadAFacturar = record.create({
                     type: "customrecord_ptg_oportunidad_facturar",
                     isDynamic: true,
@@ -249,6 +279,7 @@
                     details: "Id Saved: " + recOportunidadAFacturarIdSaved,
                 });
             }
+        }
             log.audit('Remaining Usage end for servicios facturar', runtime.getCurrentScript().getRemainingUsage());
 
 
@@ -272,16 +303,22 @@
             log.audit("detalleVentaEnvaseSearch", detalleVentaEnvaseSearch);
             var detalleVentaEnvaseResultCount = detalleVentaEnvaseSearch.runPaged().count;
             log.audit("detalleVentaEnvaseResultCount", detalleVentaEnvaseResultCount);
+            if(detalleVentaEnvaseResultCount > 0){
             var detalleVentaEnvaseResult = detalleVentaEnvaseSearch.run().getRange({
                 start: 0,
                 end: detalleVentaEnvaseResultCount,
             });
             log.audit("detalleVentaEnvaseResult", detalleVentaEnvaseResult);
             log.audit('Remaining Usage start for', runtime.getCurrentScript().getRemainingUsage());
-            if(incremento_inicio < detalleVentaEnvaseResultCount){
-                (cilindro = detalleVentaEnvaseResult[incremento_inicio].getValue({name: "custrecord_ptg_cilindro", summary: "GROUP", label: "PTG - Cilindro",})),
-                (envaseVendido = detalleVentaEnvaseResult[incremento_inicio].getValue({name: "custrecord_ptg_envasesvendidos_", summary: "SUM", label: "PTG - Envases vendidos",})),
-                (tasa = detalleVentaEnvaseResult[incremento_inicio].getValue({name: "custrecord_ptg_tasa", summary: "SUM", label: "PTG - TASA",}));
+            var incremento_inicial = incremento_inicio;
+            if(detalleVentaEnvaseResultCount < incremento_inicio){
+                incremento_inicial = detalleVentaEnvaseResultCount - 1;
+            }
+            for(var k = incremento_inicial; k >= incremento_fin; k--){
+                log.emergency("k", k);
+                (cilindro = detalleVentaEnvaseResult[k].getValue({name: "custrecord_ptg_cilindro", summary: "GROUP", label: "PTG - Cilindro",})),
+                (envaseVendido = detalleVentaEnvaseResult[k].getValue({name: "custrecord_ptg_envasesvendidos_", summary: "SUM", label: "PTG - Envases vendidos",})),
+                (tasa = detalleVentaEnvaseResult[k].getValue({name: "custrecord_ptg_tasa", summary: "SUM", label: "PTG - TASA",}));
 
                 var recVentasEnvases = record.create({
                     type: "customrecord_ptg_ventadeenvases",
@@ -300,6 +337,7 @@
                 });
                 log.audit('Remaining Usage end for', runtime.getCurrentScript().getRemainingUsage());
             }
+        }
             
 
             //DETALLE RESUMEN
@@ -329,23 +367,24 @@
             });
             var detalleResumenResultCount = detalleResumenSearch.runPaged().count;
             log.debug("detalleResumenResultCount", detalleResumenResultCount);
+            if(detalleResumenResultCount > 0){
             var detalleResumenResult = detalleResumenSearch.run().getRange({
                 start: 0,
                 end: detalleResumenResultCount,
             });
             log.audit("detalleResumenResult", detalleResumenResult);
             log.audit('Remaining Usage start for linea de articulos', runtime.getCurrentScript().getRemainingUsage());
-            if(incremento_inicio < detalleResumenResultCount){
-                (idOportunidad = detalleResumenResult[incremento_inicio].getValue({name: "internalid", label: "ID interno"})),
-                (opcionPago = detalleResumenResult[incremento_inicio].getValue({name: "custbody_ptg_opcion_pago", label: "Opción de Pago"})),
-                (referencia = detalleResumenResult[incremento_inicio].getValue({name: "custbody_drt_ptg_num_consecutivo", label: "PTG - Numero consecutivo"})),
-                (tipoArticulo = detalleResumenResult[incremento_inicio].getValue({name: "custitem_ptg_tipodearticulo_", join: "item", label: "PTG - TIPO DE ARTÍCULO"})),
-                (cliente = detalleResumenResult[incremento_inicio].getValue({name: "entity", label: "Name"})),
-                (cantidad = detalleResumenResult[incremento_inicio].getValue({name: "quantity", label: "Quantity"})),
-                (unidad = detalleResumenResult[incremento_inicio].getValue({name: "stockunit", join: "item", label: "Primary Stock Unit"})),
-                (tasa = detalleResumenResult[incremento_inicio].getValue({name: "rate", label: "Item Rate"})),
-                (impuesto = detalleResumenResult[incremento_inicio].getValue({name: "taxamount", label: "Amount (Tax)"})),
-                (nombreDocumento = detalleResumenResult[incremento_inicio].getValue({name: "tranid", label: "Document Number"}));
+            for(var l = incremento_inicio; l >= incremento_fin; l--){
+                (idOportunidad = detalleResumenResult[l].getValue({name: "internalid", label: "ID interno"})),
+                (opcionPago = detalleResumenResult[l].getValue({name: "custbody_ptg_opcion_pago", label: "Opción de Pago"})),
+                (referencia = detalleResumenResult[l].getValue({name: "custbody_drt_ptg_num_consecutivo", label: "PTG - Numero consecutivo"})),
+                (tipoArticulo = detalleResumenResult[l].getValue({name: "custitem_ptg_tipodearticulo_", join: "item", label: "PTG - TIPO DE ARTÍCULO"})),
+                (cliente = detalleResumenResult[l].getValue({name: "entity", label: "Name"})),
+                (cantidad = detalleResumenResult[l].getValue({name: "quantity", label: "Quantity"})),
+                (unidad = detalleResumenResult[l].getValue({name: "stockunit", join: "item", label: "Primary Stock Unit"})),
+                (tasa = detalleResumenResult[l].getValue({name: "rate", label: "Item Rate"})),
+                (impuesto = detalleResumenResult[l].getValue({name: "taxamount", label: "Amount (Tax)"})),
+                (nombreDocumento = detalleResumenResult[l].getValue({name: "tranid", label: "Document Number"}));
 
                 var recResumen = record.create({
                     type: "customrecord_ptg_detalle_resumen_",
@@ -375,6 +414,7 @@
                 });
                 log.audit('Remaining Usage end for linea de articulos', runtime.getCurrentScript().getRemainingUsage());
             }
+        }
 
 
             //DETALLE DE MOVIMIENTOS
@@ -392,22 +432,35 @@
             });
             var detalleMovimientoResultCount = detalleMovimientoSearch.runPaged().count;
             log.emergency("detalleMovimientoResultCount", detalleMovimientoResultCount);
+            if(detalleMovimientoResultCount > 0){
             var detalleMovimientoResult = detalleMovimientoSearch.run().getRange({
                 start: 0,
                 end: detalleMovimientoResultCount,
             });
             log.emergency("detalleMovimientoResult", detalleMovimientoResult);
-            if(incremento_inicio < detalleMovimientoResultCount){
-                (idRegistroMovimientos = detalleMovimientoResult[incremento_inicio].getValue({name: "internalid", label: "Internal ID"})),
-                (ventaGas = detalleMovimientoResult[incremento_inicio].getValue({ name: "custrecord_ptg_ventagas_", label: "PTG - Venta Gas", })),
-                (cilindro = detalleMovimientoResult[incremento_inicio].getValue({ name: "custrecord_ptg_cilindro", label: "PTG - Cilindro", }));
-                var itemObjDM = record.load({
+            var incremento_inicial = incremento_inicio;
+            if(detalleMovimientoResultCount < incremento_inicio){
+                incremento_inicial = detalleMovimientoResultCount - 1;
+            }
+            for(var m = incremento_inicial; m >= incremento_fin; m--){
+                (idRegistroMovimientos = detalleMovimientoResult[m].getValue({name: "internalid", label: "Internal ID"})),
+                (ventaGas = detalleMovimientoResult[m].getValue({ name: "custrecord_ptg_ventagas_", label: "PTG - Venta Gas", })),
+                (cilindro = detalleMovimientoResult[m].getValue({ name: "custrecord_ptg_cilindro", label: "PTG - Cilindro", }));
+                log.audit("idRegistroMovimientos", idRegistroMovimientos);
+                var inventoryItemRec = search.lookupFields({
+                    type: search.Type.INVENTORY_ITEM,
+                    id: cilindro,
+                    columns: ['custitem_ptg_capacidadcilindro_']
+                });
+                var litrosCapacidad = inventoryItemRec.custitem_ptg_capacidadcilindro_;
+                
+                /*var itemObjDM = record.load({
                     type: search.Type.INVENTORY_ITEM,
                     id: cilindro,
                 });
-                log.audit("idRegistroMovimientos", idRegistroMovimientos);
+                
                 log.debug("lookupItem", itemObjDM);
-                var litrosCapacidad = itemObjDM.getValue("custitem_ptg_capacidadcilindro_");
+                var litrosCapacidad = itemObjDM.getValue("custitem_ptg_capacidadcilindro_");*/
                 log.debug("litrosCapacidad", litrosCapacidad);
                 var litrosCapacidadInt = parseInt(litrosCapacidad);
                 log.debug("litrosCapacidadInt", litrosCapacidadInt);
@@ -430,6 +483,7 @@
                 var recordId = recObj.save();
                 log.emergency("recordId", recordId);
             }
+        }
             log.audit('Remaining Usage end for detalle de movimientos', runtime.getCurrentScript().getRemainingUsage());
 
 
@@ -439,7 +493,8 @@
             var movimientosDetalleVentasObj = search.create({
                 type: "customrecord_ptg_regitrodemovs_",
                 filters: [
-                   ["custrecord_ptg_num_viaje_oportunidad","anyof", numViaje]
+                   ["custrecord_ptg_num_viaje_oportunidad","anyof", numViaje], "AND", 
+                   ["custrecord_ptg_origen","is","F"]
                 ],
                 columns: [
                    search.createColumn({ name: "custrecord_ptg_cilindro", summary: "GROUP", label: "PTG - Cilindro"}),
@@ -461,13 +516,18 @@
                 log.audit("movimientosDetalleVentasResult", movimientosDetalleVentasResult);
                 log.audit('Remaining Usage start for', runtime.getCurrentScript().getRemainingUsage());
                 //for (var q = 0; q < movimientosDetalleVentasResult.length; q++) {
-                if(incremento_inicio < movimientosDetalleVentasObjCount){
-                    (idArticuloVentas = movimientosDetalleVentasResult[incremento_inicio].getValue({name: "custrecord_ptg_cilindro", summary: "GROUP", label: "PTG - Cilindro"}) || 0);
-                    (movimientoMasVentas = movimientosDetalleVentasResult[incremento_inicio].getValue({name: "custrecord_ptg_movmas_", summary: "SUM", label: "PTG - Mov +"}) || 0);
-                    (movimientoMenosVentas = movimientosDetalleVentasResult[incremento_inicio].getValue({name: "custrecord_ptg_movmenos_", summary: "SUM", label: "PTG - Mov -"}) || 0);
-                    (ventasVentas = movimientosDetalleVentasResult[incremento_inicio].getValue({name: "custrecord_ptg_ventagas_", summary: "SUM", label: "PTG - Venta Gas"}) || 0);
-                    (zonaPrecio = movimientosDetalleVentasResult[incremento_inicio].getValue({name: "custrecord_ptg_zonadeprecio_registromovs", summary: "GROUP", label: "PTG -Zona de precio"}) || 0);
-                    (tasaVentas = movimientosDetalleVentasResult[incremento_inicio].getValue({name: "custrecord_ptg_tasa", summary: "MAX", label: "PTG - TASA"}) || 0);
+                if(movimientosDetalleVentasObjCount >= incremento_fin){
+                    var incremento_inicial = incremento_inicio;
+                    if(movimientosDetalleVentasObjCount < incremento_inicio){
+                        incremento_inicial = movimientosDetalleVentasObjCount - 1;
+                    }
+                for(var n = incremento_inicial; n >= incremento_fin; n--){
+                    (idArticuloVentas = movimientosDetalleVentasResult[n].getValue({name: "custrecord_ptg_cilindro", summary: "GROUP", label: "PTG - Cilindro"}) || 0);
+                    (movimientoMasVentas = movimientosDetalleVentasResult[n].getValue({name: "custrecord_ptg_movmas_", summary: "SUM", label: "PTG - Mov +"}) || 0);
+                    (movimientoMenosVentas = movimientosDetalleVentasResult[n].getValue({name: "custrecord_ptg_movmenos_", summary: "SUM", label: "PTG - Mov -"}) || 0);
+                    (ventasVentas = movimientosDetalleVentasResult[n].getValue({name: "custrecord_ptg_ventagas_", summary: "SUM", label: "PTG - Venta Gas"}) || 0);
+                    (zonaPrecio = movimientosDetalleVentasResult[n].getValue({name: "custrecord_ptg_zonadeprecio_registromovs", summary: "GROUP", label: "PTG -Zona de precio"}) || 0);
+                    (tasaVentas = movimientosDetalleVentasResult[n].getValue({name: "custrecord_ptg_tasa", summary: "MAX", label: "PTG - TASA"}) || 0);
                     var movimientoMas = parseInt(movimientoMasVentas);
                     var movimientoMenos = parseInt(movimientoMenosVentas);
                     var movimientoVentaGas = parseInt(ventasVentas);
@@ -475,12 +535,19 @@
                     
                     var idInternoArticulo = parseInt(idArticuloVentas);
                     log.audit("idInternoArticulo", idInternoArticulo);
-                    var itemObj = record.load({
+                    /*var itemObj = record.load({
                         type: search.Type.INVENTORY_ITEM,
                         id: idInternoArticulo,
                     });
                     var litros = itemObj.getValue("custitem_ptg_capacidadcilindro_");
-                    log.audit("litros", litros);
+                    log.audit("litros", litros);*/
+
+                    var itemRec = search.lookupFields({
+                        type: search.Type.INVENTORY_ITEM,
+                        id: idInternoArticulo,
+                        columns: ['custitem_ptg_capacidadcilindro_']
+                    });
+                    var litros = itemRec.custitem_ptg_capacidadcilindro_;
                     
                     
                     log.audit("movimientoMas", movimientoMas);
@@ -567,15 +634,16 @@
                     log.audit('Remaining Usage end for', runtime.getCurrentScript().getRemainingUsage());
                 }
             }
+            }
             log.audit('Remaining Usage end proceso', runtime.getCurrentScript().getRemainingUsage());
 
 
 
-            if(incremento_inicio != 0){
-                var nuevoIncremento = incremento_inicio - 1;
+            if(incremento_fin > 0){
+                var nuevoIncremento = incremento_fin - 1;
                 log.emergency("nuevoIncremento", nuevoIncremento);
                 var newIncremento = 0;
-                if(incremento_inicio == nuevoIncremento){
+                if(incremento_fin == nuevoIncremento){
                     newIncremento = nuevoIncremento - 1;
                 } else {
                     newIncremento = nuevoIncremento
