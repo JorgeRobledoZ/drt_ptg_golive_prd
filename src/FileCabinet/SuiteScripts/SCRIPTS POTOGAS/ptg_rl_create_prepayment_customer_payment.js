@@ -48,6 +48,7 @@ define(['N/record', 'N/search'],
             };
             log.debug('requestBody', requestBody)
 
+            let oppId = requestBody.oppId;
             try {
 
                 if (requestBody.customerPayments.length > 0) {
@@ -106,6 +107,13 @@ define(['N/record', 'N/search'],
                             value: dataCustomer.amount
                         });
 
+                        if ( oppId ) {
+                            payment.setValue({
+                                fieldId: 'custbody_ptg_op_relacionada_al_pago',
+                                value: oppId
+                            });
+                        }
+                        
                         let id = payment.save();
 
                         if (!!id) {

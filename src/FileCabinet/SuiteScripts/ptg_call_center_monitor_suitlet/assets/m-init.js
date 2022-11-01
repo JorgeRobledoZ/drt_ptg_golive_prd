@@ -645,6 +645,13 @@ function getServicios($event) {
                     let auxDir = getDireccionFormat(pedido, "pedido"),
                         auxObs = getObservacionesFormat(pedido, "<br>"),
                         auxRuta = getRutaFormat(pedido, "pedido");
+                    let ahora    = moment(); 
+                    let comparar = null;
+                    let diffMin  = null;
+                    if ( pedido.fecha_hora_notificacion ) {
+                        comparar = moment(pedido.fecha_hora_notificacion);
+                        diffMin  = parseInt(ahora.diff(comparar, 'minutes', true));
+                    }
                         
                     let trAux = '<tr data-item='+"'"+JSON.stringify(pedido)+"'"+'>'+
                                     '<td class="text-center sticky-col">'+  
@@ -695,7 +702,7 @@ function getServicios($event) {
                                     '<td class="text-center '+(pedido.conContrato || pedido.tipoContratoId == "2" ? 'text-danger': '')+'">' + (pedido.fecha_notificacion ? dateFormatFromDate(pedido.fecha_notificacion, '5') + " - " + pedido.hora_notificacion : 'Sin notificar') + '</td>'+
                                     '<td class="text-center '+(pedido.conContrato || pedido.tipoContratoId == "2" ? 'text-danger': '')+'">' + pedido.servicioNombre + '</td>'+
                                     '<td class="text-center '+(pedido.conContrato || pedido.tipoContratoId == "2" ? 'text-danger': '')+'">' + (pedido.isPerson ? (pedido.firstName.split(" ")[0] + " " + pedido.lastName.split(" ")[0]) : pedido.companyName) + '</td>'+
-                                    '<td class="text-center '+(pedido.conContrato || pedido.tipoContratoId == "2" ? 'text-danger': '')+'">' + (pedido.fecha_notificacion ? getRestTime(dateFormatFromString(pedido.fecha_notificacion+(pedido.hora_notificacion ? " "+pedido.hora_notificacion : ''), "1"), "3") : 'Sin notificar') + '</td>'+
+                                    '<td class="text-center '+(pedido.conContrato || pedido.tipoContratoId == "2" ? 'text-danger': '')+'">' + (diffMin ? diffMin + " minuto(s)" : 'Sin notificar') + '</td>'+
                                     
                                 '</tr>';
                     $("#tablePedidos tbody").append(trAux);

@@ -1636,6 +1636,7 @@ function setMetodosPago(pedido, tipo) {
 
 function gestionarServicio($this) {
     let servicio = $($this).closest("tr").data("item");
+    console.log('Este es el servicio:', servicio);
     $("#clientes-data").find("input, select, button").prop("disabled", true);
     if($(".btn-expand").find(".fa-caret-left").length) {
         $(".btn-expand").trigger("click");
@@ -1668,12 +1669,12 @@ function gestionarServicio($this) {
     let momentYLas     = null;
     if ( servicio.entre_las ) {
         let entreLas = date+' '+servicio.entre_las;
-        momentEntreLas = moment(entreLas).format('h:mm');
+        momentEntreLas = moment(entreLas).format('hh:mm');
     }
 
     if ( servicio.y_las ) {
         let yLas = date+' '+servicio.y_las;
-        momentYLas = moment(yLas).format('h:mm');
+        momentYLas = moment(yLas).format('hh:mm');
     }
 
     $("#desdePedido").val(momentEntreLas);
@@ -1687,7 +1688,7 @@ function gestionarServicio($this) {
 
     $('.productosMetodoPago tbody').children("tr").remove();
 
-    if(servicio.objMetodosPago) {
+    if( servicio.objMetodosPago ) {
         let aux = JSON.parse(servicio.objMetodosPago);
         let total = 0;
         if(aux.pago) {
@@ -1698,8 +1699,8 @@ function gestionarServicio($this) {
                         '<td class="text-center">'+(element.folio ? element.folio : 'No aplica')+'</td>'+
                         '<td class="text-center" data-total='+element.monto+'>$'+getCorrectFormat(element.monto)+' MXN</td>'+
                         '<td class="text-center">'+
-                            '<button class="btn btn-sm btn-info edit-metodo-pago" data-table-ref=".productosMetodoPago" data-metodo-id='+element.tipo_pago+'> <i class="fa-solid fa-pen-to-square"></i> </button>&nbsp;&nbsp;'+
-                            '<button class="btn btn-sm btn-danger delete-metodo-pago" data-table-ref=".productosMetodoPago" data-metodo-id='+element.tipo_pago+'> <i class="fa-solid fa-trash-can"></i> </button>'+
+                            '<button class="btn btn-sm btn-info edit-metodo-pago" '+(userRoleId != idSupervisor ? ' disabled' : '')+' data-table-ref=".productosMetodoPago" data-metodo-id='+element.tipo_pago+'> <i class="fa-solid fa-pen-to-square"></i> </button>&nbsp;&nbsp;'+
+                            '<button class="btn btn-sm btn-danger delete-metodo-pago" '+(userRoleId != idSupervisor ? ' disabled' : '')+' data-table-ref=".productosMetodoPago" data-metodo-id='+element.tipo_pago+'> <i class="fa-solid fa-trash-can"></i> </button>'+
                         '</td>'+
                     '</tr>'
                 );
@@ -1894,6 +1895,7 @@ $('body').delegate('#editarPedido', 'click', function () {
     let totalPedido      = 0;
     let totalMetodosPago = 0;
     let descuento        = 0;
+    let prepaymentArr    = [];
     let minimoGasLp      = Number($('select#plantas').children(':selected').data('pedido-minimo'));
 
     if(validateForm($("#tab-pedidos"))) {
@@ -1927,6 +1929,31 @@ $('body').delegate('#editarPedido', 'click', function () {
     if (! $('.productosMetodoPago').parent().parent().hasClass('d-none') ) {// Contiene métodos
         totalMetodosPago = $('.productosMetodoPago').children('tfoot').find('td.total').data('total');
     }
+
+    // Agrega la lista de métodos de pago
+    $('table.productosMetodoPago > tbody  > tr.metodo-item').each(function() {
+        let metodoObj = $(this).data('metodo');
+        let metodoId  = parseInt(metodoObj.tipo_pago);
+        metodoObj.monto = parseFloat(Number(metodoObj.monto).toFixed(6))
+        if ( metodoObj.tipo_pago == '9' ) {// El método de pago es crédito
+            totalConCredito = Number(totalConCredito + parseFloat( Number(metodoObj.monto) ));
+        }
+        
+        // Si el método de pago es transferencia o prepago, se enviará una orden de prepago después de guardar el pedido
+        if ( metodosPagoPrepago.includes( metodoId ) || metodoId == metodoTransferencia ) {
+            prepaymentArr.push({
+                customer : customerGlobal.id,
+                account : metodoObj.tipo_cuenta,
+                amount : metodoObj.monto,
+                isCredit: metodosPagoPrepago.includes( metodoId ) ? (metodoObj.tipo_tarjeta == "2" ? true : false) : false,
+                isDebit: metodosPagoPrepago.includes( metodoId ) ? (metodoObj.tipo_tarjeta == "1" ? true : false) : false,
+                numRef: metodosPagoPrepago.includes( metodoId ) ? metodoObj.folio : null,
+                planta: $("#plantas").val()
+            });
+        }
+        console.log(metodoObj);
+        pagosArr.push( metodoObj );
+    });
 
     if ( Number(totalPedido).toFixed(2) != Number(totalMetodosPago).toFixed(2) ) {
         infoMsg('warning', 'El total a pagar debe ser igual al total de productos enlistados');

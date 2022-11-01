@@ -925,6 +925,7 @@ async function savePedido() {
         loadMsg('Guardando información...');
 
         setAjax(settings).then((response) => {
+            let oppId = response.data[0];
             infoMsg('success', 'Pedido', 'El pedido se a creado de manera correcta', 2000)
             console.log('Pedido creado exitósamente', response);
             opportunities = [];
@@ -932,7 +933,7 @@ async function savePedido() {
             getPendingCases();
             $('select#direccionCliente').trigger("change");
             if ( prepaymentArr.length > 0 ) {// Si se realizaron prepagos, se enviará a gestionar
-                sendPrepayment(prepaymentArr);
+                sendPrepayment(prepaymentArr, oppId);
             }
         }).catch((error) => {
             opportunities = [];
@@ -946,8 +947,9 @@ async function savePedido() {
 }
 
 // Método para envíar un prepago
-function sendPrepayment(prepaymentArr) {
+function sendPrepayment(prepaymentArr, oppId) {
     let params = {
+        "oppId" : oppId,
         "customerPayments" : prepaymentArr
     };
 
@@ -962,6 +964,28 @@ function sendPrepayment(prepaymentArr) {
     }).catch((error) => {
         // Limpia los campos de cliente
         console.log('Ha ocurrido un error al enviar los prepagos');
+        console.log(error);
+    });
+}
+
+// Anular pagos
+function voidPrepayment(prepaymentArr, oppId) {
+    let params = {
+        "oppId" : oppId,
+        "customerPayments" : prepaymentArr
+    };
+
+    let settings = {
+        url    : urldeletePayments,
+        method : 'POST',
+        data   : JSON.stringify(params),
+    }
+
+    setAjax(settings).then((response) => {
+        console.log('Prepagos invalidados exitósamente', response);
+    }).catch((error) => {
+        // Limpia los campos de cliente
+        console.log('Ha ocurrido un error al invalidar los prepagos');
         console.log(error);
     });
 }

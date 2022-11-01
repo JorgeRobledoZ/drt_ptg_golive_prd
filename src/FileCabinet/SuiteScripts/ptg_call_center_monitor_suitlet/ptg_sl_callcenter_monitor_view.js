@@ -268,6 +268,11 @@ define(['N/file', 'N/log', 'N/record', 'N/render', 'N/runtime', 'N/search', 'N/u
                 deploymentId: 'customdeploy_ptg_rl_put_notes'
             });
 
+            let deletePayments = url.resolveScript({
+                scriptId: 'customscript_ptg_rl_void_payments_cc',
+                deploymentId: 'customdeploy_ptg_rl_void_payments_cc'
+            });
+
             datasource.getPlantas = getPlantas
             datasource.createOPP = createOPP
             datasource.getOPP = getOPP;
@@ -317,6 +322,7 @@ define(['N/file', 'N/log', 'N/record', 'N/render', 'N/runtime', 'N/search', 'N/u
             datasource.getCps = getCps
             datasource.getRealHistoric = getRealHistoric
             datasource.putNotes = putNotes
+            datasource.deletePayments = deletePayments
             datasource.cusVars = JSON.stringify(genVars)
 
             log.debug('Role usuario', remainingUser.role);
