@@ -216,6 +216,7 @@ define([
               var viajeEstacionarioObj = drt_mapid_cm.searchRecord("customrecord_ptg_tabladeviaje_enc2_", filters, columns);
               log.debug("viajeEstacionarioObj", viajeEstacionarioObj);*/
 
+              //SS: TG - Viaje Activo Por Vehiculo
           var viajeEstacionarioObj = search.create({
             type: "customrecord_ptg_tabladeviaje_enc2_",
             filters: [
