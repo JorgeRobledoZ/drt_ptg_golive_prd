@@ -164,6 +164,12 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                         sublistId: 'recmachcustrecord_ptg_confirmacion_salida_',
                         fieldId: 'custrecord_ptg_precion_confirmacion',
                         line: i
+                    });
+
+                    var ptgembarque = currentRecord.getSublistValue({
+                        sublistId: 'recmachcustrecord_ptg_confirmacion_salida_',
+                        fieldId: 'custrecord_ptg_embarque_conf_salida_',
+                        line: i
                     })
 
                     log.audit('pg', pg);
@@ -257,7 +263,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                         });
 
                         var procesar = searchResultCount[0].getValue({
-                            name: 'custcol_ptg_proceso_terminado'
+                            name: 'custcol_ptg_proc_ter_desp_confirm_'
                         });
 
 
@@ -295,7 +301,8 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                         idDetalle: idDetalle,
                         precioConfirmacion: precioConfirmacion,
                         procesar: procesar,
-                        folio: folio
+                        folio: folio,
+                        ptgembarque : ptgembarque
                     }
 
                     arrayPo.push(objPo);
@@ -342,7 +349,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                     var idCompra = compraLoad.save();
                     log.audit('idCompra', idCompra);
 
-                    if (arrayPo[po]['procesar'] == false || arrayPo[po]['procesar'] == "False" || arrayPo[po]['procesar'] == "F") {
+                    if (arrayPo[po]['procesar'] == null || arrayPo[po]['procesar'] == "null") {
                         /*******************Proceso de recepciones**********************/
                         if (arrayPo[po]['tipo_desvio'] == 3) {
                             try {
@@ -451,6 +458,11 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                 fieldId: 'customform',
                                 value: form_vendor_bill
                             });
+
+                            vendorBill.setValue({
+                                fieldId: 'tranid',
+                                value: arrayPo[po]['ptgembarque']
+                            })
 
                             let lineas = vendorBill.getLineCount('item');
 
@@ -1086,7 +1098,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                 var searchLukoopVB = search.lookupFields({
                                     type: search.Type.VENDOR_BILL,
                                     id: idVendorBill,
-                                    columns: ['transactionnumber']
+                                    columns: ['tranid']
                                 });
 
                                 log.audit('searchLukoopVB', searchLukoopVB);
@@ -1094,7 +1106,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                 createSalesOrder.setCurrentSublistValue({
                                     sublistId: "item",
                                     fieldId: "custcol_ptg_fl_",
-                                    value: searchLukoopVB.transactionnumber
+                                    value: searchLukoopVB.tranid
                                 });
 
                                 let idArticle = createSalesOrder.commitLine({
@@ -1295,7 +1307,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                     var searchLukoopVB = search.lookupFields({
                                         type: search.Type.VENDOR_BILL,
                                         id: idVendorBill,
-                                        columns: ['transactionnumber']
+                                        columns: ['tranid']
                                     });
     
                                     log.audit('searchLukoopVB', searchLukoopVB);
@@ -1303,7 +1315,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                     invoiceInter.setCurrentSublistValue({
                                         sublistId: "item",
                                         fieldId: "custcol_ptg_fl_",
-                                        value: searchLukoopVB.transactionnumber
+                                        value: searchLukoopVB.tranid
                                     });
 
                                     invoiceInter.commitLine({
@@ -1404,6 +1416,29 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
 
                                     if (saveinvoice) {
                                         try {
+
+                                            var vendorbillFlete = search.create({
+                                                type: "vendorbill",
+                                                filters:
+                                                [
+                                                    ["type","anyof","VendBill"], 
+                                                    "AND", 
+                                                    ["mainline","is","T"], 
+                                                    "AND", 
+                                                    ["custbody_ptg_fact_inter_","is","T"]
+                                                ],
+                                                columns:
+                                                [
+                                                    search.createColumn({name: "tranid", label: "Document Number"})
+                                                ]
+                                            });
+                                            var conteoBusquedaFlete = vendorbillFlete.runPaged().count;
+                                            log.audit("vendorbillFlete result count", conteoBusquedaFlete);
+                
+                                           
+                                            var numeroConcecutivo = conteoBusquedaFlete + 1;
+                                            log.audit('numeroConcecutivo', numeroConcecutivo);
+                                            numeroConcecutivo = numeroConcecutivo + 1
                                             let billInter = record.create({
                                                 type: record.Type.VENDOR_BILL,
                                                 isDynamic: true
@@ -1425,9 +1460,9 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                             });
 
                                             var ubicacion = 0;
-                                            
+
                                             if (arrayPo[po]['tipo_desvio'] == 4) {
-                                                ubicacion = idAlmacenVirtual;
+                                                ubicacion = arrayPo[po]['planta_desvio'];
                                             } else {
                                                 ubicacion = arrayPo[po]['planta_desvio']
                                             }
@@ -1438,8 +1473,13 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                             });
 
                                             billInter.setValue({
+                                                fieldId: 'custbody_ptg_fact_inter_',
+                                                value: true
+                                            })
+
+                                            billInter.setValue({
                                                 fieldId: 'tranid',
-                                                value: 'FACR24698'
+                                                value: 'FAC-Interco-' + numeroConcecutivo
                                             });
 
                                             billInter.setValue({
@@ -1576,7 +1616,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
 
                                 pO.setSublistValue({
                                     sublistId: 'item',
-                                    fieldId: 'custcol_ptg_proceso_terminado',
+                                    fieldId: 'custcol_ptg_proc_ter_desp_confirm_',
                                     value: true,
                                     line: y
                                 })
@@ -1652,7 +1692,14 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                         fieldId: 'quantity',
                                         value: arrayPo[po]['litros'],
                                         line: r
-                                    })
+                                    });
+
+                                    recepcionLoad.setSublistValue({
+                                        sublistId: 'item',
+                                        fieldId: 'rate',
+                                        value: arrayPo[po]['rate'],
+                                        line: r
+                                    });
                                 }
 
                             }
