@@ -494,7 +494,8 @@
                 type: "customrecord_ptg_regitrodemovs_",
                 filters: [
                    ["custrecord_ptg_num_viaje_oportunidad","anyof", numViaje], "AND", 
-                   ["custrecord_ptg_origen","is","F"]
+                   ["custrecord_ptg_origen","is","F"],"AND", 
+                   ["custrecord_ptg_envasesvendidos_","equalto","0"]
                 ],
                 columns: [
                    search.createColumn({ name: "custrecord_ptg_cilindro", summary: "GROUP", label: "PTG - Cilindro"}),
@@ -502,7 +503,8 @@
                    search.createColumn({ name: "custrecord_ptg_movmenos_", summary: "SUM", label: "PTG - Mov -"}),
                    search.createColumn({ name: "custrecord_ptg_ventagas_", summary: "SUM", label: "PTG - Venta Gas"}),
                    search.createColumn({ name: "custrecord_ptg_zonadeprecio_registromovs", summary: "GROUP", label: "PTG -Zona de precio"}),
-                   search.createColumn({ name: "custrecord_ptg_tasa", summary: "MAX", label: "PTG - TASA"})
+                   search.createColumn({ name: "custrecord_ptg_tasa", summary: "MAX", label: "PTG - TASA"}),
+                   search.createColumn({name: "custrecord_ptg_envasesvendidos_", summary: "SUM", label: "PTG - Envases vendidos"})
                 ]
             });
             var movimientosDetalleVentasObjCount = movimientosDetalleVentasObj.runPaged().count;
@@ -528,6 +530,7 @@
                     (ventasVentas = movimientosDetalleVentasResult[n].getValue({name: "custrecord_ptg_ventagas_", summary: "SUM", label: "PTG - Venta Gas"}) || 0);
                     (zonaPrecio = movimientosDetalleVentasResult[n].getValue({name: "custrecord_ptg_zonadeprecio_registromovs", summary: "GROUP", label: "PTG -Zona de precio"}) || 0);
                     (tasaVentas = movimientosDetalleVentasResult[n].getValue({name: "custrecord_ptg_tasa", summary: "MAX", label: "PTG - TASA"}) || 0);
+                    envasesVendidos = parseInt(movimientosDetalleVentasResult[n].getValue({name: "custrecord_ptg_envasesvendidos_", summary: "SUM", label: "PTG - Envases vendidos"})) || 0;
                     var movimientoMas = parseInt(movimientoMasVentas);
                     var movimientoMenos = parseInt(movimientoMenosVentas);
                     var movimientoVentaGas = parseInt(ventasVentas);
