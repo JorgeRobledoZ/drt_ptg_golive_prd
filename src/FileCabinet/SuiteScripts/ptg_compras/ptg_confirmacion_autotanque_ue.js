@@ -440,7 +440,7 @@
                                     });
                                 }
 
-                                //idRecepcion2 = recepcion2.save();
+                                idRecepcion2 = recepcion2.save();
                                 log.audit('idRecepcion2', idRecepcion2)
                             } catch (error_recepcion) {
                                 log.audit('error_recepcion', error_recepcion)
@@ -469,8 +469,6 @@
 
                             var lineasFactura = vendorBill.getLineCount('item');
 
-                            log.audit('lineas', lineasFactura)
-
                             var objPg = {};
                             var arrayPG = [];
                             for (var a = 0; a < lineasFactura; a++) {
@@ -480,148 +478,64 @@
                                     line: a
                                 });
 
-                                if (!objPg[pgF]) {
-                                    objPg[pgF] = {
+                                if (!objPg[a]) {
+                                    objPg[a] =  {
                                         pgh: pgF,
                                         linea: a
                                     }
                                 }
 
-                                arrayPG.push(objPg);
+                                arrayPG.push({
+                                    pgh: pgF,
+                                    linea: a
+                                });
                             }
-                            for (var b = 0; b < lineasFactura; b++) {
-                                for(var h in arrayPG){
-                                    for(var j in arrayPG[h]){
-                                        var pgCustom = arrayPG[h][j]['pgh'];
-                                        var linea = arrayPG[h][j]['linea'];
 
-                                        if(pgCustom == arrayPo[po]['pg']){
-                                            vendorBill.selectLine({
-                                                sublistId: 'item',
-                                                line: b
-                                            });
-                                            
-                                            vendorBill.setCurrentSublistValue({
-                                                sublistId: 'item',
-                                                fieldId: 'quantity',
-                                                value: arrayPo[po]['litros']
-                                            });
-        
-                                            var rateB = parseFloat(arrayPo[po]['precioConfirmacion'])
-                                            rateB = rateB.toFixed(6)
-                                            log.audit('rateB', rateB)
-        
-                                            vendorBill.setCurrentSublistValue({
-                                                sublistId: 'item',
-                                                fieldId: 'rate',
-                                                value: rateB
-                                            });
-        
-                                            vendorBill.commitLine({
-                                                sublistId: 'item'
-                                            });
-                                        } else {
-                                            //vendorBill.removeLine({
-                                            //    sublistId: 'item',
-                                            //    line: b,
-                                            //    ignoreRecalc: true
-                                            //});
-            
-                                            //lineasFactura = vendorBill.getLineCount('item');
-                                            //lineasFactura --;
-                                            //b--;
-                                        }
-                                    }
-                                }
-                            }
-                            /*
-                            for (var b = 0; b < lineasFactura; b++) {
-                                log.audit('123456', objPg[arrayPo[po]['pg']]);
-
-                                if(objPg[arrayPo[po]['pg']]){    
-                                    log.audit('se cumple la condicion', 'entro')
-                                    
-
-                                } else {
+                            for(var h = arrayPG.length - 1; h >= 0; h--){
+                                const pgLinea = arrayPG[h]['pgh'];
+                                const pgRegistroPrincipal = arrayPo[po]['pg'];
+                                const esDiferentPg = pgLinea != pgRegistroPrincipal;
+                                log.audit(`linea pg`, `pgLinea ${pgLinea} pgRegistroPrincipal ${pgRegistroPrincipal} esDiferentPg ${esDiferentPg}`)
+                                if (
+                                    esDiferentPg
+                                )
+                                {   
                                     vendorBill.removeLine({
                                         sublistId: 'item',
-                                        line: b
-                                        //ignoreRecalc: true
+                                        line: h,
+                                        ignoreRecalc: true
                                     });
-    
-                                    lineasFactura = vendorBill.getLineCount('item');
-                                    //lineasFactura --;
-                                    b--;
+                                } else {
+                                    vendorBill.selectLine({
+                                        sublistId: 'item',
+                                        line: h
+                                    });
+                                    
+                                    vendorBill.setCurrentSublistValue({
+                                        sublistId: 'item',
+                                        fieldId: 'quantity',
+                                        value: arrayPo[po]['litros']
+                                    });
+
+                                    const rateConfirmacion = parseFloat(arrayPo[po]['precioConfirmacion'] || 0).toFixed(6);
+
+                                    vendorBill.setCurrentSublistValue({
+                                        sublistId: 'item',
+                                        fieldId: 'rate',
+                                        value: rateConfirmacion
+                                    });
+
+                                    vendorBill.commitLine({
+                                        sublistId: 'item'
+                                    });
                                 }
                             }
-                            */
 
                             idVendorBill = vendorBill.save({
                                 ignoreMandatoryFields: true,
                                 enableSourcing: true
                             });
-
-                            log.audit('idVendorBill', idVendorBill);
-                            /*
-
-                            for (var b = 0; b < lineas; b++) {
-                                vendorBill.removeLine({
-                                    sublistId: 'item',
-                                    line: b,
-                                    ignoreRecalc: true
-                                });
-
-                                lineas = vendorBill.getLineCount('item');
-                                b--
-                            }
-
-                            vendorBill.selectNewLine('item');
-
-                            vendorBill.setCurrentSublistValue({
-                                sublistId: 'item',
-                                fieldId: 'item',
-                                value: arrayPo[po]['item']
-                            });
-
-                            vendorBill.setCurrentSublistValue({
-                                sublistId: 'item',
-                                fieldId: 'quantity',
-                                value: arrayPo[po]['litros']
-                            });
-
-                            var rateB = parseFloat(arrayPo[po]['precioConfirmacion'])
-                            rateB = rateB.toFixed(6)
-                            log.audit('rateB', rateB)
-                            vendorBill.setCurrentSublistValue({
-                                sublistId: 'item',
-                                fieldId: 'rate',
-                                value: rateB
-                            });
-
-                            vendorBill.setCurrentSublistValue({
-                                sublistId: "item",
-                                fieldId: 'custcol2',
-                                value: arrayPo[po]['pg']
-                            });
-
-                            
-                            vendorBill.setCurrentSublistValue({
-                                sublistId: 'item',
-                                fieldId: 'orderdoc',
-                                value: arrayPo[po]['id_orden_compra'] arrayPo[po]['tarifa_kilogramo'] * arrayPo[po]['tarifa_sprecio_intercompania']
-                            });
-                            
-
-                            vendorBill.setCurrentSublistValue({
-                                sublistId: 'item',
-                                fieldId: 'custcol2',
-                                value: arrayPo[po]['pg']
-                            });
-                            
-                            vendorBill.commitLine('item');
-                            */
-                            
-                            
+                                                        
                         } catch (error_factura_compra) {
                             log.audit('error_factura_compra', error_factura_compra)
                         }
@@ -815,12 +729,6 @@
 
                                 facturaFlete.setCurrentSublistValue({
                                     sublistId: "item",
-                                    fieldId: 'landedcostcategory',
-                                    value: 48
-                                });
-
-                                facturaFlete.setCurrentSublistValue({
-                                    sublistId: "item",
                                     fieldId: 'quantity',
                                     value: 1
                                 });
@@ -842,6 +750,12 @@
                                 //custpage_4601_witaxcode
                                 //landedcostcategory
                                 //custcol_4601_witaxapplies
+
+                                facturaFlete.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: 'landedcostcategory',
+                                    value: 48
+                                });
                                 
                                 facturaFlete.setCurrentSublistValue({
                                     sublistId: "item",
@@ -859,7 +773,21 @@
                                     sublistId: 'item'
                                 });
 
-                                //idFactura3 = facturaFlete.save();
+                                const macros = facturaFlete.getMacros();
+                                log.audit('macros', macros);
+                                for (let macroDisponible in macros) {
+                                    try {
+                                        log.audit(`macros[macroDisponible].id`, macros[macroDisponible].id);
+                                        facturaFlete.executeMacro({
+                                            id: macros[macroDisponible].id
+                                        });
+                                    } catch (e) {
+                                        log.error(`error executeMacro ${macros[macroDisponible].id}`, e.message);
+                                    }
+                                }
+
+
+                                idFactura3 = facturaFlete.save();
                                 log.audit('idFacturaFlete', idFactura3);
 
                                 drt_update_record_cm.requestSuitelet("vendorbill", idFactura3, context.newRecord.type, context.newRecord.id);
