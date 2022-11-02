@@ -2,7 +2,7 @@
  *@NApiVersion 2.1
  *@NScriptType UserEventScript
  */
-define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_module/drt_update_record_cm", "N/record", "N/search", "N/runtime"], function (drt_mapid_cm, drt_update_record_cm, record, search, runtime) {
+ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_module/drt_update_record_cm", "N/record", "N/search", "N/runtime"], function (drt_mapid_cm, drt_update_record_cm, record, search, runtime) {
 
     const beforeSubmit = (context) => {
         try {
@@ -60,6 +60,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                 let idSaveTransferOrder = '';
                 let saveinvoice = '';
                 let idFacturaInter = '';
+                let saveInvoiceInter = ''
 
                 let ubicacion_desvio_planta_receipt = 0;
                 let form_desvio_cliente_invoice = 0;
@@ -89,9 +90,11 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                     item_vendor_bill_flete = objMap.item_vendor_bill_flete;
                 }
 
-                var precioTarifa = currentRecord.getValue({
-                    fieldId: 'custrecord_ptg_tarifporkilogramo_csa_'
+                var subtotalFlete = currentRecord.getValue({
+                    fieldId: 'custrecord_ptg_subtotal_fact_flete'
                 })
+
+                log.audit('subtotalFlete', subtotalFlete)
 
                 var lineas = currentRecord.getLineCount({
                     sublistId: 'recmachcustrecord_ptg_confirmacion_salida_'
@@ -437,7 +440,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                     });
                                 }
 
-                                idRecepcion2 = recepcion2.save();
+                                //idRecepcion2 = recepcion2.save();
                                 log.audit('idRecepcion2', idRecepcion2)
                             } catch (error_recepcion) {
                                 log.audit('error_recepcion', error_recepcion)
@@ -464,9 +467,102 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                 value: arrayPo[po]['ptgembarque']
                             })
 
-                            let lineas = vendorBill.getLineCount('item');
+                            var lineasFactura = vendorBill.getLineCount('item');
 
-                            log.audit('lineas', lineas)
+                            log.audit('lineas', lineasFactura)
+
+                            var objPg = {};
+                            var arrayPG = [];
+                            for (var a = 0; a < lineasFactura; a++) {
+                                var pgF = vendorBill.getSublistValue({
+                                    sublistId: 'item',
+                                    fieldId: 'custcol2',
+                                    line: a
+                                });
+
+                                if (!objPg[pgF]) {
+                                    objPg[pgF] = {
+                                        pgh: pgF,
+                                        linea: a
+                                    }
+                                }
+
+                                arrayPG.push(objPg);
+                            }
+                            for (var b = 0; b < lineasFactura; b++) {
+                                for(var h in arrayPG){
+                                    for(var j in arrayPG[h]){
+                                        var pgCustom = arrayPG[h][j]['pgh'];
+                                        var linea = arrayPG[h][j]['linea'];
+
+                                        if(pgCustom == arrayPo[po]['pg']){
+                                            vendorBill.selectLine({
+                                                sublistId: 'item',
+                                                line: b
+                                            });
+                                            
+                                            vendorBill.setCurrentSublistValue({
+                                                sublistId: 'item',
+                                                fieldId: 'quantity',
+                                                value: arrayPo[po]['litros']
+                                            });
+        
+                                            var rateB = parseFloat(arrayPo[po]['precioConfirmacion'])
+                                            rateB = rateB.toFixed(6)
+                                            log.audit('rateB', rateB)
+        
+                                            vendorBill.setCurrentSublistValue({
+                                                sublistId: 'item',
+                                                fieldId: 'rate',
+                                                value: rateB
+                                            });
+        
+                                            vendorBill.commitLine({
+                                                sublistId: 'item'
+                                            });
+                                        } else {
+                                            //vendorBill.removeLine({
+                                            //    sublistId: 'item',
+                                            //    line: b,
+                                            //    ignoreRecalc: true
+                                            //});
+            
+                                            //lineasFactura = vendorBill.getLineCount('item');
+                                            //lineasFactura --;
+                                            //b--;
+                                        }
+                                    }
+                                }
+                            }
+                            /*
+                            for (var b = 0; b < lineasFactura; b++) {
+                                log.audit('123456', objPg[arrayPo[po]['pg']]);
+
+                                if(objPg[arrayPo[po]['pg']]){    
+                                    log.audit('se cumple la condicion', 'entro')
+                                    
+
+                                } else {
+                                    vendorBill.removeLine({
+                                        sublistId: 'item',
+                                        line: b
+                                        //ignoreRecalc: true
+                                    });
+    
+                                    lineasFactura = vendorBill.getLineCount('item');
+                                    //lineasFactura --;
+                                    b--;
+                                }
+                            }
+                            */
+
+                            idVendorBill = vendorBill.save({
+                                ignoreMandatoryFields: true,
+                                enableSourcing: true
+                            });
+
+                            log.audit('idVendorBill', idVendorBill);
+                            /*
 
                             for (var b = 0; b < lineas; b++) {
                                 vendorBill.removeLine({
@@ -492,6 +588,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                 fieldId: 'quantity',
                                 value: arrayPo[po]['litros']
                             });
+
                             var rateB = parseFloat(arrayPo[po]['precioConfirmacion'])
                             rateB = rateB.toFixed(6)
                             log.audit('rateB', rateB)
@@ -501,28 +598,30 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                 value: rateB
                             });
 
-                            /*
+                            vendorBill.setCurrentSublistValue({
+                                sublistId: "item",
+                                fieldId: 'custcol2',
+                                value: arrayPo[po]['pg']
+                            });
+
+                            
                             vendorBill.setCurrentSublistValue({
                                 sublistId: 'item',
                                 fieldId: 'orderdoc',
                                 value: arrayPo[po]['id_orden_compra'] arrayPo[po]['tarifa_kilogramo'] * arrayPo[po]['tarifa_sprecio_intercompania']
                             });
-                            */
+                            
 
                             vendorBill.setCurrentSublistValue({
                                 sublistId: 'item',
                                 fieldId: 'custcol2',
                                 value: arrayPo[po]['pg']
                             });
-
+                            
                             vendorBill.commitLine('item');
-
-                            idVendorBill = vendorBill.save({
-                                ignoreMandatoryFields: true,
-                                enableSourcing: true
-                            });
-
-                            log.audit('idVendorBill', idVendorBill);
+                            */
+                            
+                            
                         } catch (error_factura_compra) {
                             log.audit('error_factura_compra', error_factura_compra)
                         }
@@ -604,162 +703,170 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                             log.audit('tarifa', tarifa)
                         }
 
-                        try {
+                        if(arrayPo[po]['tarifa_v_senciillo'] || arrayPo[po]['tarifa_v_senciillo'] > 0){
+                            try {
+                                var vendorbillSearchObj = search.create({
+                                    type: "vendorbill",
+                                    filters:
+                                    [
+                                        ["type","anyof","VendBill"], 
+                                        "AND", 
+                                        ["mainline","is","T"], 
+                                        "AND", 
+                                        ["custbody_ptg_fact_flete_","is","T"]
+                                    ],
+                                    columns:
+                                    [
+                                        search.createColumn({name: "tranid", label: "Document Number"})
+                                    ]
+                                });
+                                var conteoBusqueda = vendorbillSearchObj.runPaged().count;
+                                log.audit("vendorbillSearchObj result count", conteoBusqueda);
 
-                            var vendorbillSearchObj = search.create({
-                                type: "vendorbill",
-                                filters:
-                                [
-                                    ["type","anyof","VendBill"], 
-                                    "AND", 
-                                    ["mainline","is","T"], 
-                                    "AND", 
-                                    ["custbody_ptg_fact_flete_","is","T"]
-                                ],
-                                columns:
-                                [
-                                    search.createColumn({name: "tranid", label: "Document Number"})
-                                ]
-                            });
-                            var conteoBusqueda = vendorbillSearchObj.runPaged().count;
-                            log.audit("vendorbillSearchObj result count", conteoBusqueda);
+                            
+                                var numeroEntero = conteoBusqueda + 1;
+                                log.audit('numeroEntero1', numeroEntero);
+                                numeroEntero = numeroEntero + 1
 
-                           
-                            var numeroEntero = conteoBusqueda + 1;
-                            log.audit('numeroEntero1', numeroEntero);
-                            numeroEntero = numeroEntero + 1
+                                let facturaFlete = record.create({
+                                    type: record.Type.VENDOR_BILL,
+                                    isDynamic: true
+                                });
 
-                            let facturaFlete = record.create({
-                                type: record.Type.VENDOR_BILL,
-                                isDynamic: true
-                            });
+                                facturaFlete.setValue({
+                                    fieldId: 'customform',
+                                    value: form_vendor_bill
+                                });
 
-                            facturaFlete.setValue({
-                                fieldId: 'customform',
-                                value: form_vendor_bill
-                            });
-
-                            facturaFlete.setValue({
-                                fieldId: 'entity',
-                                value: arrayPo[po]['provedorFlete']
-                            });
+                                facturaFlete.setValue({
+                                    fieldId: 'entity',
+                                    value: arrayPo[po]['provedorFlete']
+                                });
 
 
-                            facturaFlete.setValue({
-                                fieldId: 'subsidiary',
-                                value: arrayPo[po]['subsidiaria_linea'] ? arrayPo[po]['subsidiaria_linea'] : arrayPo[po]['subsidiaria']
-                            });
+                                facturaFlete.setValue({
+                                    fieldId: 'subsidiary',
+                                    value: arrayPo[po]['subsidiaria_linea'] ? arrayPo[po]['subsidiaria_linea'] : arrayPo[po]['subsidiaria']
+                                });
 
-                            var fleteUbicacion = 0;
-                            if (arrayPo[po]['tipo_desvio'] == 4) {
-                                fleteUbicacion = arrayPo[po]['planta_desvio']
-                            } else {
-                                fleteUbicacion = arrayPo[po]['location']
+                                var fleteUbicacion = 0;
+                                if (arrayPo[po]['tipo_desvio'] == 4) {
+                                    fleteUbicacion = arrayPo[po]['planta_desvio']
+                                } else {
+                                    fleteUbicacion = arrayPo[po]['location']
+                                }
+
+                                facturaFlete.setValue({
+                                    fieldId: 'location',
+                                    value: fleteUbicacion
+                                });
+
+                                facturaFlete.setValue({
+                                    fieldId: 'custbody_ptg_fact_flete_',
+                                    value: true
+                                })
+
+                                facturaFlete.setValue({
+                                    fieldId: 'tranid',
+                                    value: 'PTG-Flete-' + numeroEntero
+                                });
+
+                                facturaFlete.setValue({
+                                    fieldId: 'approvalstatus',
+                                    value: 2
+                                });
+
+                                facturaFlete.setValue({
+                                    fieldId: 'memo',
+                                    value: 'factura de flete'
+                                });
+                                
+                                
+                                facturaFlete.setValue({
+                                    fieldId: 'custpage_4601_appliesto',
+                                    value: true
+                                });
+
+                                facturaFlete.setValue({
+                                    fieldId: 'custpage_4601_witaxcode',
+                                    value: 1
+                                });
+
+                                facturaFlete.setValue({
+                                    fieldId: 'custbody_4601_entitytype',
+                                    value: 1
+                                });
+
+                                facturaFlete.selectNewLine({
+                                    sublistId: 'item'
+                                });
+
+                                facturaFlete.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: 'item',
+                                    value: item_vendor_bill_flete
+                                });
+
+                                //facturaFlete.setCurrentSublistValue({
+                                //    sublistId: "item",
+                                //    fieldId: 'location',
+                                //    value: objTransaccion.ubicacion
+                                // });
+
+                                facturaFlete.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: 'landedcostcategory',
+                                    value: 48
+                                });
+
+                                facturaFlete.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: 'quantity',
+                                    value: 1
+                                });
+
+                                facturaFlete.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: 'custcol2',
+                                    value: arrayPo[po]['pg']
+                                });
+
+                                var rateCalculado = arrayPo[po]['litros'] * arrayPo[po]['tarifa_v_senciillo']
+                                log.audit('rateCalculado', rateCalculado);
+
+                                facturaFlete.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: 'rate',
+                                    value: rateCalculado.toFixed(6)
+                                });
+                                //custpage_4601_witaxcode
+                                //landedcostcategory
+                                //custcol_4601_witaxapplies
+                                
+                                facturaFlete.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: 'mandatorytaxcode',
+                                    value: true
+                                });
+
+                                facturaFlete.setCurrentSublistValue({
+                                    sublistId: "item",
+                                    fieldId: 'custcol_4601_witaxapplies',
+                                    value: true
+                                });
+
+                                let articuloCreado1 = facturaFlete.commitLine({
+                                    sublistId: 'item'
+                                });
+
+                                //idFactura3 = facturaFlete.save();
+                                log.audit('idFacturaFlete', idFactura3);
+
+                                drt_update_record_cm.requestSuitelet("vendorbill", idFactura3, context.newRecord.type, context.newRecord.id);
+
+                            } catch (error_Factura_flete) {
+                                log.error('error_Factura_flete', error_Factura_flete)
                             }
-
-                            facturaFlete.setValue({
-                                fieldId: 'location',
-                                value: fleteUbicacion
-                            });
-
-                            facturaFlete.setValue({
-                                fieldId: 'custbody_ptg_fact_flete_',
-                                value: true
-                            })
-
-                            facturaFlete.setValue({
-                                fieldId: 'tranid',
-                                value: 'PTG-Flete-' + numeroEntero
-                            });
-
-                            facturaFlete.setValue({
-                                fieldId: 'approvalstatus',
-                                value: 2
-                            });
-
-                            facturaFlete.setValue({
-                                fieldId: 'memo',
-                                value: 'factura de flete'
-                            });
-                            
-                            
-                            facturaFlete.setValue({
-                                fieldId: 'custpage_4601_appliesto',
-                                value: true
-                            });
-
-                            facturaFlete.setValue({
-                                fieldId: 'custpage_4601_witaxcode',
-                                value: 1
-                            });
-
-                            facturaFlete.setValue({
-                                fieldId: 'custbody_4601_entitytype',
-                                value: 1
-                            });
-
-                            facturaFlete.selectNewLine({
-                                sublistId: 'item'
-                            });
-
-                            facturaFlete.setCurrentSublistValue({
-                                sublistId: "item",
-                                fieldId: 'item',
-                                value: item_vendor_bill_flete
-                            });
-
-                            //facturaFlete.setCurrentSublistValue({
-                            //    sublistId: "item",
-                            //    fieldId: 'location',
-                            //    value: objTransaccion.ubicacion
-                            // });
-
-                            facturaFlete.setCurrentSublistValue({
-                                sublistId: "item",
-                                fieldId: 'landedcostcategory',
-                                value: 48
-                            });
-
-                            facturaFlete.setCurrentSublistValue({
-                                sublistId: "item",
-                                fieldId: 'quantity',
-                                value: 1
-                            });
-                            var rateCalculado = arrayPo[po]['litros'] * arrayPo[po]['tarifa_v_senciillo']
-                            log.audit('rateCalculado', rateCalculado);
-
-                            facturaFlete.setCurrentSublistValue({
-                                sublistId: "item",
-                                fieldId: 'rate',
-                                value: rateCalculado.toFixed(6)
-                            });
-                            //custpage_4601_witaxcode
-                            //landedcostcategory
-                            //custcol_4601_witaxapplies
-                            
-                            facturaFlete.setCurrentSublistValue({
-                                sublistId: "item",
-                                fieldId: 'mandatorytaxcode',
-                                value: true
-                            });
-
-                            facturaFlete.setCurrentSublistValue({
-                                sublistId: "item",
-                                fieldId: 'custcol_4601_witaxapplies',
-                                value: true
-                            });
-
-                            let articuloCreado1 = facturaFlete.commitLine({
-                                sublistId: 'item'
-                            });
-
-                            idFactura3 = facturaFlete.save();
-                            log.audit('idFacturaFlete', idFactura3);
-
-                            drt_update_record_cm.requestSuitelet("vendorbill", idFactura3, context.newRecord.type, context.newRecord.id);
-
-                        } catch (error_Factura_flete) {
-                            log.error('error_Factura_flete', error_Factura_flete)
                         }
 
                         /**************Proceso de Creacion de Orden de traslado****************** */
@@ -975,20 +1082,18 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                             sublistId: 'item'
                                         });
 
-                                        let facturaFleteLoad = record.load({
-                                            type: record.Type.VENDOR_BILL,
-                                            id: idFactura3,
-                                            isDynamic: true
-                                        });
-
-                                        let total = facturaFleteLoad.getValue({
-                                            fieldId: 'usertotal'
-                                        });
-
-                                        let savefFL = facturaFleteLoad.save();
-
-                                        log.audit('savefFL', savefFL);
-
+                                        let total = 0;
+                                        if(idFactura3){
+                                            let facturaFleteLoad = record.load({
+                                                type: record.Type.VENDOR_BILL,
+                                                id: idFactura3,
+                                                isDynamic: true
+                                            });
+    
+                                            total = facturaFleteLoad.getValue({
+                                                fieldId: 'usertotal'
+                                            });
+                                        }
 
                                         receiptOrder.setValue({
                                             fieldId: 'landedcostmethod',
@@ -1406,7 +1511,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                             value: form_invoice
                                         });
 
-                                        let saveInvoiceInter = invoiceInter.save({
+                                        saveInvoiceInter = invoiceInter.save({
                                             enableSourcing: false,
                                             ignoreMandatoryFields: true
                                         });
@@ -1519,6 +1624,12 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                                 value: arrayPo[po]['litros']
                                             });
 
+                                            billInter.setCurrentSublistValue({
+                                                sublistId: "item",
+                                                fieldId: 'custcol2',
+                                                value: arrayPo[po]['pg']
+                                            });
+
                                             var precioConfirmacionV = parseFloat(arrayPo[po]['precioConfirmacion']);
                                             var precioIntercom = parseFloat(arrayPo[po]['tarifa_sprecio_intercompania']);
                                             var resultado1 = precioIntercom + precioConfirmacionV
@@ -1603,7 +1714,7 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                 pO.setSublistValue({
                                     sublistId: 'item',
                                     fieldId: 'custcol_ptg_factura_de_venta',
-                                    value: saveinvoice,
+                                    value: saveInvoiceInter,
                                     line: y
                                 })
 
@@ -1620,13 +1731,14 @@ define(["SuiteScripts/drt_custom_module/drt_mapid_cm", "SuiteScripts/drt_custom_
                                     value: true,
                                     line: y
                                 })
-
+                                /*
                                 pO.setSublistValue({
                                     sublistId: 'item',
                                     fieldId: 'custcol_ptg_pg_en_uso_',
                                     value: false,
                                     line: y
                                 })
+                                */
                             }
                         }
 
