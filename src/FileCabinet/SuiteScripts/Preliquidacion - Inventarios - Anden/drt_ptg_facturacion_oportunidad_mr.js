@@ -13,7 +13,7 @@
  *@NApiVersion 2.1
  *@NScriptType MapReduceScript
  */
- define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https'], function (drt_mapid_cm, runtime, search, record, email, error, url, https) {
+ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', 'N/runtime', 'N/search', 'N/record', 'N/email', 'N/error', 'N/url', 'N/https', 'N/task'], function (drt_mapid_cm, runtime, search, record, email, error, url, https, task) {
 
     function getInputData() {
         try {
@@ -97,9 +97,7 @@
                 ]
             });
             var transactionSearchCount = transactionSearchObj.runPaged().count;
-            log.audit("transactionSearchCount", transactionSearchCount);
             if(transactionSearchCount > 0){
-                log.audit("Reprocesa facturación con factura ya creada");
                 var transactionSearchResult = transactionSearchObj.run().getRange({
                     start: 0,
                     end: 2,
@@ -156,15 +154,16 @@
                     var pagoAFacturaObj = search.create({
                         type: "customerpayment",
                         filters: [
-                           ["type","anyof","CustPymt"], "AND", 
-                           ["mainline","is","F"], "AND", 
-                           ["paidtransaction","anyof",idTransaccion]
+                            ["type","anyof","CustPymt","CustCred"], "AND", 
+                            [["mainline","is","F"],"AND",["paidtransaction","anyof",idTransaccion]], "OR", 
+                            [["mainline","is","T"],"AND",["createdfrom","anyof",idTransaccion]]
                         ],
                         columns: [
                            search.createColumn({name: "paidtransaction", label: "Transacción paga"})
                         ]
                      });
                      var pagoAFacturaCount = pagoAFacturaObj.runPaged().count;
+                     log.audit("pagoAFacturaCount: "+pagoAFacturaCount, "idTransaccion: "+ idTransaccion)
                      if(pagoAFacturaCount > 0){
                         context.write({
                             key: idTransaccion,
@@ -176,7 +175,6 @@
                             value: {crear_pago: "true"}
                         });
                      }
-    
                 }
             } else {
                 reprocesa = 0;
@@ -731,10 +729,6 @@
 
     function reduce(context) {
         try {
-            log.audit({
-                title: 'context reduce',
-                details: JSON.stringify(context)
-            });
             var idFactura = JSON.parse(context.key);
             var idFacturaPI = parseInt(idFactura);
             var contextValues = JSON.parse(context.values);
@@ -788,54 +782,48 @@
             var tarjetaDebitoHSBCId = 0;
 
 
-            var objMap=drt_mapid_cm.drt_liquidacion();
-            if (Object.keys(objMap).length>0) {
-                articuloServicio = objMap.articuloServicio;
-                efectivoId = objMap.efectivo;
-                prepagoBanorteId = objMap.prepagoBanorte;
-                valeId = objMap.vale;
-                cortesiaId = objMap.cortesia;
-                tarjetaCreditoId = objMap.tarjetaCredito;
-                tarjetaDebitoId = objMap.tarjetaDebito;
-                multipleId = objMap.multiple;
-                prepagoTransferenciaId = objMap.prepagoTransferencia;
-                creditoClienteId = objMap.creditoCliente;
-                reposicionId = objMap.reposicion;
-                saldoAFavorId = objMap.saldoAFavor;
-                consumoInternoId = objMap.consumoInterno;
-                prepagoBancomerId = objMap.prepagoBancomer;
-                prepagoHSBCId = objMap.prepagoHSBC;
-                prepagoBanamexId = objMap.prepagoBanamex;
-                prepagoSantanderId = objMap.prepagoSantander;
-                prepagoScotianId = objMap.prepagoScotian;
-                bonificacionId = objMap.bonificacion;
-                ticketCardId = objMap.ticketCard;
-                chequeBancomerId = objMap.chequeBancomer;
-                recirculacionId = objMap.recirculacion;
-                canceladoId = objMap.cancelado;
-                rellenoId = objMap.relleno;
-                transferenciaId = objMap.transferencia;
-                traspasoId = objMap.traspaso;
-                chequeSantanderId = objMap.chequeSantander;
-                chequeScotianId = objMap.chequeScotian;
-                chequeHSBCId = objMap.chequeHSBC;
-                chequeBanamexId = objMap.chequeBanamex;
-                chequeBanorteId = objMap.chequeBanorte;
-                tarjetaCreditoBancomerId = objMap.tarjetaCreditoBancomer;
-                tarjetaCreditoHSBCId = objMap.tarjetaCreditoHSBC;
-                tarjetaCreditoBanamexId = objMap.tarjetaCreditoBanamex;
-                tarjetaDebitoBanamexId = objMap.tarjetaDebitoBanamex;
-                tarjetaDebitoBancomerId = objMap.tarjetaDebitoBancomer;
-                tarjetaDebitoHSBCId = objMap.tarjetaDebitoHSBC;
-            }
-
-            if(creaPago == "true"){
-                log.emergency("Si crea pago");
-            } else {
-                log.emergency("No crea pago")
-            }
-
             if(idFacturaPI && creaPago == "true"){
+                var objMap=drt_mapid_cm.drt_liquidacion();
+                if (Object.keys(objMap).length>0) {
+                    articuloServicio = objMap.articuloServicio;
+                    efectivoId = objMap.efectivo;
+                    prepagoBanorteId = objMap.prepagoBanorte;
+                    valeId = objMap.vale;
+                    cortesiaId = objMap.cortesia;
+                    tarjetaCreditoId = objMap.tarjetaCredito;
+                    tarjetaDebitoId = objMap.tarjetaDebito;
+                    multipleId = objMap.multiple;
+                    prepagoTransferenciaId = objMap.prepagoTransferencia;
+                    creditoClienteId = objMap.creditoCliente;
+                    reposicionId = objMap.reposicion;
+                    saldoAFavorId = objMap.saldoAFavor;
+                    consumoInternoId = objMap.consumoInterno;
+                    prepagoBancomerId = objMap.prepagoBancomer;
+                    prepagoHSBCId = objMap.prepagoHSBC;
+                    prepagoBanamexId = objMap.prepagoBanamex;
+                    prepagoSantanderId = objMap.prepagoSantander;
+                    prepagoScotianId = objMap.prepagoScotian;
+                    bonificacionId = objMap.bonificacion;
+                    ticketCardId = objMap.ticketCard;
+                    chequeBancomerId = objMap.chequeBancomer;
+                    recirculacionId = objMap.recirculacion;
+                    canceladoId = objMap.cancelado;
+                    rellenoId = objMap.relleno;
+                    transferenciaId = objMap.transferencia;
+                    traspasoId = objMap.traspaso;
+                    chequeSantanderId = objMap.chequeSantander;
+                    chequeScotianId = objMap.chequeScotian;
+                    chequeHSBCId = objMap.chequeHSBC;
+                    chequeBanamexId = objMap.chequeBanamex;
+                    chequeBanorteId = objMap.chequeBanorte;
+                    tarjetaCreditoBancomerId = objMap.tarjetaCreditoBancomer;
+                    tarjetaCreditoHSBCId = objMap.tarjetaCreditoHSBC;
+                    tarjetaCreditoBanamexId = objMap.tarjetaCreditoBanamex;
+                    tarjetaDebitoBanamexId = objMap.tarjetaDebitoBanamex;
+                    tarjetaDebitoBancomerId = objMap.tarjetaDebitoBancomer;
+                    tarjetaDebitoHSBCId = objMap.tarjetaDebitoHSBC;
+                    idArticuloServicio = objMap.idArticuloServicio;
+                }
                 log.emergency("Entra a crea pago")
                 var invoiceObj = record.load({
                     type: record.Type.INVOICE,
@@ -859,11 +847,12 @@
                 log.emergency("mapeoPagos", mapeoPagos);
 
                 var notaCredito = mapeoPagos.nota_credito;
-                var esPrepago = mapeoPagos.es_prepago;                
-                    
-                //if(objValueTipoPago == efectivoId || objValueTipoPago == tarjetaCreditoId || objValueTipoPago == tarjetaDebitoId || objValueTipoPago == chequeBancomerId || objValueTipoPago == chequeSantanderId || objValueTipoPago == chequeScotianId || objValueTipoPago == chequeHSBCId || objValueTipoPago == chequeBanamexId || objValueTipoPago == chequeBanorteId || objValueTipoPago == tarjetaCreditoBancomerId || objValueTipoPago == tarjetaCreditoHSBCId || objValueTipoPago == tarjetaCreditoBanamexId || objValueTipoPago == tarjetaDebitoBanamexId || objValueTipoPago == tarjetaDebitoBancomerId || objValueTipoPago == tarjetaDebitoHSBCId){
-                if(!notaCredito && !esPrepago){
-                log.audit("UN PAGO, EFECTIVO ó TARJETA DE CREDITO ó TARJETA DE DEBITO ó CHEQUE");
+                var esPrepago = mapeoPagos.es_prepago;
+                var creditoCliente = mapeoPagos.credito_cliente;
+                var consumoIntenro = mapeoPagos.consumo_interno;
+
+                if(!notaCredito && !esPrepago && !creditoCliente && !consumoIntenro){
+                    log.audit("UN PAGO, EFECTIVO ó TARJETA DE CREDITO ó TARJETA DE DEBITO ó CHEQUE");
                     var pagoObj = record.transform({
                         fromType: record.Type.INVOICE,
                         fromId: idFactura,
@@ -880,9 +869,8 @@
                     });
                     log.emergency("Pago Creado con: "+objValueTipoPago, pagoObjID);
                 }
-    
-                //else if (objValueTipoPago == prepagoBanorteId || objValueTipoPago == prepagoTransferenciaId || objValueTipoPago == prepagoBancomerId || objValueTipoPago == prepagoHSBCId || objValueTipoPago == prepagoBanamexId || objValueTipoPago == prepagoSantanderId || objValueTipoPago == prepagoScotianId){
-                else if(!notaCredito && esPrepago){
+
+                else if(!notaCredito && esPrepago && !creditoCliente && !consumoIntenro){
                 log.emergency("UN PAGO Prepago");
                     //SS: PTG - Registro de Oportunidad Prepago SS
                     var recOportunidadPrepago = search.create({
@@ -946,44 +934,125 @@
                     }
     
                 }
-                
-                //else if (objValueTipoPago == cortesiaId || objValueTipoPago == reposicionId || objValueTipoPago == bonificacionId){
+
                 else if(notaCredito){
                     log.audit("UN PAGO cortesía, reposicion o bonificacion");
+                    var invoiceLookup = search.lookupFields({
+                        type: record.Type.INVOICE,
+                        id: idFactura,
+                        columns: ['entity']
+                    });
+                    var invoiceCustomer = invoiceLookup.entity[0].value;                
+
                     var creditMemoObj = record.transform({
                         fromType: record.Type.INVOICE,
                         fromId: idFactura,
                         toType: record.Type.CREDIT_MEMO,
-                        isDynamic: false
+                        isDynamic: false,
                     });
 
                     var articuloServicioMapeo = mapeoPagos.articulo_servicio;
     
-                    //if(objValueTipoPago == cortesiaId || objValueTipoPago == bonificacionId){
+                    //CortesiaId || Bonificacion
                     if(articuloServicioMapeo){
+                        var itemArray = [];
+                        var rateArray = [];
                         var amountArray = [];
+                        var grossAmountArray = [];
+                        var importeImpuestoArray = [];
                         var itemCountLine = creditMemoObj.getLineCount('item');
                         log.audit("itemCountLine", itemCountLine);
                         for (var i = 0; i < itemCountLine; i++) {
+                            itemArray[i] = creditMemoObj.getSublistValue({
+                                sublistId: "item",
+                                fieldId: "item",
+                                line: i,
+                            });
+                            rateArray[i] = creditMemoObj.getSublistValue({
+                                sublistId: "item",
+                                fieldId: "rate",
+                                line: i,
+                            });
+                            grossAmountArray[i] = creditMemoObj.getSublistValue({
+                                sublistId: "item",
+                                fieldId: "grossamt",
+                                line: i,
+                            });
+                            importeImpuestoArray[i] = creditMemoObj.getSublistValue({
+                                sublistId: "item",
+                                fieldId: "tax1amt",
+                                line: i,
+                            });
                             amountArray[i] = creditMemoObj.getSublistValue({
                                 sublistId: "item",
                                 fieldId: "amount",
                                 line: i,
                             });
-                            log.audit("amountArray[i]", amountArray[i]);
+                            log.audit("linea: "+i, "itemArray[i]: "+itemArray[i]+ " grossAmountArray[i]: "+grossAmountArray[i]+" importeImpuestoArray[i]: "+importeImpuestoArray[i]+ " amountArray[i]: "+ amountArray[i]);
                         }
+
                             
                         for (var j = 0; j < itemCountLine; j++) {
-                            creditMemoObj.setSublistValue('item', 'item', j, articuloServicio);  
-                            creditMemoObj.setSublistValue('item', 'quantity', j, 1);
-                            creditMemoObj.setSublistValue('item', 'amount', j, amountArray[j]);
+                            if(itemArray[j] != idArticuloServicio){
+                                creditMemoObj.setSublistValue('item', 'item', j, articuloServicio);
+                                creditMemoObj.setSublistValue('item', 'quantity', j, 1);
+                                creditMemoObj.setSublistValue('item', 'rate', j, rateArray[j]);
+                                creditMemoObj.setSublistValue('item', 'amount', j, amountArray[j]);
+                                creditMemoObj.setSublistValue('item', 'grossamt', j, grossAmountArray[j]);
+                                creditMemoObj.setSublistValue('item', 'tax1amt', j, importeImpuestoArray[j]);
+                            }
                         }
                     }
-    
+
+                    //creditMemoObj.setValue("custbody_psg_ei_template", 143);
+
+                    
+
                     var creditMemoID = creditMemoObj.save({
                         ignoreMandatoryFields: true
                     });
                     log.emergency("Nota de credito Creado con: "+objValueTipoPago, creditMemoID);
+
+                    try {
+                        var creditMemoSF = record.submitFields({
+                            type: record.Type.CREDIT_MEMO,
+                            id: creditMemoID,
+                            values: {
+                                entity: invoiceCustomer,
+                                custbody_psg_ei_sending_method: 11,
+                                custbody_psg_ei_template: 143,
+                                custbody_psg_ei_status: 1,
+                            }
+                        });
+                        log.audit("creditMemoSF", creditMemoSF);
+                    } catch (error) {
+                        log.error("error upd invoice", error);
+                    }
+
+                    if(creditMemoSF){
+                        try {
+                            var creditMemoTask = task.create({
+                                taskType: task.TaskType.MAP_REDUCE,
+                                scriptId: 'customscript_drt_ptg_certify_nc_mr',
+                                params: {custscript_drt_credit_memo_id: creditMemoSF}
+                            });
+                            creditMemoTask.submit();
+                            log.audit("creditMemoTask", creditMemoTask);
+                        } catch (error) {
+                            log.error("error creditMemoTask", error);
+                        }   
+                    }
+
+                    /*var urlStltNC = url.resolveScript({
+                        scriptId: "customscript_drt_ptg_certify_nc_sl",
+                        deploymentId: "customdeploy_drt_ptg_certify_nc_sl",
+                        returnExternalUrl: false
+                    });
+              
+                    log.emergency("urlStltNC", urlStltNC);
+                    https.get({
+                        url: urlStltNC//+'&id='+creditMemoID
+                    });*/
                 }
             
             }
