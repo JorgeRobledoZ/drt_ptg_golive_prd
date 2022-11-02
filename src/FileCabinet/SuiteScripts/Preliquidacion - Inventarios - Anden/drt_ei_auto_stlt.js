@@ -242,7 +242,12 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 			 
 			 if(jsonData.preliqCilind){
 				log.audit("Cilindros");
-				liquidacion = jsonData.preliqCilind;
+				var preliqLookup = search.lookupFields({
+					type: "customrecord_ptg_preliquicilndros_",
+					id: jsonData.preliqCilind,
+					columns: ['custrecord_ptg_folio_preliqui_cil_']
+				});
+				liquidacion = preliqLookup.custrecord_ptg_folio_preliqui_cil_;
 				descripcionArticulo = nameItem + " Nota: " + jsonData.oportunidad.substring(1) + " - Liquidación.: " + liquidacion;
 			 } else if(jsonData.preliqEstaci){
 				log.audit("Estacionarios");
@@ -268,7 +273,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 
 			 xmlDoc += '    <fx:Concepto>';
 			 //xmlDoc += '      <fx:NoIdentificacion>' + jsonData.permiso + '</fx:NoIdentificacion>';
-			 xmlDoc += '      <fx:Cantidad>' + jsonData.items[i].quantity + '</fx:Cantidad>';
+			 xmlDoc += '      <fx:Cantidad>' + jsonData.items[i].quantity.toFixed(6) + '</fx:Cantidad>';
 			 xmlDoc += '      <fx:ClaveUnidad>' + jsonData.items[i].ClaveUnidad + '</fx:ClaveUnidad>';
 			 xmlDoc += '      <fx:UnidadDeMedida>' + jsonData.items[i].unit + '</fx:UnidadDeMedida>';
 			 xmlDoc += '      <fx:ClaveProdServ>' + jsonData.items[i].ClaveProdServ + '</fx:ClaveProdServ>';
@@ -348,6 +353,17 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 			id: id_factura,
 			isDynamic: true,
 		  });
+
+		  var zonaPrecioId = rec.getValue("custbody_ptg_zonadeprecioop_");
+		  var itemLookup = search.lookupFields({
+			type: "customrecord_ptg_zonasdeprecio_",
+			id: zonaPrecioId,
+			columns: ['custrecord_ptg_factor_conversion', 'custrecord_ptg_precio_']
+		 });
+
+		 var factor = itemLookup.custrecord_ptg_factor_conversion;
+		 var precioLitro = itemLookup.custrecord_ptg_precio_;
+
 		//jsonData.tranid = rec.getValue({ fieldId: 'tranid'});
 		//jsonData.consecutivo = rec.getValue({ fieldId: 'transactionnumber'});
 		  log.audit("rec", rec);
@@ -373,6 +389,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 				fieldId: 'quantity',
 				line: j
 			});
+
 			var unitArray = rec.getSublistValue({
 				sublistId: 'item',
 				fieldId: 'units_display',
@@ -381,6 +398,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 			/*if(nameArray == "GAS LP TEST UNIDAD GAS LP TEST UNIDAD" || nameArray == "GAS LP - PI GAS LP - PI" || nameArray == "GAS LP - PI" || nameArray == "GAS LP GAS LP" || nameArray == "GAS LP"){
 				unitArray = "LTS"
 			}*/ //Revisar si así quedará, se comenta por pruebas
+
 			var taxcodeidArray = rec.getSublistValue({
 				sublistId: 'item', 
 				fieldId: 'taxcode',
@@ -397,6 +415,18 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 				fieldId: 'rate',
 				line: j
 			 })).toFixed(2);
+
+			 var quantityArrayFinal = 0;
+			 var taxrateArrayFinal = 0;
+			if(unitArray == "CIL 10 KGS" || unitArray == "CIL 20 KGS" || unitArray == "CIL 30 KGS" || unitArray == "CIL 45 KGS"){
+				var cantidad = unitArray.split(" ")[1];
+				quantityArrayFinal = cantidad / factor;
+				taxrateArrayFinal = precioLitro;
+			} else {
+				quantityArrayFinal = quantityArray;
+				taxrateArrayFinal = rateArray;
+			}
+
 			var taxamtArray = parseFloat(rec.getSublistValue({
 				sublistId: 'item', 
 				fieldId: 'tax1amt',
@@ -444,7 +474,7 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 
 			 if(nameArray != "Descuentos, bonificaciones y devoluciones" && nameArray != "PTG - Descuentos, bonificaciones y devoluciones"){
 
-				objItems = {line: lineaArray, itemid: itemidArray, name: nameArray, quantity: quantityArray, unit: unitArray, taxcodeid: taxcodeidArray, taxcode: taxcodeArray, taxrate: taxrateArray, rate: rateArray,
+				objItems = {line: lineaArray, itemid: itemidArray, name: nameArray, quantity: quantityArrayFinal, unit: unitArray, taxcodeid: taxcodeidArray, taxcode: taxcodeArray, taxrate: taxrateArray, rate: taxrateArrayFinal,
 					taxamt: taxamtArray, amount: amountArray, discount: discouArray, idinvo: idinvoArray, type: typeArray, ClaveUnidad: ClaveUArray, ClaveProdServ: ClavePArray, objetoImp: objetoImpArray}
 
 				lineaSubtotales = amountArray * 1;
@@ -528,11 +558,11 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						 oportunidad: rec.getText("opportunity").split(' ')[1],
 						 creadoDesde: rec.getText("createdfrom").split(' ')[1],
 						 oportunidadID: rec.getValue("opportunity"),
-						 preliqCilind: rec.getText("custbody_ptg_registro_pre_liq"),
-						 preliqEstaci: rec.getText("custbody_ptg_registro_pre_liq_esta"),
-						 preliqCarbur: rec.getText("custbody_ptg_registro_pre_liq_carb"),
-						 preliqVenAnd: rec.getText("custbody_ptg_registro_liq_venta_anden"),
-						 preliqViaEsp: rec.getText("custbody_ptg_liq_viaje_especial"),
+						 preliqCilind: rec.getValue("custbody_ptg_registro_pre_liq"),
+						 preliqEstaci: rec.getValue("custbody_ptg_registro_pre_liq_esta"),
+						 preliqCarbur: rec.getValue("custbody_ptg_registro_pre_liq_carb"),
+						 preliqVenAnd: rec.getValue("custbody_ptg_registro_liq_venta_anden"),
+						 preliqViaEsp: rec.getValue("custbody_ptg_liq_viaje_especial"),
 						 rfcemisor: '',
 						 today: '',
 						 regfiscal: '',
@@ -563,7 +593,13 @@ define(['N/search', 'N/record', 'N/format', 'N/runtime', 'N/https', 'N/xml', 'N/
 						jsonData.rfcrecepFin = jsonData.rfcrecep;
 						jsonData.entityFin = jsonData.entity;
 						jsonData.tipoIndustria = tipoDeIndustria;
-						jsonData.codigoPostalReceptor = codigoPostalCliente;
+
+						if(jsonData.rfcrecep == "XAXX010101000"){
+							var setupConfig = getSetupCFDI(jsonData.subsidiary);
+							jsonData.codigoPostalReceptor = setupConfig.codigoPostalEmisor;
+						} else {
+							jsonData.codigoPostalReceptor = codigoPostalCliente;
+						}
 
 					}
 					 log.audit("jsonData", jsonData);
