@@ -47,14 +47,14 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             form.title = "Servicios Procesados";
           }
           
-        //  if (status == estatusEtapa && tipoServicio == servicioCilindros) {
+          if (status == 2) {
               form.addButton({
                   id: "custpage_drt_to_preliq_cil",
                   label: "Preliquidación Cilindros",
                   functionName: "pasarPreliquidacion()",
               });
-         /* }
-          if (status == estatusEtapa && tipoServicio == servicioEstacionarios) {
+          }
+          /*if (status == estatusEtapa && tipoServicio == servicioEstacionarios) {
             form.addButton({
                 id: "custpage_drt_to_preliq_cil",
                 label: "Preliquidación Estacionarios",
@@ -206,6 +206,8 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
   
        var searchResultCount = numViajeSearchObj.runPaged().count;
        log.audit("searchResultCount", searchResultCount);
+
+       if (context.type == "create") {
   
         if (!numViaje || numViaje == "") {
               var numeroEntero = searchResultCount + 1;
@@ -213,6 +215,7 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
               newRecord.setValue("custrecord_ptg_folio_reg_serv_cil", numeroEntero.toFixed(0));
               newRecord.setValue("name", numeroEntero.toFixed(0));
         }
+      }
         
     } catch (e) {
       log.error({
