@@ -179,7 +179,9 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
              //BÚSQUEDA GUARDADA: PTG - Registro Facturación Generadas Cil Error
              var facturasGeneradasError = search.create({
                 type: "customrecord_drt_ptg_registro_factura",
-                filters: [["custrecord_ptg_num_viaje_fac_","anyof",recId], "AND", ["custrecord_ptg_status","doesnotstartwith","Success"]],
+                filters: [["custrecord_ptg_num_viaje_fac_","anyof",recId], "AND", 
+                ["custrecord_ptg_status","doesnotstartwith","Success"],"AND", 
+                ["isinactive","is","F"]],
                 columns: [
                    search.createColumn({name: "scriptid", sort: search.Sort.ASC, label: "ID de script"})
                 ]
