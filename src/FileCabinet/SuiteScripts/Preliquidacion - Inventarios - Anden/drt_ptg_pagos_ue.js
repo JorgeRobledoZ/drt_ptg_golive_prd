@@ -31,6 +31,12 @@
               var kilometrajeConsumoInterno = customRec.getValue("custrecord_ptg_kilometra_consumo_interno");
               var idCliente = customRec.getValue("custrecord_ptg_pagos_cliente");
               var idDireccion = customRec.getValue("custrecord_ptg_pagos_direccion");
+              var clienteRec = search.lookupFields({
+                type: record.Type.CUSTOMER,
+                id: idCliente,
+                columns: ['custentity_ptg_requiere_factura']
+              });
+              var requiereFactura = clienteRec.custentity_ptg_requiere_factura;
               var objPagos = {};
               var arrayPagos = [];
               var objPagosOportunidad = {};
@@ -1601,16 +1607,12 @@
                 log.audit("Una opcion de pago", opcionPago);
               }
               
-              var solicitaFactura = false;
-              if(idCliente != publicoGeneral){
-                solicitaFactura = true;
-              }
               var objUpdate = {
                 entity: idCliente,
                 custbody_ptg_opcion_pago_obj: objValue,
                 custbody_ptg_opcion_pago: opcionPago,
                 shipaddresslist: internalDireccion,
-                custbody_ptg_cliente_solicita_factura: solicitaFactura,
+                custbody_ptg_cliente_solicita_factura: requiereFactura,
               }
               log.audit("objUpdate", objUpdate);
 
