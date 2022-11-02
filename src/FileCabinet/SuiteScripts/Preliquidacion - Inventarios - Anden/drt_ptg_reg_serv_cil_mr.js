@@ -674,7 +674,7 @@
 
     return {
         getInputData: getInputData,
-        map: map,
+        //map: map,
         reduce: reduce,
         summarize: summarize
     }
