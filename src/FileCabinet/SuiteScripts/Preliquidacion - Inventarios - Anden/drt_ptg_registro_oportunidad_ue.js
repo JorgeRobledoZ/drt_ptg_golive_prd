@@ -13,7 +13,7 @@
  * @NScriptType UserEventScript
  * @NModuleScope SameAccount
  */
-define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime", 'N/ui/serverWidget'], function (drt_mapid_cm, record, search, runtime, serverWidget) {
+define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "N/runtime", 'N/ui/serverWidget', 'N/redirect'], function (drt_mapid_cm, record, search, runtime, serverWidget, redirect) {
   function afterSubmit(context) {
     try {
       if (context.type == "edit") {
@@ -190,6 +190,14 @@ define(['SuiteScripts/drt_custom_module/drt_mapid_cm', "N/record", "N/search", "
             type: "customrecord_ptg_registrooportunidad_",
             id: recId,
             values: objUpdate,
+        });
+
+        redirect.toRecord({
+          type: "customrecord_ptg_preliquicilndros_",
+          id: preliquidacion,
+          parameters: {
+            'reload' : true
+          }
         });
 
       }
