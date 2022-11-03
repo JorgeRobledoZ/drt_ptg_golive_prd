@@ -37,6 +37,8 @@
                 columns: ['custentity_ptg_requiere_factura']
               });
               var requiereFactura = clienteRec.custentity_ptg_requiere_factura;
+              log.audit("clienteRec", clienteRec);
+              log.audit("requiereFactura", requiereFactura);
               var objPagos = {};
               var arrayPagos = [];
               var objPagosOportunidad = {};
@@ -1360,7 +1362,8 @@
                        search.createColumn({name: "custrecord_ptg_saldo_reg_oport", label: "PTG - Saldo"}),
                        search.createColumn({name: "custrecord_ptg_excede_limite_reg_oport", label: "PTG - Excede Límite de Crédito"}),
                        search.createColumn({name: "custrecord_ptg_restriccion_reg_oport", label: "PTG - RESTRICCION"}),
-                       search.createColumn({name: "internalid", sort: search.Sort.DESC, label: "ID interno"})
+                       search.createColumn({name: "internalid", sort: search.Sort.DESC, label: "ID interno"}),
+                       search.createColumn({name: "custrecord_ptg_direccion_registroop_", label: "PTG - Dirección"})
                     ]
                  });
                  var registroCilindroObjCount = registroCilindroObj.runPaged().count;
@@ -1382,7 +1385,8 @@
                   (saldoCil = registroCilindroObjResult[0].getValue({name: "custrecord_ptg_saldo_reg_oport", label: "PTG - Saldo"})),
                   (excedeLimiteCil = registroCilindroObjResult[0].getValue({name: "custrecord_ptg_excede_limite_reg_oport", label: "PTG - Excede Límite de Crédito"})),
                   (restriccionCil = registroCilindroObjResult[0].getValue({name: "custrecord_ptg_restriccion_reg_oport", label: "PTG - RESTRICCION"})),
-                  (idInternoRegistroCil = registroCilindroObjResult[0].getValue({name: "internalid", sort: search.Sort.DESC, label: "ID interno"}));
+                  (idInternoRegistroCil = registroCilindroObjResult[0].getValue({name: "internalid", sort: search.Sort.DESC, label: "ID interno"})),
+                  (idInternoDireccion = registroCilindroObjResult[0].getValue({name: "custrecord_ptg_direccion_registroop_", label: "PTG - Dirección"}));
 
                   for (var j = lineasOld; j < lineas; j++){
                     var recTipoPagoCil = record.create({
@@ -1394,9 +1398,11 @@
                     recTipoPagoCil.setValue("custrecord_ptg_optpreliq_", registroCil);
                     recTipoPagoCil.setValue("custrecord_ptg_tipopago_oportunidad_", tipoPagoArraySublista[j]);
                     recTipoPagoCil.setValue("custrecord_ptg_total_", montoArraySublista[j]);
+                    recTipoPagoCil.setValue("custrecord_ptg_referencia_reg_oport", folioArraySublista[j]);
                     recTipoPagoCil.setValue("custrecord_drt_ptg_registro_oportunidad", registroDesdeOportunidad);
                     recTipoPagoCil.setValue("custrecord_ptg_modificar_met_pago_cilind", urlCil);
                     recTipoPagoCil.setValue("custrecord_ptg_cliente_reg_oport", nombreClienteCil);
+                    recTipoPagoCil.setValue("custrecord_ptg_direccion_registroop_", idInternoDireccion);
                     recTipoPagoCil.setValue("custrecord_ptg_saldo_vencido_reg_oport", saldoVencidoCil);
                     recTipoPagoCil.setValue("custrecord_ptg_limite_credito_reg_oport", limiteCreditoCil);
                     recTipoPagoCil.setValue("custrecord_ptg_saldo_reg_oport", saldoCil);
