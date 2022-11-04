@@ -641,28 +641,7 @@
                                 var numeroEntero = conteoBusqueda + 1;
                                 log.audit('numeroEntero1', numeroEntero);
                                 numeroEntero = numeroEntero + 1
-
-                                let facturaFlete = record.create({
-                                    type: record.Type.VENDOR_BILL,
-                                    isDynamic: true
-                                });
-
-                                facturaFlete.setValue({
-                                    fieldId: 'customform',
-                                    value: form_vendor_bill
-                                });
-
-                                facturaFlete.setValue({
-                                    fieldId: 'entity',
-                                    value: arrayPo[po]['provedorFlete']
-                                });
-
-
-                                facturaFlete.setValue({
-                                    fieldId: 'subsidiary',
-                                    value: arrayPo[po]['subsidiaria_linea'] ? arrayPo[po]['subsidiaria_linea'] : arrayPo[po]['subsidiaria']
-                                });
-
+                                
                                 var fleteUbicacion = 0;
                                 if (arrayPo[po]['tipo_desvio'] == 4) {
                                     fleteUbicacion = arrayPo[po]['planta_desvio']
@@ -670,124 +649,105 @@
                                     fleteUbicacion = arrayPo[po]['location']
                                 }
 
-                                facturaFlete.setValue({
-                                    fieldId: 'location',
-                                    value: fleteUbicacion
-                                });
+                              
 
-                                facturaFlete.setValue({
-                                    fieldId: 'custbody_ptg_fact_flete_',
-                                    value: true
-                                })
-
-                                facturaFlete.setValue({
-                                    fieldId: 'tranid',
-                                    value: 'PTG-Flete-' + numeroEntero
-                                });
-
-                                facturaFlete.setValue({
-                                    fieldId: 'approvalstatus',
-                                    value: 2
-                                });
-
-                                facturaFlete.setValue({
-                                    fieldId: 'memo',
-                                    value: 'factura de flete'
-                                });
-                                
-                                
-                                facturaFlete.setValue({
-                                    fieldId: 'custpage_4601_appliesto',
-                                    value: true
-                                });
-
-                                facturaFlete.setValue({
-                                    fieldId: 'custpage_4601_witaxcode',
-                                    value: 1
-                                });
-
-                                facturaFlete.setValue({
-                                    fieldId: 'custbody_4601_entitytype',
-                                    value: 1
-                                });
-
-                                facturaFlete.selectNewLine({
-                                    sublistId: 'item'
-                                });
-
-                                facturaFlete.setCurrentSublistValue({
-                                    sublistId: "item",
-                                    fieldId: 'item',
-                                    value: item_vendor_bill_flete
-                                });
-
-                                //facturaFlete.setCurrentSublistValue({
-                                //    sublistId: "item",
-                                //    fieldId: 'location',
-                                //    value: objTransaccion.ubicacion
-                                // });
-
-                                facturaFlete.setCurrentSublistValue({
-                                    sublistId: "item",
-                                    fieldId: 'quantity',
-                                    value: 1
-                                });
-
-                                facturaFlete.setCurrentSublistValue({
-                                    sublistId: "item",
-                                    fieldId: 'custcol2',
-                                    value: arrayPo[po]['pg']
-                                });
-
-                                var rateCalculado = arrayPo[po]['litros'] * arrayPo[po]['tarifa_v_senciillo']
-                                log.audit('rateCalculado', rateCalculado);
-
-                                facturaFlete.setCurrentSublistValue({
-                                    sublistId: "item",
-                                    fieldId: 'rate',
-                                    value: rateCalculado.toFixed(6)
-                                });
-                                //custpage_4601_witaxcode
-                                //landedcostcategory
-                                //custcol_4601_witaxapplies
-
-                                facturaFlete.setCurrentSublistValue({
-                                    sublistId: "item",
-                                    fieldId: 'landedcostcategory',
-                                    value: 48
-                                });
-                                
-                                facturaFlete.setCurrentSublistValue({
-                                    sublistId: "item",
-                                    fieldId: 'mandatorytaxcode',
-                                    value: true
-                                });
-
-                                facturaFlete.setCurrentSublistValue({
-                                    sublistId: "item",
-                                    fieldId: 'custcol_4601_witaxapplies',
-                                    value: true
-                                });
-
-                                let articuloCreado1 = facturaFlete.commitLine({
-                                    sublistId: 'item'
-                                });
-
-                                const macros = facturaFlete.getMacros();
-                                log.audit('macros', macros);
-                                for (let macroDisponible in macros) {
-                                    try {
-                                        log.audit(`macros[macroDisponible].id`, macros[macroDisponible].id);
-                                        facturaFlete.executeMacro({
-                                            id: macros[macroDisponible].id
-                                        });
-                                    } catch (e) {
-                                        log.error(`error executeMacro ${macros[macroDisponible].id}`, e.message);
-                                    }
+                                let headers = {
+                                    customform: form_vendor_bill,
+                                    entity: arrayPo[po]['provedorFlete'],
+                                    subsidiary: arrayPo[po]['subsidiaria_linea'] ? arrayPo[po]['subsidiaria_linea'] : arrayPo[po]['subsidiaria'],
+                                    location: fleteUbicacion,
+                                    custbody_ptg_fact_flete_: true,
+                                    tranid: 'PTG-Flete-' + numeroEntero,
+                                    custbody_4601_appliesto: "T",
+                                    
+                                    approvalstatus: 2,
+                                    memo: 'factura de flete',
+                                    custpage_4601_witaxcode:1,
+                                    custbody_4601_entitytype:1,
+                                    
+                        
                                 }
+                                let quantity = 1;
+                                let taxAmount= 0.04;
 
-
-                                idFactura3 = facturaFlete.save();
+                                let rate =  (arrayPo[po]['litros'] * arrayPo[po]['tarifa_v_senciillo']).toFixed(6);
+                                let total = Number(Number(rate).toFixed(2) *  quantity).toFixed(2);
+                                let whAmount = ( Number(total) *Number( taxAmount) ).toFixed(2)* -1;
+                           
+                        
+                                let susblistItems = [
+                                    {
+                                        item: item_vendor_bill_flete,
+                                        quantity: 1,
+                                        custcol2: arrayPo[po]['pg'],
+                                        rate: rate,
+                                        landedcostcategory: 48,
+                                        mandatorytaxcode: true,
+                                        custcol_4601_witaxapplies: true,
+                                        custcol_4601_itemdefaultwitaxcode: 1,
+                                        custcol_4601_witaxcode: 1,
+                                        custcol_4601_witaxbaseamount: total,
+                                        custcol_4601_witaxamount:whAmount,
+                        
+                                    },
+                                    {
+                                        item: 18,
+                                        origlocation: fleteUbicacion,
+                                        origrate:whAmount,
+                                        location: fleteUbicacion,
+                                        custcol_4601_witaxapplies: false,
+                                        custcol_4601_witaxline: "T",
+                                        custcol_4601_witaxline_exp:"T",
+                                        rate: whAmount,
+                                        amount: whAmount,
+                        
+                                    }
+                                        
+                                ];
+                                log.audit('facturaFlete paramFactura', paramFactura);
+                                log.audit('facturaFlete susblistItems', susblistItems);
+                        
+                                let facturaFlete = record.create({
+                                    type: record.Type.VENDOR_BILL,
+                                    isDynamic: true,
+                                    defaultValues: {
+                                        entity: 16148,
+                                        nexus: 1,
+                                        subsidiary: 25
+                                    }
+                                });
+                        
+                                for (var i in headers) {
+                                    facturaFlete.setValue({
+                                        fieldId: i,
+                                        value: headers[i]
+                                    });
+                                }
+              
+                                for (var i in susblistItems) {
+                                    facturaFlete.selectNewLine({
+                                        sublistId: 'item'
+                                    });
+                                    for (var j in susblistItems[i]) {
+                                        facturaFlete.setCurrentSublistValue({
+                                            sublistId: 'item',
+                                            fieldId: j,
+                                            value: susblistItems[i][j],
+                                            forceSyncSourcing: true
+                                        });
+                                    }
+                                    facturaFlete.commitLine({
+                                        sublistId: 'item'
+                                    });
+                                }
+                                try {
+                                    var calculateTax = facturaFlete.getMacro({ id: "getSummaryTaxTotals" });
+                                } catch (error) {
+                                   log.error("calculateTax", error);
+                                }
+                        
+                                let idFactura3 = facturaFlete.save({ enableSourcing: true });
+                        
                                 log.audit('idFacturaFlete', idFactura3);
 
                                 drt_update_record_cm.requestSuitelet("vendorbill", idFactura3, context.newRecord.type, context.newRecord.id);
@@ -810,6 +770,8 @@
                                     fieldId: 'customform',
                                     value: form_transfer_order
                                 });
+
+                                
 
                                 createTransferOrder.setValue({
                                     fieldId: 'subsidiary',
