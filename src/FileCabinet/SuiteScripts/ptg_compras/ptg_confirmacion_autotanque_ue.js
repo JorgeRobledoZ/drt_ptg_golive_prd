@@ -720,16 +720,15 @@
                                     }
                                         
                                 ];
-                                log.audit('facturaFlete paramFactura', paramFactura);
+                                log.audit('facturaFlete paramFactura', headers);
                                 log.audit('facturaFlete susblistItems', susblistItems);
                         
                                 let facturaFlete = record.create({
                                     type: record.Type.VENDOR_BILL,
                                     isDynamic: true,
                                     defaultValues: {
-                                        entity: 16148,
-                                        nexus: 1,
-                                        subsidiary: 25
+                                        entity: headers.entity,
+                                        subsidiary: headers.subsidiary
                                     }
                                 });
                         
