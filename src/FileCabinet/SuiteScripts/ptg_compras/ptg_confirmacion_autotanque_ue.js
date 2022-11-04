@@ -847,7 +847,7 @@
 
                                 createTransferOrder.setValue({
                                     fieldId: 'memo',
-                                    value: "Proceso Desvio a Planta"
+                                    value: "Proceso Desvio a Planta y Desvio a Cliente"
                                 });
 
                                 createTransferOrder.selectNewLine({
@@ -860,18 +860,24 @@
                                     value: arrayPo[po]['item']
                                 });
 
+                                var searchLukoopRateItem = search.lookupFields({
+                                    type: search.Type.INVENTORY_ITEM,
+                                    id: arrayPo[po]['item'],
+                                    columns: ['averagecost']
+                                });
+                                log.audit('searchLukoopRateItem', searchLukoopRateItem);
+
                                 createTransferOrder.setCurrentSublistValue({
                                     sublistId: "item",
                                     fieldId: "quantity",
                                     value: arrayPo[po]['litros']
                                 });
-                                /*
+                                
                                 createTransferOrder.setCurrentSublistValue({
                                     sublistId: "item",
                                     fieldId: "rate",
-                                    value: arrayNewTransaction[h]['precio_unitario']
+                                    value: searchLukoopRateItem.averagecost
                                 });
-                                */
 
                                 createTransferOrder.commitLine({
                                     sublistId: "item",
