@@ -503,7 +503,7 @@
                                     vendorBill.removeLine({
                                         sublistId: 'item',
                                         line: h,
-                                        ignoreRecalc: true
+                                        ignoreRecalc: false
                                     });
                                 } else {
                                     vendorBill.selectLine({
@@ -518,19 +518,35 @@
                                     });
 
                                     const rateConfirmacion = parseFloat(arrayPo[po]['precioConfirmacion'] || 0).toFixed(6);
+                                    log.audit('rateB', rateConfirmacion)
 
                                     vendorBill.setCurrentSublistValue({
                                         sublistId: 'item',
                                         fieldId: 'rate',
                                         value: rateConfirmacion
                                     });
-
+                                    
                                     vendorBill.commitLine({
                                         sublistId: 'item'
                                     });
                                 }
-                            }
 
+                            }
+                            /*
+                            const macros = vendorBill.getMacros();
+                                log.audit('macros', macros);
+                                for (let macroDisponible in macros) {
+                                    try {
+                                        log.audit(`macros[macroDisponible].id`, macros[macroDisponible].id);
+                                        vendorBill.executeMacro({
+                                            id: macros[macroDisponible].id
+                                        });
+                                    } catch (e) {
+                                        log.error(`error executeMacro ${macros[macroDisponible].id}`, e.message);
+                                    }
+                                }
+
+                             */
                             idVendorBill = vendorBill.save({
                                 ignoreMandatoryFields: true,
                                 enableSourcing: true
@@ -745,9 +761,10 @@
                                 } catch (error) {
                                    log.error("calculateTax", error);
                                 }
-                        
-                                let idFactura3 = facturaFlete.save({ enableSourcing: true });
-                        
+                                
+
+
+                                idFactura3 = facturaFlete.save();
                                 log.audit('idFacturaFlete', idFactura3);
 
                                 drt_update_record_cm.requestSuitelet("vendorbill", idFactura3, context.newRecord.type, context.newRecord.id);
@@ -771,7 +788,10 @@
                                     value: form_transfer_order
                                 });
 
-                                
+                                createTransferOrder.setValue({
+                                    fieldId: 'useitemcostastransfercost',
+                                    value: true
+                                });
 
                                 createTransferOrder.setValue({
                                     fieldId: 'subsidiary',
@@ -1110,7 +1130,7 @@
 
                                 saveinvoice = createSalesOrder.save();
 
-                                log.audit('saveinvoice', saveinvoice);
+                                log.audit('save_so', saveinvoice);
 
                                 if (saveinvoice) {
 
@@ -1185,11 +1205,11 @@
                                         value: form_invoice
                                     });
 
-                                    let saveInvoice = invoice.save();
-                                    log.audit('saveInvoice', saveInvoice);
+                                    saveInvoiceInter = invoice.save();
+                                    log.audit('factura_de_venta_cliente ', saveInvoiceInter);
                                 }
                             } catch (error_cliente_desvio) {
-                                log.audit('error_cliente_desvio', error_cliente_desvio);
+                                log.error('error_cliente_desvio', error_cliente_desvio);
                             }
 
                         }
@@ -1621,14 +1641,13 @@
                                     value: true,
                                     line: y
                                 })
-                                /*
+                                
                                 pO.setSublistValue({
                                     sublistId: 'item',
                                     fieldId: 'custcol_ptg_pg_en_uso_',
                                     value: false,
                                     line: y
                                 })
-                                */
                             }
                         }
 
